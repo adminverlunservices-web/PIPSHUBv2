@@ -5,8 +5,7 @@ PIPSHUB is a React/Vite trading application backed by PHP endpoints for Deriv OA
 ## Stack
 
 - React 18 and Vite for the application interface
-- PHP 8.2+ for the session and Deriv API endpoints
-- Apache/XAMPP for local full-stack hosting
+- Vercel Node functions for sessions, OAuth, and Deriv API endpoints
 
 ## Run the frontend
 
@@ -27,7 +26,7 @@ The main React entrypoint is `src/main.jsx`, which mounts the application in `in
 npm run build
 ```
 
-The production bundle is written to `react-dist/`. Copy the project into an Apache document root, enable PHP and cURL, and open the project URL. The root `index.php` serves the built React app when `react-dist/index.html` exists.
+The production bundle is written to `react-dist/`. Deploy the repository to Vercel; `vercel.json` points Vercel at that output directory.
 
 For Vercel, the included `vercel.json` points the deployment output to `react-dist/`.
 
@@ -52,4 +51,4 @@ For a separately hosted frontend, set `VITE_API_BASE_URL` to the API origin and 
 
 ## Repository notes
 
-The legacy PHP files remain in the repository for the existing Apache installation, but the deployed React app uses the Node functions under `api/` instead. `deriv/config.php` is preserved as requested and is not imported by the React build.
+The old PHP pages and duplicate API handlers have been removed. The four requested legacy Deriv files and the root `config.php` remain preserved, but they are not imported by the React build.
