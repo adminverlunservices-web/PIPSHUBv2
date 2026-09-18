@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { apiUrl } from './config';
 
 const nav = [
   ['dashboard', 'Dashboard', '/'],
@@ -30,7 +31,7 @@ function Link({ href, children, className = '', onClick }) {
 }
 
 async function requestJson(url, options) {
-  const response = await fetch(url, options);
+  const response = await fetch(apiUrl(url), { credentials: 'include', ...options });
   const body = await response.text();
   let data;
   try {
@@ -130,7 +131,7 @@ function Dashboard() {
 
 function AccountSetup() {
   const [accounts, setAccounts] = useState([]); const [status, setStatus] = useState('Loading'); const [message, setMessage] = useState(''); const [selected, setSelected] = useState('');
-  useEffect(() => { requestJson('api/deriv-accounts.php', { credentials: 'same-origin' }).then((data) => { setAccounts(data.accounts); setSelected(data.selected_account_id); setStatus(`${data.accounts.length} account${data.accounts.length === 1 ? '' : 's'}`); }).catch((error) => { setStatus('Unavailable'); setMessage(error.message); }); }, []);
+  useEffect(() => { requestJson('api/deriv-accounts.php').then((data) => { setAccounts(data.accounts); setSelected(data.selected_account_id); setStatus(`${data.accounts.length} account${data.accounts.length === 1 ? '' : 's'}`); }).catch((error) => { setStatus('Unavailable'); setMessage(error.message); }); }, []);
   const choose = (account) => { setMessage('Switching account...'); const body = new URLSearchParams({ account_id: account.account_id }); requestJson('api/deriv-accounts.php', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body, credentials: 'same-origin' }).then((data) => { setAccounts(data.accounts); setSelected(data.selected_account_id); setMessage('Account selected.'); }).catch((error) => setMessage(error.message)); };
   return <><Hero kicker="Account control" heading="Account setup." lede="Choose which Deriv account powers your balance and trading session." /><section className="panel table-panel"><PanelHeading kicker="Available accounts" heading="Select an account" action={<span className="badge">{status}</span>} /><div className="account-list">{accounts.length ? accounts.map((account) => <div className="account-row" key={account.account_id}><div><b>{account.account_type === 'real' ? 'Real account' : 'Demo account'}</b><small>{account.account_id} · {account.currency} · {account.status}</small></div><strong>{Number(account.balance).toFixed(2)} {account.currency}</strong><button type="button" disabled={account.account_id === selected} onClick={() => choose(account)}>{account.account_id === selected ? 'Selected' : 'Use account'}</button></div>) : <p className="empty-state">Loading Deriv accounts...</p>}</div><p aria-live="polite">{message}</p></section></>;
 }
