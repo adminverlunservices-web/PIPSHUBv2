@@ -1,0 +1,9 @@
+node_modules/
+react-dist/
+.npm/
+.env
+.env.*
+!.env.example
+*.log
+.vscode/
+Thumbs.db
