@@ -31,16 +31,25 @@ The production bundle is written to `react-dist/`. Copy the project into an Apac
 
 For Vercel, the included `vercel.json` points the deployment output to `react-dist/`.
 
-## Deriv OAuth setup
+## Vercel backend setup
 
-The OAuth client configuration lives in `deriv/config.php`. Register the exact callback URL with Deriv before connecting an account:
+The React app includes Vercel Node functions under `api/` for account data, trading sessions, OAuth, logout, and market validation. Configure these Vercel environment variables:
 
 ```text
-https://your-domain.example/PIPSHUB/deriv/callback.php
+DERIV_CLIENT_ID=your_deriv_client_id
+DERIV_REDIRECT_URI=https://your-project.vercel.app/api/deriv-callback.js
+APP_URL=https://your-project.vercel.app
+SESSION_SECRET=a-long-random-secret
 ```
 
-For local XAMPP testing, use a callback URL that is registered for your local host. Keep access tokens in the PHP session and do not commit private credentials or generated build output.
+Register the exact callback URL with Deriv before connecting an account:
+
+```text
+https://your-project.vercel.app/api/deriv-callback.js
+```
+
+For a separately hosted frontend, set `VITE_API_BASE_URL` to the API origin and set `FRONTEND_ORIGIN` on the API deployment. Do not commit real credentials or generated build output. `.env.example` contains the complete variable list.
 
 ## Repository notes
 
-The legacy PHP pages remain available alongside the React app. The React app is the default interface after a production build, while the PHP API and OAuth routes continue to be served directly by Apache.
+The legacy PHP files remain in the repository for the existing Apache installation, but the deployed React app uses the Node functions under `api/` instead. `deriv/config.php` is preserved as requested and is not imported by the React build.
