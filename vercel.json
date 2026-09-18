@@ -1,0 +1,4 @@
+{
+  "outputDirectory": "react-dist",
+  "framework": "vite"
+}

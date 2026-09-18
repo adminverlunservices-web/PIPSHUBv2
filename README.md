@@ -29,6 +29,8 @@ npm run build
 
 The production bundle is written to `react-dist/`. Copy the project into an Apache document root, enable PHP and cURL, and open the project URL. The root `index.php` serves the built React app when `react-dist/index.html` exists.
 
+For Vercel, the included `vercel.json` points the deployment output to `react-dist/`.
+
 ## Deriv OAuth setup
 
 The OAuth client configuration lives in `deriv/config.php`. Register the exact callback URL with Deriv before connecting an account:
