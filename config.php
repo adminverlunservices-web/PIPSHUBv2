@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 const PIPSHUB_APP_ID = '33Qn9yJLubVP6VQ8F5MoG';
 const PIPSHUB_DERIV_APP_ID = '1089';
-const PIPSHUB_SITE = 'https://customerrelations.site';
+const PIPSHUB_SITE = 'https://customerrelations.online';
 const PIPSHUB_DERIV_AUTH = 'https://auth.deriv.com/oauth2/authorize';
 const PIPSHUB_DERIV_WS = 'wss://ws.derivws.com/websockets/v3';
 
