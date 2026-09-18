@@ -49,6 +49,21 @@ https://your-project.vercel.app/api/deriv-callback.js
 
 For a separately hosted frontend, set `VITE_API_BASE_URL` to the API origin and set `FRONTEND_ORIGIN` on the API deployment. Do not commit real credentials or generated build output. `.env.example` contains the complete variable list.
 
+## Rise/Fall app
+
+The dedicated Rise/Fall trading interface is in `deriv/rise-fall-app`. Deploy it as a separate Vercel project with its Root Directory set to `deriv/rise-fall-app`, then set these variables in that project:
+
+```text
+NEXT_PUBLIC_DERIV_APP_ID=your_deriv_app_id
+NEXT_PUBLIC_DERIV_REDIRECT_URI=https://your-rise-fall-project.vercel.app
+NEXT_PUBLIC_DERIV_OAUTH_SCOPES=trade,account_manage
+NEXT_PUBLIC_DERIV_ENV=production
+```
+
+Set `VITE_RISE_FALL_URL` in the main Vercel project to the deployed Rise/Fall URL. The main PIPSHUB navigation will then open this dedicated app for Rise/Fall trading.
+
+The same navigation exposes the attached Digits and Deriv Bot apps. Deploy them as separate Vercel projects with Root Directories `deriv/digits-no-chart-app` and `deriv/bot-app`, then set `VITE_DIGITS_URL` and `VITE_BOT_URL` in the main project.
+
 ## Repository notes
 
 The old PHP pages and duplicate API handlers have been removed. The four requested legacy Deriv files and the root `config.php` remain preserved, but they are not imported by the React build.
