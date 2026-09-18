@@ -29,6 +29,19 @@ function Link({ href, children, className = '', onClick }) {
   return <a className={className} href={`#${href}`} onClick={onClick}>{children}</a>;
 }
 
+async function requestJson(url, options) {
+  const response = await fetch(url, options);
+  const body = await response.text();
+  let data;
+  try {
+    data = body ? JSON.parse(body) : {};
+  } catch {
+    throw new Error(response.status === 403 ? 'The PHP API is not available on this deployment. Deploy the PHP backend and configure the frontend API URL.' : `API returned an invalid response (${response.status}).`);
+  }
+  if (!response.ok) throw new Error(data.error || `Request failed (${response.status}).`);
+  return data;
+}
+
 function Layout({ route, title, children }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const connected = false;
@@ -117,8 +130,8 @@ function Dashboard() {
 
 function AccountSetup() {
   const [accounts, setAccounts] = useState([]); const [status, setStatus] = useState('Loading'); const [message, setMessage] = useState(''); const [selected, setSelected] = useState('');
-  useEffect(() => { fetch('api/deriv-accounts.php', { credentials: 'same-origin' }).then((response) => response.json().then((data) => ({ ok: response.ok, data }))).then(({ ok, data }) => { if (!ok) throw new Error(data.error || 'Unable to load accounts.'); setAccounts(data.accounts); setSelected(data.selected_account_id); setStatus(`${data.accounts.length} account${data.accounts.length === 1 ? '' : 's'}`); }).catch((error) => { setStatus('Unavailable'); setMessage(error.message); }); }, []);
-  const choose = (account) => { setMessage('Switching account...'); const body = new URLSearchParams({ account_id: account.account_id }); fetch('api/deriv-accounts.php', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body }).then((response) => response.json().then((data) => ({ ok: response.ok, data }))).then(({ ok, data }) => { if (!ok) throw new Error(data.error || 'Account switch failed.'); setAccounts(data.accounts); setSelected(data.selected_account_id); setMessage('Account selected.'); }).catch((error) => setMessage(error.message)); };
+  useEffect(() => { requestJson('api/deriv-accounts.php', { credentials: 'same-origin' }).then((data) => { setAccounts(data.accounts); setSelected(data.selected_account_id); setStatus(`${data.accounts.length} account${data.accounts.length === 1 ? '' : 's'}`); }).catch((error) => { setStatus('Unavailable'); setMessage(error.message); }); }, []);
+  const choose = (account) => { setMessage('Switching account...'); const body = new URLSearchParams({ account_id: account.account_id }); requestJson('api/deriv-accounts.php', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body, credentials: 'same-origin' }).then((data) => { setAccounts(data.accounts); setSelected(data.selected_account_id); setMessage('Account selected.'); }).catch((error) => setMessage(error.message)); };
   return <><Hero kicker="Account control" heading="Account setup." lede="Choose which Deriv account powers your balance and trading session." /><section className="panel table-panel"><PanelHeading kicker="Available accounts" heading="Select an account" action={<span className="badge">{status}</span>} /><div className="account-list">{accounts.length ? accounts.map((account) => <div className="account-row" key={account.account_id}><div><b>{account.account_type === 'real' ? 'Real account' : 'Demo account'}</b><small>{account.account_id} · {account.currency} · {account.status}</small></div><strong>{Number(account.balance).toFixed(2)} {account.currency}</strong><button type="button" disabled={account.account_id === selected} onClick={() => choose(account)}>{account.account_id === selected ? 'Selected' : 'Use account'}</button></div>) : <p className="empty-state">Loading Deriv accounts...</p>}</div><p aria-live="polite">{message}</p></section></>;
 }
 
