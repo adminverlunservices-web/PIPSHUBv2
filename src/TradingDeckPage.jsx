@@ -818,7 +818,7 @@ function TradingDeckPage() {
               </div>
             ))
           ) : (
-            <div className="active-trades-empty">No active trades</div>
+            <div className="active-trades-empty">No Active trades</div>
           )}
         </div>
       </div>

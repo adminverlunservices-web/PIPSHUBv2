@@ -222,7 +222,7 @@
         const renderContracts = () => {
             list.innerHTML = '';
             if (contracts.size === 0) {
-                list.innerHTML = '<p class="empty-state">No open contracts.</p>';
+                list.innerHTML = '<p class="empty-state">No Active trades</p>';
                 return;
             }
             contracts.forEach((contract) => {
