@@ -1,34 +1,35 @@
 .trading-deck-page {
   width: 100%;
   min-height: 100vh;
-  background: linear-gradient(180deg, #071c2d 0%, #081727 100%);
-  color: #edf3ff;
+  background: #071a2b;
+  color: #edf5ff;
   font-family: 'Segoe UI', sans-serif;
-  padding: 18px 18px 30px;
+  padding: 0 0 24px;
 }
 
 .trading-deck-topbar {
   display: flex;
   align-items: center;
   width: 100%;
-  min-height: 74px;
-  border-bottom: 1px solid rgba(141, 165, 189, 0.22);
-  gap: 16px;
+  min-height: 76px;
+  padding: 8px 18px 0 18px;
+  border-bottom: 1px solid rgba(161, 182, 205, 0.18);
+  gap: 14px;
 }
 
 .trading-deck-brand-wrap {
   display: flex;
   align-items: center;
-  gap: 12px;
-  min-width: 250px;
+  gap: 10px;
+  min-width: 270px;
 }
 
 .trading-deck-menu {
-  width: 42px;
-  height: 42px;
-  border: 1px solid rgba(163, 182, 206, 0.38);
-  background: rgba(15, 23, 35, 0.9);
-  border-radius: 12px;
+  width: 28px;
+  height: 28px;
+  border: 1px solid rgba(171, 188, 208, 0.3);
+  background: transparent;
+  border-radius: 10px;
   display: inline-flex;
   flex-direction: column;
   justify-content: center;
@@ -36,12 +37,13 @@
   gap: 4px;
   cursor: pointer;
   padding: 0;
+  margin-right: 4px;
 }
 
 .trading-deck-menu span {
-  width: 16px;
+  width: 14px;
   height: 2px;
-  background: #edf4ff;
+  background: #edf5ff;
   border-radius: 2px;
   display: block;
 }
@@ -50,23 +52,23 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #1f9bff 0%, #0f5ff0 100%);
-  box-shadow: 0 0 18px rgba(33, 103, 237, 0.5);
+  background: linear-gradient(135deg, #1b98ff 0%, #0a69ff 100%);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.18), 0 0 16px rgba(40, 115, 255, 0.45);
 }
 
 .brand-dot {
-  color: #eef8ff;
-  font-size: 1.2rem;
+  color: #f3f8ff;
+  font-size: 1.3rem;
   font-weight: 700;
   line-height: 1;
   transform: translateY(-1px);
 }
 
 .trading-deck-brand-name {
-  font-size: 1.05rem;
+  font-size: 1.1rem;
   font-weight: 700;
   letter-spacing: -0.04em;
   color: #edf5ff;
@@ -76,29 +78,29 @@
   font-size: 1.06rem;
   color: #dfeaf8;
   font-weight: 600;
-  margin-left: 2px;
+  opacity: 0.88;
 }
 
 .trading-deck-search {
   flex: 1 1 auto;
-  max-width: 430px;
-  min-width: 190px;
+  max-width: 400px;
+  min-width: 180px;
   display: flex;
   align-items: center;
   gap: 10px;
   height: 42px;
   border: 1px solid rgba(154, 172, 195, 0.35);
   border-radius: 14px;
-  background: rgba(10, 19, 28, 0.9);
-  color: rgba(202, 216, 235, 0.7);
+  background: rgba(11, 19, 28, 0.8);
+  color: rgba(202, 216, 235, 0.72);
   padding: 0 14px;
   font-size: 0.95rem;
 }
 
 .search-icon {
-  font-size: 1.15rem;
+  font-size: 1.08rem;
   line-height: 1;
-  opacity: 0.8;
+  opacity: 0.9;
 }
 
 .search-text {
@@ -108,23 +110,24 @@
 .trading-deck-tools {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   margin-left: auto;
 }
 
 .tool-pill {
   position: relative;
-  width: 32px;
-  height: 32px;
-  border-radius: 10px;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
   border: 1px solid rgba(157, 179, 202, 0.35);
-  background: rgba(10, 18, 28, 0.85);
+  background: rgba(9, 17, 26, 0.9);
   color: #edf4ff;
-  font-size: 1rem;
+  font-size: 0.8rem;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  padding: 0;
 }
 
 .tool-pill-ghost {
@@ -137,67 +140,69 @@
 
 .notify-dot {
   position: absolute;
-  top: 5px;
-  right: 5px;
-  width: 7px;
-  height: 7px;
+  top: 4px;
+  right: 4px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
-  background: #6ee7b7;
-  box-shadow: 0 0 0 2px #0d1d2b;
+  background: #6fe7bc;
+  box-shadow: 0 0 0 2px #081b2a;
 }
 
 .trading-deck-balance-block {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 0 10px 0 14px;
+  gap: 10px;
+  padding: 0 8px 0 12px;
   border-radius: 14px;
   background: rgba(12, 21, 30, 0.75);
   border: 1px solid rgba(124, 145, 170, 0.25);
+  min-height: 52px;
 }
 
 .balance-copy {
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  justify-content: center;
-  padding: 7px 0;
+  gap: 2px;
+  padding: 6px 0;
 }
 
 .balance-label {
-  font-size: 0.59rem;
+  font-size: 0.57rem;
   letter-spacing: 0.12em;
-  color: #9bb4d0;
+  color: #a0b9d7;
   font-weight: 700;
 }
 
 .balance-copy strong {
-  font-size: 0.98rem;
-  letter-spacing: -0.03em;
+  font-size: 0.97rem;
+  letter-spacing: -0.05em;
   color: #eff9ff;
+  font-weight: 700;
 }
 
 .deposit-button {
   border: none;
   border-radius: 10px;
-  background: linear-gradient(135deg, #69f0c0 0%, #6fe8ca 100%);
+  background: linear-gradient(135deg, #5ef0b8 0%, #5fe8c0 100%);
   color: #071f1c;
   font-weight: 800;
-  padding: 11px 16px;
+  padding: 9px 16px;
   cursor: pointer;
+  letter-spacing: -0.02em;
 }
 
 .debit-badge {
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: rgba(155, 173, 195, 0.18);
-  border: 1px solid rgba(170, 186, 207, 0.27);
+  background: rgba(155, 173, 195, 0.16);
+  border: 1px solid rgba(170, 186, 207, 0.25);
   color: #ecf5ff;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 700;
 }
 
@@ -205,45 +210,45 @@
   display: flex;
   align-items: center;
   gap: 18px;
-  padding-top: 26px;
+  padding: 24px 18px 0 18px;
   flex-wrap: wrap;
 }
 
 .selector-card {
   display: flex;
   align-items: center;
-  gap: 12px;
-  min-width: 270px;
-  min-height: 56px;
-  border-radius: 16px;
-  padding: 0 18px 0 18px;
-  background: rgba(11, 20, 29, 0.75);
-  border: 1px solid rgba(149, 172, 196, 0.33);
+  gap: 14px;
+  min-width: 290px;
+  min-height: 52px;
+  border-radius: 18px;
+  padding: 0 16px 0 18px;
+  background: rgba(11, 20, 29, 0.65);
+  border: 1px solid rgba(149, 172, 196, 0.32);
   color: #edf4ff;
 }
 
 .selector-card.active {
-  border-color: rgba(119, 173, 245, 0.65);
+  border-color: rgba(130, 176, 246, 0.68);
 }
 
 .selector-label {
-  font-size: 0.74rem;
-  letter-spacing: 0.01em;
-  color: #9ab2ce;
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  color: #a0b6d0;
   white-space: nowrap;
 }
 
 .selector-value {
   flex: 1 1 auto;
   font-weight: 600;
-  font-size: 0.92rem;
+  font-size: 0.96rem;
   white-space: nowrap;
   color: #edf4ff;
 }
 
 .selector-caret {
   color: #a8bfd9;
-  font-size: 1.08rem;
+  font-size: 1rem;
 }
 
 @media (max-width: 980px) {
@@ -273,7 +278,7 @@
 
 @media (max-width: 620px) {
   .trading-deck-page {
-    padding: 12px 10px 20px;
+    padding: 0 0 20px;
   }
 
   .trading-deck-brand-wrap {
