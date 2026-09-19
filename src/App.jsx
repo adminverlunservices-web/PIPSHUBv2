@@ -264,9 +264,31 @@ function Builder() { return <><Hero kicker="Visual strategy lab" heading="Assemb
 
 function Bots({ path }) {
   const speed = path === '/speed';
+  const [sampleBots, setSampleBots] = useState([]);
   const [importedBots, setImportedBots] = useState([]);
   const [importStatus, setImportStatus] = useState('');
   const templates = ['Digit Compass', 'Tick Current', 'Quiet Range'];
+  const sampleBotFiles = [
+    'rise-fall-pulse.json',
+    'digits-over-five.json',
+    'accumulator-growth.json',
+    'even-odd-checker.json',
+  ];
+
+  useEffect(() => {
+    let active = true;
+    Promise.all(sampleBotFiles.map((file) => fetch(`/bots/bots/${file}`).then((response) => {
+      if (!response.ok) throw new Error(`Unable to load ${file}.`);
+      return response.json();
+    }))).then((bots) => {
+      if (active) setSampleBots(bots);
+    }).catch(() => {
+      if (active) setImportStatus('Sample bots are unavailable.');
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const importBots = async (event) => {
     const file = event.target.files?.[0];
@@ -314,6 +336,14 @@ function Bots({ path }) {
             <h3>{name}</h3>
             <p>Purpose-built synthetic market strategy with clear entry rules.</p>
             <div className="bot-meta"><span>{index === 0 ? 'R_100' : 'R_75'}</span><span>{speed ? '5 ticks' : 'Medium'}</span><b>{speed ? '0 runs' : 'Use →'}</b></div>
+          </article>
+        ))}
+        {sampleBots.map((bot) => (
+          <article className="bot-card sample" key={bot.name}>
+            <div className="bot-top"><span className="bot-icon">◆</span><span className="badge">Sample</span></div>
+            <h3>{bot.name}</h3>
+            <p>{bot.description}</p>
+            <div className="bot-meta"><span>{bot.market}</span><span>{bot.tradeType}</span><b>Load →</b></div>
           </article>
         ))}
         {importedBots.map((bot, index) => (
