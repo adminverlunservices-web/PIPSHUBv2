@@ -64,6 +64,8 @@ Set `VITE_RISE_FALL_URL` in the main Vercel project to the deployed Rise/Fall UR
 
 The same navigation exposes the attached Digits and Deriv Bot apps. Deploy them as separate Vercel projects with Root Directories `deriv/digits-no-chart-app` and `deriv/bot-app`, then set `VITE_DIGITS_URL` and `VITE_BOT_URL` in the main project. During local Vite development, the Bot link opens the Bot app at `http://localhost:4003`; start it from `deriv/bot-app` with `npm install` and `npm run dev`.
 
+The Accumulators app is available from the main navigation as well. Deploy `deriv/accumulators` as a separate Vercel project, set `VITE_ACCUMULATORS_URL`, and use port `3001` for local development so it does not conflict with Rise/Fall.
+
 ## Repository notes
 
 The old PHP pages and duplicate API handlers have been removed. The four requested legacy Deriv files and the root `config.php` remain preserved, but they are not imported by the React build.

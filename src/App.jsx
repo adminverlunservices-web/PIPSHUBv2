@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
-import { API_BASE_URL, BOT_URL, DIGITS_URL, RISE_FALL_APP_URL, apiUrl } from './config';
+import { ACCUMULATORS_APP_URL, API_BASE_URL, BOT_URL, DIGITS_URL, RISE_FALL_APP_URL, apiUrl } from './config';
 
 const nav = [
   ['dashboard', 'Dashboard', '/'],
   ['account', 'Account Setup', '/account'],
   ['contracts', 'Contracts', '/contracts'],
   ['rise-fall', 'Rise / Fall', '/rise-fall'],
+  ['accumulators', 'Accumulators', '/accumulators'],
   ['digits', 'Digits Trading', DIGITS_URL],
   ['bot-app', 'Deriv Bot', BOT_URL],
   ['builder', 'Bot Builder', '/builder'],
@@ -75,6 +76,11 @@ function RiseFallApp() {
   return <section className="embedded-app"><div className="embedded-toolbar"><div><p className="kicker">Trading application</p><h2>Rise / Fall</h2></div><a className="outline-button" href={RISE_FALL_APP_URL} target="_blank" rel="noreferrer">Open separately ↗</a></div><iframe title="Rise / Fall trading app" src={RISE_FALL_APP_URL} /></section>;
 }
 
+function AccumulatorsApp() {
+  if (!ACCUMULATORS_APP_URL) return <section className="panel" style={{ marginTop: '34px' }}><p className="kicker">Accumulators</p><h2>Production URL not configured.</h2><p>Set <code>VITE_ACCUMULATORS_URL</code> to the deployed Accumulators app URL, then rebuild this project.</p></section>;
+  return <section className="embedded-app"><div className="embedded-toolbar"><div><p className="kicker">Trading application</p><h2>Accumulators</h2></div><a className="outline-button" href={ACCUMULATORS_APP_URL} target="_blank" rel="noreferrer">Open separately ↗</a></div><iframe title="Accumulators trading app" src={ACCUMULATORS_APP_URL} /></section>;
+}
+
 function Hero({ kicker, heading, lede, action }) {
   return <section className="hero-row compact"><div><p className="kicker">{kicker}</p><h2>{heading}</h2><p className="lede">{lede}</p></div>{action}</section>;
 }
@@ -100,16 +106,51 @@ function PulseChart({ market = 'R_100', onMarketChange }) {
       canvas.width = width * ratio;
       canvas.height = height * ratio;
       context.setTransform(ratio, 0, 0, ratio, 0, 0);
-      context.clearRect(0, 0, width, height);
-      context.strokeStyle = '#e1e9e4';
-      for (let y = 28; y < height; y += 42) { context.beginPath(); context.moveTo(0, y); context.lineTo(width, y); context.stroke(); }
+      context.fillStyle = '#171c26';
+      context.fillRect(0, 0, width, height);
+      context.strokeStyle = 'rgba(255,255,255,.055)';
+      context.lineWidth = 1;
+      for (let y = 22; y < height; y += 48) { context.beginPath(); context.moveTo(0, y); context.lineTo(width, y); context.stroke(); }
+      for (let x = 0; x < width; x += Math.max(72, width / 6)) { context.beginPath(); context.moveTo(x, 0); context.lineTo(x, height); context.stroke(); }
       if (prices.length < 2) return;
       const low = Math.min(...prices);
       const high = Math.max(...prices);
       const spread = high - low || 1;
+      const points = prices.map((price, index) => ({ x: index * width / (prices.length - 1), y: 18 + (high - price) / spread * (height - 36) }));
       context.beginPath();
-      prices.forEach((price, index) => { const x = index * width / (prices.length - 1); const y = 16 + (high - price) / spread * (height - 32); index ? context.lineTo(x, y) : context.moveTo(x, y); });
-      context.strokeStyle = '#2377c9'; context.lineWidth = 2; context.stroke();
+      points.forEach(({ x, y }, index) => { index ? context.lineTo(x, y) : context.moveTo(x, y); });
+      context.lineTo(points[points.length - 1].x, height);
+      context.lineTo(points[0].x, height);
+      context.closePath();
+      context.fillStyle = 'rgba(112,118,128,.28)';
+      context.fill();
+      context.beginPath();
+      points.forEach(({ x, y }, index) => { index ? context.lineTo(x, y) : context.moveTo(x, y); });
+      context.strokeStyle = '#c7cbd2';
+      context.lineWidth = 1.35;
+      context.stroke();
+      const latest = points[points.length - 1];
+      context.beginPath();
+      context.arc(latest.x, latest.y, 4.5, 0, Math.PI * 2);
+      context.fillStyle = '#f7f8fa';
+      context.fill();
+      context.strokeStyle = '#737b87';
+      context.lineWidth = 1;
+      context.stroke();
+      const label = Number(prices[prices.length - 1]).toFixed(2);
+      const labelWidth = 58;
+      const labelHeight = 25;
+      const labelX = width - labelWidth - 8;
+      const labelY = Math.max(8, Math.min(height - labelHeight - 8, latest.y - labelHeight / 2));
+      context.fillStyle = '#f7f8fa';
+      context.beginPath();
+      context.roundRect(labelX, labelY, labelWidth, labelHeight, 4);
+      context.fill();
+      context.fillStyle = '#171c26';
+      context.font = "500 11px 'DM Mono', monospace";
+      context.textAlign = 'center';
+      context.textBaseline = 'middle';
+      context.fillText(label, labelX + labelWidth / 2, labelY + labelHeight / 2 + 1);
     };
     try {
       socket = new WebSocket('wss://api.derivws.com/trading/v1/options/ws/public');
@@ -186,6 +227,7 @@ function App() {
   if (path === '/manual') content = <ManualTrading />;
   if (path === '/markets') content = <Markets />;
   if (path === '/rise-fall') content = <RiseFallApp />;
+  if (path === '/accumulators') content = <AccumulatorsApp />;
   if (path === '/bots' || path === '/speed') content = <Bots path={path} />;
   if (simplePages[path]) content = <SimplePage path={path} />;
   return <Layout route={route} title={title}>{content}</Layout>;
