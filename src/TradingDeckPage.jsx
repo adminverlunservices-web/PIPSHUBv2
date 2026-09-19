@@ -281,6 +281,8 @@ function TradingDeckPage() {
   const [tradeDirection, setTradeDirection] = useState('rise');
   const [duration, setDuration] = useState('1');
   const [stake, setStake] = useState(10);
+  const [digit, setDigit] = useState('5');
+  const [multiplier, setMultiplier] = useState('1');
   const [liveQuote, setLiveQuote] = useState(null);
   const marketMeta = {
     R_10: { name: 'Volatility 10 Index', price: 18.42 },
@@ -298,11 +300,15 @@ function TradingDeckPage() {
     'Rise / Fall': { primary: 'Rise', secondary: 'Fall', primaryValue: 'rise', secondaryValue: 'fall' },
     'Touch / No Touch': { primary: 'Touch', secondary: 'No Touch', primaryValue: 'touch', secondaryValue: 'noTouch' },
     'Even / Odd': { primary: 'Even', secondary: 'Odd', primaryValue: 'even', secondaryValue: 'odd' },
+    'Accumulators': { primary: 'Up', secondary: 'Down', primaryValue: 'up', secondaryValue: 'down' },
+    Digits: { primary: 'Over', secondary: 'Under', primaryValue: 'over', secondaryValue: 'under' },
   };
   const activeTradeType = tradeTypeOptions[tradeType] || tradeTypeOptions['Higher / Lower'];
   const currentMarket = marketMeta[market] || marketMeta.R_100;
   const currentPrice = liveQuote ?? currentMarket.price;
   const directionLabel = tradeDirection === activeTradeType.secondaryValue ? activeTradeType.secondary : activeTradeType.primary;
+  const isAccumulatorMode = tradeType === 'Accumulators';
+  const isDigitsMode = tradeType === 'Digits';
   const navItems = [
     { label: 'Dashboard', href: '#/' },
     { label: 'Trading Deck', href: '#/trading-deck', active: true },
@@ -449,6 +455,8 @@ function TradingDeckPage() {
             <option>Rise / Fall</option>
             <option>Touch / No Touch</option>
             <option>Even / Odd</option>
+            <option>Accumulators</option>
+            <option>Digits</option>
           </select>
           <span className="selector-caret">⌄</span>
         </label>
@@ -493,55 +501,139 @@ function TradingDeckPage() {
               </span>
             </div>
 
-            <div className="trade-chooser">
-              <button
-                type="button"
-                className={`trade-option ${tradeDirection === activeTradeType.primaryValue ? 'selected' : ''}`}
-                data-direction={activeTradeType.primaryValue}
-                onClick={() => setTradeDirection(activeTradeType.primaryValue)}
-              >
-                <span className="option-arrow up">↗</span>
-                {activeTradeType.primary}
-              </button>
-              <button
-                type="button"
-                className={`trade-option ${tradeDirection === activeTradeType.secondaryValue ? 'selected' : ''}`}
-                data-direction={activeTradeType.secondaryValue}
-                onClick={() => setTradeDirection(activeTradeType.secondaryValue)}
-              >
-                <span className="option-arrow down">↘</span>
-                {activeTradeType.secondary}
-              </button>
-            </div>
+            {!isAccumulatorMode && !isDigitsMode ? (
+              <div className="trade-chooser">
+                <button
+                  type="button"
+                  className={`trade-option ${tradeDirection === activeTradeType.primaryValue ? 'selected' : ''}`}
+                  data-direction={activeTradeType.primaryValue}
+                  onClick={() => setTradeDirection(activeTradeType.primaryValue)}
+                >
+                  <span className="option-arrow up">↗</span>
+                  {activeTradeType.primary}
+                </button>
+                <button
+                  type="button"
+                  className={`trade-option ${tradeDirection === activeTradeType.secondaryValue ? 'selected' : ''}`}
+                  data-direction={activeTradeType.secondaryValue}
+                  onClick={() => setTradeDirection(activeTradeType.secondaryValue)}
+                >
+                  <span className="option-arrow down">↘</span>
+                  {activeTradeType.secondary}
+                </button>
+              </div>
+            ) : (
+              <div className="trade-chooser">
+                <button
+                  type="button"
+                  className={`trade-option ${tradeDirection === activeTradeType.primaryValue ? 'selected' : ''}`}
+                  data-direction={activeTradeType.primaryValue}
+                  onClick={() => setTradeDirection(activeTradeType.primaryValue)}
+                >
+                  <span className="option-arrow up">{isDigitsMode ? '◉' : '↗'}</span>
+                  {activeTradeType.primary}
+                </button>
+                <button
+                  type="button"
+                  className={`trade-option ${tradeDirection === activeTradeType.secondaryValue ? 'selected' : ''}`}
+                  data-direction={activeTradeType.secondaryValue}
+                  onClick={() => setTradeDirection(activeTradeType.secondaryValue)}
+                >
+                  <span className="option-arrow down">{isDigitsMode ? '◌' : '↘'}</span>
+                  {activeTradeType.secondary}
+                </button>
+              </div>
+            )}
 
             <div className="trade-grid">
-              <label className="field-box">
-                <span className="field-label">Duration</span>
-                <div className="field-value">
-                  <select value={duration} onChange={(event) => setDuration(event.target.value)} className="field-select">
-                    <option value="1">1 minute</option>
-                    <option value="2">2 minutes</option>
-                    <option value="5">5 minutes</option>
-                    <option value="10">10 minutes</option>
-                  </select>
-                  <span className="field-caret">⌄</span>
-                </div>
-              </label>
+              {isDigitsMode ? (
+                <>
+                  <label className="field-box">
+                    <span className="field-label">Digit</span>
+                    <div className="field-value">
+                      <select value={digit} onChange={(event) => setDigit(event.target.value)} className="field-select">
+                        {Array.from({ length: 10 }, (_, index) => (
+                          <option key={index} value={String(index)}>{index}</option>
+                        ))}
+                      </select>
+                      <span className="field-caret">⌄</span>
+                    </div>
+                  </label>
 
-              <label className="field-box">
-                <span className="field-label">Stake</span>
-                <div className="field-value amount-value">
-                  <input
-                    type="number"
-                    min="1"
-                    step="1"
-                    value={stake}
-                    onChange={(event) => setStake(Math.max(1, Number(event.target.value) || 1))}
-                    className="stake-input"
-                    aria-label="Stake amount"
-                  />
-                </div>
-              </label>
+                  <label className="field-box">
+                    <span className="field-label">Stake</span>
+                    <div className="field-value amount-value">
+                      <input
+                        type="number"
+                        min="1"
+                        step="1"
+                        value={stake}
+                        onChange={(event) => setStake(Math.max(1, Number(event.target.value) || 1))}
+                        className="stake-input"
+                        aria-label="Stake amount"
+                      />
+                    </div>
+                  </label>
+                </>
+              ) : isAccumulatorMode ? (
+                <>
+                  <label className="field-box">
+                    <span className="field-label">Duration</span>
+                    <div className="field-value">
+                      <select value={duration} onChange={(event) => setDuration(event.target.value)} className="field-select">
+                        <option value="5">5 minutes</option>
+                        <option value="10">10 minutes</option>
+                        <option value="15">15 minutes</option>
+                        <option value="30">30 minutes</option>
+                      </select>
+                      <span className="field-caret">⌄</span>
+                    </div>
+                  </label>
+
+                  <label className="field-box">
+                    <span className="field-label">Multiplier</span>
+                    <div className="field-value">
+                      <select value={multiplier} onChange={(event) => setMultiplier(event.target.value)} className="field-select">
+                        <option value="1">x1</option>
+                        <option value="2">x2</option>
+                        <option value="5">x5</option>
+                        <option value="10">x10</option>
+                      </select>
+                      <span className="field-caret">⌄</span>
+                    </div>
+                  </label>
+                </>
+              ) : (
+                <>
+                  <label className="field-box">
+                    <span className="field-label">Duration</span>
+                    <div className="field-value">
+                      <select value={duration} onChange={(event) => setDuration(event.target.value)} className="field-select">
+                        <option value="1">1 minute</option>
+                        <option value="2">2 minutes</option>
+                        <option value="5">5 minutes</option>
+                        <option value="10">10 minutes</option>
+                      </select>
+                      <span className="field-caret">⌄</span>
+                    </div>
+                  </label>
+
+                  <label className="field-box">
+                    <span className="field-label">Stake</span>
+                    <div className="field-value amount-value">
+                      <input
+                        type="number"
+                        min="1"
+                        step="1"
+                        value={stake}
+                        onChange={(event) => setStake(Math.max(1, Number(event.target.value) || 1))}
+                        className="stake-input"
+                        aria-label="Stake amount"
+                      />
+                    </div>
+                  </label>
+                </>
+              )}
             </div>
 
             <div className="stake-controls">
