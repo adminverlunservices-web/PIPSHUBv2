@@ -335,11 +335,7 @@ function TradingDeckPage() {
   const [tradeStatus, setTradeStatus] = useState('Ready');
   const [loadedBot, setLoadedBot] = useState(null);
   const [activeTradesMinimized, setActiveTradesMinimized] = useState(false);
-  const [activeTrades, setActiveTrades] = useState([
-    { id: 1, symbol: 'R_100', direction: 'Rise', stake: 25, price: 119.74 },
-    { id: 2, symbol: 'R_50', direction: 'Fall', stake: 15, price: 64.11 },
-    { id: 3, symbol: '1HZ100V', direction: 'Rise', stake: 40, price: 117.82 },
-  ]);
+  const [activeTrades, setActiveTrades] = useState([]);
   const socketRef = useRef(null);
   const marketMeta = {
     R_10: { name: 'Volatility 10 Index', price: 18.42 },
