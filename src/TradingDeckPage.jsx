@@ -66,6 +66,7 @@ function LiveFeedChart({ market = 'R_100', onMarketChange, onQuoteChange }) {
       context.lineWidth = 1;
 
       const plotBottom = height - 26;
+      const currentMarkerX = width * 0.7;
       for (let y = 18; y < plotBottom; y += 42) {
         context.beginPath();
         context.moveTo(0, y);
@@ -87,13 +88,13 @@ function LiveFeedChart({ market = 'R_100', onMarketChange, onQuoteChange }) {
       const spread = high - low || 1;
       const plotHeight = plotBottom - 18;
       const points = prices.map((price, index) => ({
-        x: index * width / (prices.length - 1),
+        x: index * currentMarkerX / (prices.length - 1),
         y: 18 + (high - price) / spread * plotHeight,
       }));
       const latestPrice = prices[prices.length - 1];
       const guideOffset = Math.max(spread * 0.2, spread * 0.08);
-      const guideStart = width * 0.25;
-      const guideEnd = width * 0.85;
+      const guideStart = currentMarkerX;
+      const guideEnd = width - 8;
       const guideY = (value) => Math.max(20, Math.min(plotBottom - 2, 18 + (high - value) / spread * plotHeight));
       const drawGuide = (value, label) => {
         const y = guideY(value);
