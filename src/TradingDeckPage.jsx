@@ -11,23 +11,26 @@ function TradingDeckPage() {
             <span></span>
           </button>
 
-          <div className="trading-deck-brand">
-            <span className="brand-mark">d</span>
-            <span className="brand-word">deriv.</span>
+          <div className="trading-deck-brand-mark" aria-label="Deriv logo">
+            <span className="brand-dot">d</span>
           </div>
 
+          <span className="trading-deck-brand-name">deriv.</span>
           <span className="trading-deck-trade-label">Trade</span>
         </div>
 
         <div className="trading-deck-search">
           <span className="search-icon">⌕</span>
-          <span>Search markets</span>
+          <span className="search-text">Search markets</span>
         </div>
 
         <div className="trading-deck-tools">
-          <button type="button" className="tool-pill">⌘</button>
-          <button type="button" className="tool-pill">◔</button>
-          <button type="button" className="tool-pill">◌</button>
+          <button type="button" className="tool-pill tool-pill-ghost">⌘</button>
+          <button type="button" className="tool-pill tool-pill-ghost">◌</button>
+          <button type="button" className="tool-pill tool-pill-notify">
+            <span className="notify-dot"></span>
+            ◔
+          </button>
         </div>
 
         <div className="trading-deck-balance-block">

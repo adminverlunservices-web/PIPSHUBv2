@@ -269,12 +269,16 @@ function Markets() { return <><Hero kicker="Market intelligence" heading="Read t
 function App() {
   const [path] = useRoute();
   const [route, title] = routeNames[path];
+
+  if (path === '/trading-deck') {
+    return <TradingDeckPage />;
+  }
+
   let content = <Dashboard />;
   if (path === '/account') content = <AccountSetup />;
   if (path === '/contracts') content = <Contracts />;
   if (path === '/builder') content = <Builder />;
   if (path === '/manual') content = <ManualTrading />;
-  if (path === '/trading-deck') content = <TradingDeckPage />;
   if (path === '/markets') content = <Markets />;
   if (path === '/bots' || path === '/speed') content = <Bots path={path} />;
   if (simplePages[path]) content = <SimplePage path={path} />;
