@@ -102,8 +102,8 @@ function LiveFeedChart({ market = 'R_100', onMarketChange, onQuoteChange }) {
         context.lineWidth = 2;
         context.globalAlpha = 0.95;
         context.beginPath();
-        context.moveTo(width * 0.35, guideY);
-        context.lineTo(width * 0.65, guideY);
+        context.moveTo(width * 0.3, guideY);
+        context.lineTo(width * 0.6, guideY);
         context.stroke();
         context.setLineDash([]);
         context.fillStyle = color;
@@ -181,8 +181,8 @@ function LiveFeedChart({ market = 'R_100', onMarketChange, onQuoteChange }) {
       context.strokeStyle = 'rgba(243, 248, 255, 0.9)';
       context.lineWidth = 1.5;
       context.beginPath();
-      context.moveTo(width * 0.35, latest.y);
-      context.lineTo(width * 0.65, latest.y);
+      context.moveTo(width * 0.3, latest.y);
+      context.lineTo(width * 0.6, latest.y);
       context.stroke();
       context.setLineDash([]);
       context.fillStyle = '#f3f8ff';
