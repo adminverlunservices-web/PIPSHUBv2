@@ -264,78 +264,134 @@ function LiveFeedChart({ market = 'R_100', onMarketChange }) {
 }
 
 function TradingDeckPage() {
+  const [balance, setBalance] = useState('--');
+  const [currency, setCurrency] = useState('USD');
+  const [tradeType, setTradeType] = useState('Higher / Lower');
+  const [market, setMarket] = useState('R_100');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  useEffect(() => {
+    let active = true;
+
+    fetch(apiUrl('api/deriv-session.js'), { credentials: 'include' })
+      .then(async (response) => {
+        const text = await response.text();
+        let payload = {};
+
+        try {
+          payload = text ? JSON.parse(text) : {};
+        } catch {
+          if (active) {
+            setBalance('--');
+            setCurrency('USD');
+          }
+          return;
+        }
+
+        if (!active) return;
+
+        if (payload && typeof payload.balance === 'number') {
+          setBalance(`${payload.balance.toFixed(2)}`);
+          setCurrency(payload.currency || 'USD');
+        } else {
+          setBalance('--');
+          setCurrency('USD');
+        }
+      })
+      .catch(() => {
+        if (active) {
+          setBalance('--');
+          setCurrency('USD');
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
   return (
-    <div className="trading-card-page">
-      <div className="trading-card-shell">
-        <div className="trading-card-header">
-          <h1>Open a trade</h1>
-          <button type="button" className="demo-account-button">Demo account</button>
-        </div>
+    <div className="trading-deck-page">
+      <header className="trading-deck-topbar">
+        <div className="trading-deck-brand-wrap">
+          <button className="trading-deck-menu" type="button" aria-label="Toggle menu">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
 
-        <div className="trading-card-chart-wrap">
-          <LiveFeedChart market="R_100" />
-        </div>
-
-        <div className="market-title">Volatility 100 Index</div>
-
-        <div className="trade-section">
-          <div className="label-line">Contract type</div>
-          <div className="contract-toggle">
-            <button type="button" className="contract-option selected">
-              <span className="contract-arrow up">↗</span>
-              Rise
-            </button>
-            <button type="button" className="contract-option">
-              <span className="contract-arrow down">↘</span>
-              Fall
-            </button>
+          <div className="trading-deck-brand-mark" aria-label="Deriv logo">
+            <span className="brand-dot">d</span>
           </div>
+
+          <span className="trading-deck-brand-name">deriv.</span>
+          <span className="trading-deck-trade-label">Trade</span>
         </div>
 
-        <div className="field-block">
-          <div className="label-line">Duration</div>
-          <div className="select-box">
-            <span>1 minute</span>
-            <span className="select-caret">⌄</span>
+        <label className="trading-deck-search" aria-label="Search markets">
+          <span className="search-icon"><SearchIcon /></span>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            placeholder="Search markets"
+            aria-label="Search markets"
+          />
+          <span className="search-shortcut">⌘ K</span>
+        </label>
+
+        <div className="trading-deck-tools">
+          <button type="button" className="tool-pill tool-pill-ghost" aria-label="Filter">
+            <FilterIcon />
+          </button>
+          <button type="button" className="tool-pill tool-pill-ghost" aria-label="Notifications">
+            <BellIcon />
+          </button>
+          <button type="button" className="tool-pill tool-pill-notify" aria-label="Alerts">
+            <span className="notify-dot"></span>
+            <BellIcon />
+          </button>
+        </div>
+
+        <div className="trading-deck-balance-block">
+          <div className="balance-copy">
+            <span className="balance-label">DEMO BALANCE</span>
+            <strong>{balance === '--' ? '--' : `$${Number(balance).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currency}`}</strong>
           </div>
+          <button type="button" className="deposit-button">
+            <WalletIcon />
+            <span>Deposit</span>
+          </button>
+          <div className="debit-badge">JD</div>
         </div>
+      </header>
 
-        <div className="stake-header">
-          <span className="label-line">Stake</span>
-          <span className="balance-text">Balance: $10,000.00</span>
-        </div>
+      <div className="trading-deck-controls">
+        <label className="selector-card">
+          <span className="selector-label">Trade type</span>
+          <select value={tradeType} onChange={(event) => setTradeType(event.target.value)} className="selector-native">
+            <option>Higher / Lower</option>
+            <option>Rise / Fall</option>
+            <option>Touch / No Touch</option>
+            <option>Even / Odd</option>
+          </select>
+          <span className="selector-caret">⌄</span>
+        </label>
 
-        <div className="stake-box">
-          <button type="button" className="step-button" aria-label="Decrease stake">−</button>
-          <div className="stake-value">$ 10.00</div>
-          <button type="button" className="step-button" aria-label="Increase stake">+</button>
-        </div>
+        <label className="selector-card active">
+          <span className="selector-label">Volatility</span>
+          <select value={market} onChange={(event) => setMarket(event.target.value)} className="selector-native">
+            <option value="R_100">Volatility 100 (1s)</option>
+            <option value="R_75">Volatility 75 (1s)</option>
+            <option value="R_50">Volatility 50 (1s)</option>
+            <option value="1HZ10V">Volatility 10 (1s)</option>
+          </select>
+          <span className="selector-caret">⌄</span>
+        </label>
+      </div>
 
-        <div className="quick-stakes">
-          <button type="button">$10</button>
-          <button type="button">$50</button>
-          <button type="button">$100</button>
-        </div>
-
-        <div className="summary-panel">
-          <div className="summary-row">
-            <span>Potential payout</span>
-            <strong>$ 19.20</strong>
-          </div>
-          <div className="summary-row summary-row-profit">
-            <span>Profit</span>
-            <strong>$ 9.20 (92.0%)</strong>
-          </div>
-        </div>
-
-        <button type="button" className="trade-button">
-          <span className="trade-button-icon">◔</span>
-          Trade Rise
-        </button>
-
-        <div className="legal-note">
-          By placing this trade, you agree to the terms and acknowledge the risks involved.
-        </div>
+      <div className="trading-deck-live-panel">
+        <LiveFeedChart market={market} onMarketChange={setMarket} />
       </div>
     </div>
   );
