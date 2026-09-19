@@ -283,6 +283,10 @@ export function AccumulatorView({
         : [],
     [proposal, barrierColor]
   );
+  const growthGuideOffset = Math.min(18, Math.max(6, Math.abs(Number(growthRate) || 1) * 2));
+  const growthGuideStyle = {
+    '--growth-guide-offset': `${growthGuideOffset}%`,
+  } as CSSProperties;
 
   // In edit mode, login/sign-up/account actions are inert (no OAuth navigation
   // out of the editor) — only the theme toggle stays interactive.
@@ -340,7 +344,10 @@ export function AccumulatorView({
           )}
         </div>
       ) : (
-        <div className="relative max-lg:h-[50dvh] lg:h-[min(33.6rem,66vh)] lg:min-h-[384px]">
+        <div
+          className="accumulator-chart-shell relative max-lg:h-[50dvh] lg:h-[min(33.6rem,66vh)] lg:min-h-[384px]"
+          style={growthGuideStyle}
+        >
           <div className={`h-full ${editMode ? 'pointer-events-none select-none' : ''}`}>
             {chartData ? (
               <AccumulatorChart
@@ -361,6 +368,12 @@ export function AccumulatorView({
             ) : (
               <Skeleton className="h-full w-full rounded-md" />
             )}
+          </div>
+          <div className="accumulator-growth-guide accumulator-growth-guide-upper" aria-hidden="true">
+            <span>{growthRate}% growth</span>
+          </div>
+          <div className="accumulator-growth-guide accumulator-growth-guide-lower" aria-hidden="true">
+            <span>{growthRate}% growth</span>
           </div>
 
           {editMode && !rearrangeMode && (
@@ -388,6 +401,7 @@ export function AccumulatorView({
       isLive,
       endEpoch,
       chartBarriers,
+      growthRate,
       contractMarkers,
       rearrangeMode,
       localize,
