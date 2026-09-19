@@ -97,6 +97,7 @@ function PulseChart({ market = 'R_100', onMarketChange }) {
     if (!canvas) return undefined;
     const context = canvas.getContext('2d');
     const prices = [];
+    const times = [];
     let socket;
     let closed = false;
     const draw = () => {
@@ -110,17 +111,19 @@ function PulseChart({ market = 'R_100', onMarketChange }) {
       context.fillRect(0, 0, width, height);
       context.strokeStyle = 'rgba(255,255,255,.055)';
       context.lineWidth = 1;
-      for (let y = 22; y < height; y += 48) { context.beginPath(); context.moveTo(0, y); context.lineTo(width, y); context.stroke(); }
-      for (let x = 0; x < width; x += Math.max(72, width / 6)) { context.beginPath(); context.moveTo(x, 0); context.lineTo(x, height); context.stroke(); }
+      const plotBottom = height - 26;
+      for (let y = 22; y < plotBottom; y += 48) { context.beginPath(); context.moveTo(0, y); context.lineTo(width, y); context.stroke(); }
+      for (let x = 0; x < width; x += Math.max(72, width / 6)) { context.beginPath(); context.moveTo(x, 0); context.lineTo(x, plotBottom); context.stroke(); }
       if (prices.length < 2) return;
       const low = Math.min(...prices);
       const high = Math.max(...prices);
       const spread = high - low || 1;
-      const points = prices.map((price, index) => ({ x: index * width / (prices.length - 1), y: 18 + (high - price) / spread * (height - 36) }));
+      const plotHeight = plotBottom - 18;
+      const points = prices.map((price, index) => ({ x: index * width / (prices.length - 1), y: 18 + (high - price) / spread * plotHeight }));
       context.beginPath();
       points.forEach(({ x, y }, index) => { index ? context.lineTo(x, y) : context.moveTo(x, y); });
-      context.lineTo(points[points.length - 1].x, height);
-      context.lineTo(points[0].x, height);
+      context.lineTo(points[points.length - 1].x, plotBottom);
+      context.lineTo(points[0].x, plotBottom);
       context.closePath();
       context.fillStyle = 'rgba(112,118,128,.28)';
       context.fill();
@@ -151,6 +154,20 @@ function PulseChart({ market = 'R_100', onMarketChange }) {
       context.textAlign = 'center';
       context.textBaseline = 'middle';
       context.fillText(label, labelX + labelWidth / 2, labelY + labelHeight / 2 + 1);
+      context.fillStyle = 'rgba(210,216,225,.62)';
+      context.font = "10px 'DM Mono', monospace";
+      context.textAlign = 'right';
+      context.textBaseline = 'middle';
+      [high, low + spread / 2, low].forEach((value, index) => context.fillText(value.toFixed(2), width - 8, 18 + index * plotHeight / 2));
+      context.textAlign = 'center';
+      context.textBaseline = 'top';
+      const firstTime = times[0] || Date.now();
+      const lastTime = times[times.length - 1] || firstTime;
+      const timeRange = Math.max(lastTime - firstTime, 1);
+      [0, .33, .66, 1].forEach((position) => {
+        const timestamp = firstTime + timeRange * position;
+        context.fillText(new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }), width * position, plotBottom + 7);
+      });
     };
     try {
       socket = new WebSocket('wss://api.derivws.com/trading/v1/options/ws/public');
@@ -158,8 +175,8 @@ function PulseChart({ market = 'R_100', onMarketChange }) {
       socket.addEventListener('message', (event) => {
         const message = JSON.parse(event.data);
         if (message.error) setTick(message.error.message || 'Market data unavailable');
-        if (message.history?.prices) { prices.push(...message.history.prices.slice(-80)); draw(); socket.send(JSON.stringify({ ticks: market, subscribe: 1 })); }
-        if (message.tick) { prices.push(Number(message.tick.quote)); if (prices.length > 80) prices.shift(); draw(); setTick(`${Number(message.tick.quote).toFixed(2)} · live`); }
+        if (message.history?.prices) { const historyPrices = message.history.prices.slice(-80); prices.push(...historyPrices); times.push(...(message.history.times?.slice(-historyPrices.length).map((value) => Number(value) * 1000) || historyPrices.map((_, index) => Date.now() - (historyPrices.length - index) * 1000))); draw(); socket.send(JSON.stringify({ ticks: market, subscribe: 1 })); }
+        if (message.tick) { prices.push(Number(message.tick.quote)); times.push(Number(message.tick.epoch || Date.now() / 1000) * 1000); if (prices.length > 80) { prices.shift(); times.shift(); } draw(); setTick(`${Number(message.tick.quote).toFixed(2)} · live`); }
       });
       socket.addEventListener('error', () => setTick('Unable to connect to market data'));
       socket.addEventListener('close', () => { if (!closed) setTick('Market data disconnected'); });
@@ -175,8 +192,9 @@ function Dashboard() {
   const [market, setMarket] = useState('R_100');
   const [balance, setBalance] = useState('--');
   const [balanceStatus, setBalanceStatus] = useState('Connect Deriv to begin');
+  const marketNames = { R_100: 'Volatility 100 Index', R_75: 'Volatility 75 Index', R_50: 'Volatility 50 Index', '1HZ10V': 'Volatility 10 (1s)' };
   useEffect(() => { fetch(apiUrl('api/deriv-session.js'), { credentials: 'include' }).then((response) => response.json().then((data) => ({ ok: response.ok, data }))).then(({ ok, data }) => { if (!ok || typeof data.balance !== 'number') throw new Error(data.error || 'Connect Deriv to begin'); setBalance(`${data.balance.toFixed(2)} ${data.currency}`); setBalanceStatus(`Live ${data.account_type} account balance`); }).catch((error) => setBalanceStatus(error.message)); }, []);
-  return <><section className="hero-row"><div><p className="kicker">Market command center</p><h2>Trade with a clearer signal.</h2><p className="lede">Build, test, and monitor Deriv strategies from one focused workspace.</p></div><Link className="primary-button" href="/builder">Create a bot <span>+</span></Link></section><section className="metric-grid"><article className="metric"><span>Account balance</span><strong>{balance}</strong><small>{balanceStatus}</small></article><article className="metric"><span>Open positions</span><strong>0</strong><small className="neutral">No active contracts</small></article><article className="metric"><span>Session return</span><strong>--</strong><small className="neutral">Awaiting market data</small></article></section><section className="dashboard-grid"><article className="panel chart-panel"><div className="panel-heading"><div><p className="kicker">Live pulse</p><h3>Volatility 100 Index</h3></div></div><PulseChart market={market} onMarketChange={setMarket} /></article><article className="panel signal-panel"><PanelHeading kicker="Strategy feed" heading="Latest signals" action={<span className="live-tag">LIVE</span>} /><div className="signal-list"><div><b>Digit Over</b><span>R_100 · 1 min</span><em>Ready</em></div><div><b>Rise / Fall</b><span>R_75 · 5 ticks</span><em>Ready</em></div><div><b>Even / Odd</b><span>1HZ10V · 3 ticks</span><em>Ready</em></div></div><Link className="text-link" href="/markets">Open analysis →</Link></article></section><section className="quick-row"><Link href="/manual"><span>01</span><b>Manual trading</b><small>Place a focused contract</small></Link><Link href="/smart"><span>02</span><b>Smart trading</b><small>Let signals guide entries</small></Link><Link href="/speed"><span>03</span><b>Speed bots</b><small>Automate rapid strategies</small></Link></section></>;
+  return <><section className="hero-row"><div><p className="kicker">Market command center</p><h2>Trade with a clearer signal.</h2><p className="lede">Build, test, and monitor Deriv strategies from one focused workspace.</p></div><Link className="primary-button" href="/builder">Create a bot <span>+</span></Link></section><section className="metric-grid"><article className="metric"><span>Account balance</span><strong>{balance}</strong><small>{balanceStatus}</small></article><article className="metric"><span>Open positions</span><strong>0</strong><small className="neutral">No active contracts</small></article><article className="metric"><span>Session return</span><strong>--</strong><small className="neutral">Awaiting market data</small></article></section><section className="dashboard-grid"><article className="panel chart-panel"><div className="panel-heading"><div><p className="kicker">Live pulse</p><h3>{marketNames[market]}</h3></div></div><PulseChart market={market} onMarketChange={setMarket} /></article><article className="panel signal-panel"><PanelHeading kicker="Strategy feed" heading="Latest signals" action={<span className="live-tag">LIVE</span>} /><div className="signal-list"><div><b>Digit Over</b><span>R_100 · 1 min</span><em>Ready</em></div><div><b>Rise / Fall</b><span>R_75 · 5 ticks</span><em>Ready</em></div><div><b>Even / Odd</b><span>1HZ10V · 3 ticks</span><em>Ready</em></div></div><Link className="text-link" href="/markets">Open analysis →</Link></article></section><section className="quick-row"><Link href="/manual"><span>01</span><b>Manual trading</b><small>Place a focused contract</small></Link><Link href="/smart"><span>02</span><b>Smart trading</b><small>Let signals guide entries</small></Link><Link href="/speed"><span>03</span><b>Speed bots</b><small>Automate rapid strategies</small></Link></section></>;
 }
 
 function AccountSetup() {
