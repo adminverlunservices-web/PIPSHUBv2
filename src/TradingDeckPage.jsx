@@ -90,6 +90,29 @@ function LiveFeedChart({ market = 'R_100', onMarketChange, onQuoteChange }) {
         x: index * width / (prices.length - 1),
         y: 18 + (high - price) / spread * plotHeight,
       }));
+      const latestPrice = prices[prices.length - 1];
+      const guideOffset = Math.max(spread * 0.2, spread * 0.08);
+      const drawGuide = (value, label, color) => {
+        const rawGuideY = 18 + (high - value) / spread * plotHeight;
+        const guideY = Math.max(20, Math.min(plotBottom - 2, rawGuideY));
+
+        context.save();
+        context.setLineDash([10, 7]);
+        context.strokeStyle = color;
+        context.lineWidth = 2;
+        context.globalAlpha = 0.95;
+        context.beginPath();
+        context.moveTo(0, guideY);
+        context.lineTo(width, guideY);
+        context.stroke();
+        context.setLineDash([]);
+        context.fillStyle = color;
+        context.font = "600 10px 'Segoe UI', sans-serif";
+        context.textAlign = 'right';
+        context.textBaseline = 'bottom';
+        context.fillText(label, width - 8, guideY - 4);
+        context.restore();
+      };
 
       const drawLine = () => {
         context.beginPath();
@@ -146,6 +169,11 @@ function LiveFeedChart({ market = 'R_100', onMarketChange, onQuoteChange }) {
       } else {
         drawLine();
       }
+
+      // Keep the growth guides above every chart mode so they remain long,
+      // visible, and readable over the live series.
+      drawGuide(latestPrice + guideOffset, 'Upper guide', '#63d1a1');
+      drawGuide(latestPrice - guideOffset, 'Lower guide', '#f0a36b');
 
       const latest = points[points.length - 1];
       context.beginPath();
