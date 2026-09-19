@@ -392,6 +392,82 @@ function TradingDeckPage() {
 
       <div className="trading-deck-live-panel">
         <LiveFeedChart market={market} onMarketChange={setMarket} />
+
+        <div className="trading-card-wrap">
+          <div className="trading-card-shell">
+            <div className="trading-card-header">
+              <div>
+                <span className="trading-card-kicker">Trade</span>
+                <h2>Volatility 100 Index</h2>
+              </div>
+              <button type="button" className="demo-account-button">Demo account</button>
+            </div>
+
+            <div className="trading-card-market-row">
+              <div className="price-stat">
+                <span>Current price</span>
+                <strong>119.74</strong>
+              </div>
+              <span className="market-trend positive">+2.45%</span>
+            </div>
+
+            <div className="trade-chooser">
+              <button type="button" className="trade-option selected">
+                <span className="option-arrow up">↗</span>
+                Rise
+              </button>
+              <button type="button" className="trade-option">
+                <span className="option-arrow down">↘</span>
+                Fall
+              </button>
+            </div>
+
+            <div className="trade-grid">
+              <div className="field-box">
+                <span className="field-label">Duration</span>
+                <div className="field-value">
+                  <span>1 minute</span>
+                  <span className="field-caret">⌄</span>
+                </div>
+              </div>
+
+              <div className="field-box">
+                <span className="field-label">Stake</span>
+                <div className="field-value amount-value">
+                  <span>$ 10.00</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="stake-controls">
+              <button type="button" className="step-button" aria-label="Decrease stake">−</button>
+              <div className="stake-display">$ 10.00</div>
+              <button type="button" className="step-button" aria-label="Increase stake">+</button>
+            </div>
+
+            <div className="quick-stakes">
+              <button type="button">$10</button>
+              <button type="button">$50</button>
+              <button type="button" className="is-selected">$100</button>
+            </div>
+
+            <div className="summary-panel">
+              <div className="summary-row">
+                <span>Potential payout</span>
+                <strong>$ 19.20</strong>
+              </div>
+              <div className="summary-row payout-row">
+                <span>Profit</span>
+                <strong>$ 9.20 (92.0%)</strong>
+              </div>
+            </div>
+
+            <button type="button" className="trade-submit-button">
+              <span className="submit-bullet">◔</span>
+              Trade Rise
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
