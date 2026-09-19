@@ -53,6 +53,8 @@ For a separately hosted frontend, set `VITE_API_BASE_URL` to the API origin and 
 
 Rise / Fall, Digits Trading, Accumulators, Bot Builder, Trading Bots, and Speed Bots are restored as internal React workspace pages and use the main application's hash navigation.
 
+Manual Trading uses the default PIPSHUBv2 Vite React page.
+
 ## Repository notes
 
 The old PHP pages and duplicate API handlers have been removed. The four requested legacy Deriv files and the root `config.php` remain preserved, but they are not imported by the React build.
