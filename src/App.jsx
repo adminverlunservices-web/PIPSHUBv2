@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { API_BASE_URL, BOT_URL, DIGITS_URL, apiUrl } from './config';
+import { API_BASE_URL, BOT_URL, DIGITS_URL, RISE_FALL_URL, apiUrl } from './config';
 
 const nav = [
   ['dashboard', 'Dashboard', '/'],
   ['account', 'Account Setup', '/account'],
   ['contracts', 'Contracts', '/contracts'],
-  ['rise-fall', 'Rise / Fall', BOT_URL],
+  ['rise-fall', 'Rise / Fall', RISE_FALL_URL],
   ['digits', 'Digits Trading', DIGITS_URL],
   ['bot-app', 'Deriv Bot', BOT_URL],
   ['builder', 'Bot Builder', '/builder'],

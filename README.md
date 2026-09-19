@@ -62,7 +62,7 @@ NEXT_PUBLIC_DERIV_ENV=production
 
 Set `VITE_RISE_FALL_URL` in the main Vercel project to the deployed Rise/Fall URL. The main PIPSHUB navigation will then open this dedicated app for Rise/Fall trading.
 
-The same navigation exposes the attached Digits and Deriv Bot apps. Deploy them as separate Vercel projects with Root Directories `deriv/digits-no-chart-app` and `deriv/bot-app`, then set `VITE_DIGITS_URL` and `VITE_BOT_URL` in the main project.
+The same navigation exposes the attached Digits and Deriv Bot apps. Deploy them as separate Vercel projects with Root Directories `deriv/digits-no-chart-app` and `deriv/bot-app`, then set `VITE_DIGITS_URL` and `VITE_BOT_URL` in the main project. During local Vite development, the Bot link opens the Bot app at `http://localhost:4003`; start it from `deriv/bot-app` with `npm install` and `npm run dev`.
 
 ## Repository notes
 
