@@ -1,10 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import TradingDeckPage from './TradingDeckPage';
 import { API_BASE_URL, apiUrl } from './config';
-import riseFallPulseBot from '../bots/bots/rise-fall-pulse.json';
-import digitsOverFiveBot from '../bots/bots/digits-over-five.json';
-import accumulatorGrowthBot from '../bots/bots/accumulator-growth.json';
-import evenOddCheckerBot from '../bots/bots/even-odd-checker.json';
+import { sampleBots } from './sampleBots';
 
 const nav = [
   ['dashboard', 'Dashboard', '/'],
@@ -271,8 +268,6 @@ function Bots({ path }) {
   const [importedBots, setImportedBots] = useState([]);
   const [importStatus, setImportStatus] = useState('');
   const templates = ['Digit Compass', 'Tick Current', 'Quiet Range'];
-  const sampleBots = [riseFallPulseBot, digitsOverFiveBot, accumulatorGrowthBot, evenOddCheckerBot];
-
   const importBots = async (event) => {
     const file = event.target.files?.[0];
     event.target.value = '';
