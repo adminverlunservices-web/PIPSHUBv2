@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import TradesPage from './TradesPage';
 import { API_BASE_URL, apiUrl } from './config';
 
 const nav = [
@@ -273,7 +272,6 @@ function App() {
   if (path === '/contracts') content = <Contracts />;
   if (path === '/builder') content = <Builder />;
   if (path === '/manual') content = <ManualTrading />;
-  if (path === '/rise-fall') content = <TradesPage />;
   if (path === '/markets') content = <Markets />;
   if (path === '/bots' || path === '/speed') content = <Bots path={path} />;
   if (simplePages[path]) content = <SimplePage path={path} />;
