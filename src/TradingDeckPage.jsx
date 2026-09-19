@@ -333,6 +333,7 @@ function TradingDeckPage() {
   const [multiplier, setMultiplier] = useState('1');
   const [liveQuote, setLiveQuote] = useState(null);
   const [tradeStatus, setTradeStatus] = useState('Ready');
+  const [loadedBot, setLoadedBot] = useState(null);
   const [activeTradesMinimized, setActiveTradesMinimized] = useState(false);
   const [activeTrades, setActiveTrades] = useState([
     { id: 1, symbol: 'R_100', direction: 'Rise', stake: 25, price: 119.74 },
@@ -378,6 +379,27 @@ function TradingDeckPage() {
   const payout = Number((stake * 1.92).toFixed(2));
   const profit = Number((payout - stake).toFixed(2));
   const profitPercent = Number(((profit / stake) * 100).toFixed(1));
+  const loadedBotScript = loadedBot?.script
+    || (Array.isArray(loadedBot?.scripts) ? loadedBot.scripts.join('\n') : '');
+
+  useEffect(() => {
+    try {
+      const storedBot = localStorage.getItem('pipshub:selected-bot');
+      if (storedBot) {
+        const parsedBot = JSON.parse(storedBot);
+        if (parsedBot && typeof parsedBot.name === 'string' && parsedBot.name.trim()) {
+          setLoadedBot(parsedBot);
+          if (typeof parsedBot.market === 'string' && marketMeta[parsedBot.market]) setMarket(parsedBot.market);
+          if (typeof parsedBot.tradeType === 'string' && tradeTypeOptions[parsedBot.tradeType]) {
+            setTradeType(parsedBot.tradeType);
+            setTradeDirection(tradeTypeOptions[parsedBot.tradeType].primaryValue);
+          }
+        }
+      }
+    } catch {
+      localStorage.removeItem('pipshub:selected-bot');
+    }
+  }, []);
 
   const stopTrade = (tradeId) => {
     setActiveTrades((current) => current.filter((trade) => trade.id !== tradeId));
@@ -631,6 +653,7 @@ function TradingDeckPage() {
               <div>
                 <span className="trading-card-kicker">Trade</span>
                 <h2>{currentMarket.name}</h2>
+                {loadedBot && <span className="loaded-bot-label">Bot loaded: {loadedBot.name}</span>}
               </div>
               <button type="button" className="demo-account-button">Demo account</button>
             </div>
@@ -833,6 +856,12 @@ function TradingDeckPage() {
               Trade {directionLabel}
             </button>
             <p className="trade-status" aria-live="polite">{tradeStatus}</p>
+            {loadedBotScript && (
+              <details className="loaded-bot-script">
+                <summary>Loaded bot script</summary>
+                <pre>{loadedBotScript}</pre>
+              </details>
+            )}
           </div>
         </div>
       </div>

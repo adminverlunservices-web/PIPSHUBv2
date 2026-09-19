@@ -262,7 +262,72 @@ function SimplePage({ path }) {
 
 function Builder() { return <><Hero kicker="Visual strategy lab" heading="Assemble your next bot." lede="Choose a market, define the contract, and arrange the logic blocks that drive execution." action={<button className="primary-button">Save strategy <span>↓</span></button>} /><section className="builder-layout"><article className="panel builder-controls"><PanelHeading kicker="Parameters" heading="Bot settings" action={<span className="badge">Draft</span>} /><label>Market<select><option>Volatility 100 Index</option><option>Volatility 75 Index</option><option>1HZ10V</option></select></label><label>Contract type<select><option>Digits Over / Under</option><option>Rise / Fall</option><option>Even / Odd</option></select></label><div className="two-col"><label>Duration<input type="number" defaultValue="5" min="1" /></label><label>Unit<select><option>Ticks</option><option>Minutes</option></select></label></div><button className="outline-button">Add condition <span>+</span></button></article><article className="panel workspace"><PanelHeading kicker="Logic canvas" heading="Entry conditions" action={<span className="canvas-state"><i /> Ready</span>} /><div className="block-stack"><div className="logic-block blue"><span className="grip">::</span><div><b>When market updates</b><small>On every incoming tick</small></div><strong>...</strong></div><div className="logic-block coral"><span className="grip">::</span><div><b>Digit last tick</b><small>is greater than 5</small></div><button aria-label="Remove condition">x</button></div><div className="drop-zone">Drop a condition here</div></div><div className="code-preview"><span>Generated strategy</span><code>if (lastDigit &gt; 5) {'{'} placeContract(); {'}'}</code></div></article></section></>; }
 
-function Bots({ path }) { const speed = path === '/speed'; return <><Hero kicker={speed ? 'Rapid automation' : 'Strategy catalog'} heading={speed ? 'Speed bots.' : 'Trading bots.'} lede={speed ? 'Launch lightweight strategies for short contract cycles with clear limits.' : 'Browse purpose-built templates and send any one of them into the builder.'} action={<Link className="primary-button" href="/builder">Build custom <span>+</span></Link>} /><section className="bot-grid">{['Digit Compass', 'Tick Current', 'Quiet Range'].map((name, index) => <article className={`bot-card ${index === 0 ? 'selected' : ''}`} key={name}><div className="bot-top"><span className="bot-icon">{speed ? '⚡' : '▣'}</span><span className="badge">{speed ? 'Ready' : 'Template'}</span></div><h3>{name}</h3><p>Purpose-built synthetic market strategy with clear entry rules.</p><div className="bot-meta"><span>{index === 0 ? 'R_100' : 'R_75'}</span><span>{speed ? '5 ticks' : 'Medium'}</span><b>{speed ? '0 runs' : 'Use →'}</b></div></article>)}</section></>; }
+function Bots({ path }) {
+  const speed = path === '/speed';
+  const [importedBots, setImportedBots] = useState([]);
+  const [importStatus, setImportStatus] = useState('');
+  const templates = ['Digit Compass', 'Tick Current', 'Quiet Range'];
+
+  const importBots = async (event) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+
+    try {
+      const parsed = JSON.parse(await file.text());
+      const candidates = Array.isArray(parsed) ? parsed : parsed?.bots;
+      if (!Array.isArray(candidates) || candidates.length === 0) {
+        throw new Error('The file must contain a non-empty bot list.');
+      }
+      const validBots = candidates.filter((bot) => bot && typeof bot === 'object' && typeof bot.name === 'string' && bot.name.trim());
+      if (!validBots.length) throw new Error('No named bots were found in the selected file.');
+      setImportedBots(validBots);
+      setImportStatus(`${validBots.length} bot${validBots.length === 1 ? '' : 's'} imported.`);
+      localStorage.setItem('pipshub:selected-bot', JSON.stringify(validBots[0]));
+      window.location.hash = '/trading-deck';
+    } catch (error) {
+      setImportStatus(error instanceof Error ? error.message : 'Unable to import bots.');
+    }
+  };
+
+  return (
+    <>
+      <Hero
+        kicker={speed ? 'Rapid automation' : 'Strategy catalog'}
+        heading={speed ? 'Speed bots.' : 'Trading bots.'}
+        lede={speed ? 'Launch lightweight strategies for short contract cycles with clear limits.' : 'Browse purpose-built templates and send any one of them into the builder.'}
+        action={
+          <div className="hero-actions">
+            <label className="outline-button import-bots-button">
+              Import bots
+              <input type="file" accept=".json,application/json" onChange={importBots} />
+            </label>
+            <Link className="primary-button" href="/builder">Build custom <span>+</span></Link>
+          </div>
+        }
+      />
+      {importStatus && <p className="import-status" role="status">{importStatus}</p>}
+      <section className="bot-grid">
+        {templates.map((name, index) => (
+          <article className={`bot-card ${index === 0 ? 'selected' : ''}`} key={name}>
+            <div className="bot-top"><span className="bot-icon">{speed ? '⚡' : '▣'}</span><span className="badge">{speed ? 'Ready' : 'Template'}</span></div>
+            <h3>{name}</h3>
+            <p>Purpose-built synthetic market strategy with clear entry rules.</p>
+            <div className="bot-meta"><span>{index === 0 ? 'R_100' : 'R_75'}</span><span>{speed ? '5 ticks' : 'Medium'}</span><b>{speed ? '0 runs' : 'Use →'}</b></div>
+          </article>
+        ))}
+        {importedBots.map((bot, index) => (
+          <article className="bot-card imported" key={`${bot.name}-${index}`}>
+            <div className="bot-top"><span className="bot-icon">↥</span><span className="badge">Imported</span></div>
+            <h3>{bot.name.trim()}</h3>
+            <p>{typeof bot.description === 'string' && bot.description.trim() ? bot.description : 'Imported strategy ready to configure.'}</p>
+            <div className="bot-meta"><span>{bot.market || 'Custom'}</span><span>{bot.contract || 'Strategy'}</span><b>Use →</b></div>
+          </article>
+        ))}
+      </section>
+    </>
+  );
+}
 
 function Markets() { return <><Hero kicker="Market intelligence" heading="Read the market." lede="A compact view of volatility, tick flow, and contract readiness." action={<select className="market-select"><option>All synthetic markets</option><option>Volatility indices</option><option>1HZ indices</option></select>} /><section className="analysis-grid"><article className="panel"><PanelHeading kicker="Market matrix" heading="Live conditions" action={<span className="connection"><i /> Polling</span>} /><table><thead><tr><th>Market</th><th>Spread</th><th>Tick flow</th><th>Bias</th></tr></thead><tbody>{[['R_100', '0.01', '88%', 'Bullish'], ['R_75', '0.02', '64%', 'Neutral'], ['R_50', '0.01', '52%', 'Quiet'], ['1HZ10V', '0.01', '76%', 'Active']].map(([name, spread, flow, bias]) => <tr key={name}><td>{name}</td><td>{spread}</td><td><span className="bar"><i style={{ width: flow }} /></span></td><td className="positive">{bias}</td></tr>)}</tbody></table></article><article className="panel checklist"><p className="kicker">Pre-flight</p><h3>Before you trade</h3><label><input type="checkbox" /> Account connected</label><label><input type="checkbox" /> Market selected</label><label><input type="checkbox" /> Risk limit set</label><Link className="outline-button full" href="/manual">Open trading desk</Link></article></section></>; }
 
