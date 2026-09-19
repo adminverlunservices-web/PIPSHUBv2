@@ -1,10 +1,11 @@
 .trading-deck-page {
   width: 100%;
   min-height: 100vh;
-  background: #071a2b;
+  background: #071a2c;
   color: #edf5ff;
   font-family: 'Segoe UI', sans-serif;
-  padding: 0 0 24px;
+  padding: 0;
+  overflow: hidden;
 }
 
 .trading-deck-topbar {
@@ -12,23 +13,25 @@
   align-items: center;
   width: 100%;
   min-height: 76px;
-  padding: 8px 18px 0 18px;
-  border-bottom: 1px solid rgba(161, 182, 205, 0.18);
-  gap: 14px;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 8px 18px 6px 18px;
+  border-bottom: 1px solid rgba(160, 180, 204, 0.22);
+  gap: 18px;
 }
 
 .trading-deck-brand-wrap {
   display: flex;
   align-items: center;
   gap: 10px;
-  min-width: 270px;
+  min-width: 290px;
 }
 
 .trading-deck-menu {
   width: 28px;
   height: 28px;
-  border: 1px solid rgba(171, 188, 208, 0.3);
-  background: transparent;
+  border: 1px solid rgba(170, 188, 206, 0.26);
+  background: rgba(9, 16, 23, 0.82);
   border-radius: 10px;
   display: inline-flex;
   flex-direction: column;
@@ -37,13 +40,13 @@
   gap: 4px;
   cursor: pointer;
   padding: 0;
-  margin-right: 4px;
+  margin-right: 5px;
 }
 
 .trading-deck-menu span {
   width: 14px;
   height: 2px;
-  background: #edf5ff;
+  background: #eef5ff;
   border-radius: 2px;
   display: block;
 }
@@ -52,23 +55,23 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #1b98ff 0%, #0a69ff 100%);
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.18), 0 0 16px rgba(40, 115, 255, 0.45);
+  background: linear-gradient(180deg, #1f9fff 0%, #0e67ff 100%);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.1);
 }
 
 .brand-dot {
-  color: #f3f8ff;
-  font-size: 1.3rem;
+  color: #f4f9ff;
+  font-size: 1.2rem;
   font-weight: 700;
   line-height: 1;
   transform: translateY(-1px);
 }
 
 .trading-deck-brand-name {
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   font-weight: 700;
   letter-spacing: -0.04em;
   color: #edf5ff;
@@ -78,33 +81,73 @@
   font-size: 1.06rem;
   color: #dfeaf8;
   font-weight: 600;
-  opacity: 0.88;
+  opacity: 0.9;
 }
 
 .trading-deck-search {
   flex: 1 1 auto;
-  max-width: 400px;
+  max-width: 420px;
   min-width: 180px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 9px;
   height: 42px;
   border: 1px solid rgba(154, 172, 195, 0.35);
   border-radius: 14px;
-  background: rgba(11, 19, 28, 0.8);
+  background: rgba(12, 20, 28, 0.9);
   color: rgba(202, 216, 235, 0.72);
-  padding: 0 14px;
-  font-size: 0.95rem;
+  padding: 0 12px 0 14px;
+  font-size: 0.94rem;
+  margin-left: 6px;
+}
+
+.trading-deck-search input {
+  flex: 1 1 auto;
+  min-width: 0;
+  background: transparent;
+  border: 0;
+  outline: none;
+  color: #edf4ff;
+  font-size: 0.94rem;
+  font-family: inherit;
+}
+
+.trading-deck-search input::placeholder {
+  color: rgba(202, 216, 235, 0.72);
 }
 
 .search-icon {
-  font-size: 1.08rem;
-  line-height: 1;
-  opacity: 0.9;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  color: rgba(219, 229, 243, 0.9);
+  flex-shrink: 0;
 }
 
-.search-text {
-  letter-spacing: 0.01em;
+.search-shortcut {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(160, 176, 198, 0.28);
+  background: rgba(14, 23, 32, 0.8);
+  color: rgba(219, 229, 243, 0.8);
+  font-size: 0.7rem;
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+}
+
+.search-icon svg,
+.tool-pill svg,
+.deposit-button svg {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 .trading-deck-tools {
@@ -119,10 +162,9 @@
   width: 28px;
   height: 28px;
   border-radius: 8px;
-  border: 1px solid rgba(157, 179, 202, 0.35);
-  background: rgba(9, 17, 26, 0.9);
+  border: 1px solid rgba(160, 178, 200, 0.3);
+  background: rgba(8, 17, 26, 0.92);
   color: #edf4ff;
-  font-size: 0.8rem;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -131,7 +173,7 @@
 }
 
 .tool-pill-ghost {
-  opacity: 0.8;
+  opacity: 0.82;
 }
 
 .tool-pill-notify {
@@ -146,50 +188,60 @@
   height: 6px;
   border-radius: 50%;
   background: #6fe7bc;
-  box-shadow: 0 0 0 2px #081b2a;
+  box-shadow: 0 0 0 2px #071b29;
 }
 
 .trading-deck-balance-block {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 0 8px 0 12px;
+  gap: 12px;
+  padding: 7px 8px 7px 12px;
   border-radius: 14px;
-  background: rgba(12, 21, 30, 0.75);
-  border: 1px solid rgba(124, 145, 170, 0.25);
+  background: rgba(12, 21, 30, 0.76);
+  border: 1px solid rgba(123, 143, 168, 0.24);
   min-height: 52px;
+  max-width: 460px;
 }
 
 .balance-copy {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  padding: 6px 0;
+  padding: 2px 0;
 }
 
 .balance-label {
-  font-size: 0.57rem;
-  letter-spacing: 0.12em;
-  color: #a0b9d7;
+  font-size: 0.58rem;
+  letter-spacing: 0.14em;
+  color: #9eb6d4;
   font-weight: 700;
 }
 
 .balance-copy strong {
-  font-size: 0.97rem;
-  letter-spacing: -0.05em;
-  color: #eff9ff;
+  font-size: 0.98rem;
+  letter-spacing: -0.04em;
+  color: #f0f9ff;
   font-weight: 700;
 }
 
 .deposit-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   border: none;
   border-radius: 10px;
-  background: linear-gradient(135deg, #5ef0b8 0%, #5fe8c0 100%);
-  color: #071f1c;
+  background: linear-gradient(180deg, #6ff0bf 0%, #63e9bb 100%);
+  color: #081f1a;
   font-weight: 800;
-  padding: 9px 16px;
+  padding: 10px 16px;
   cursor: pointer;
   letter-spacing: -0.02em;
+}
+
+.deposit-button svg {
+  width: 14px;
+  height: 14px;
 }
 
 .debit-badge {
@@ -199,10 +251,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: rgba(155, 173, 195, 0.16);
-  border: 1px solid rgba(170, 186, 207, 0.25);
-  color: #ecf5ff;
-  font-size: 0.75rem;
+  background: rgba(160, 174, 194, 0.14);
+  border: 1px solid rgba(172, 188, 207, 0.26);
+  color: #edf5ff;
+  font-size: 0.74rem;
   font-weight: 700;
 }
 
@@ -210,45 +262,66 @@
   display: flex;
   align-items: center;
   gap: 18px;
-  padding: 24px 18px 0 18px;
+  padding: 26px 18px 0 18px;
   flex-wrap: wrap;
+  max-width: 1440px;
+  margin: 0 auto;
 }
 
 .selector-card {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 14px;
-  min-width: 290px;
+  gap: 16px;
+  min-width: 300px;
   min-height: 52px;
-  border-radius: 18px;
-  padding: 0 16px 0 18px;
-  background: rgba(11, 20, 29, 0.65);
-  border: 1px solid rgba(149, 172, 196, 0.32);
+  border-radius: 16px;
+  padding: 0 14px 0 18px;
+  background: rgba(11, 20, 29, 0.7);
+  border: 1px solid rgba(150, 173, 196, 0.3);
   color: #edf4ff;
+  cursor: pointer;
 }
 
 .selector-card.active {
-  border-color: rgba(130, 176, 246, 0.68);
+  border-color: rgba(130, 176, 246, 0.64);
 }
 
 .selector-label {
   font-size: 0.72rem;
   letter-spacing: 0.02em;
-  color: #a0b6d0;
+  color: #9bb3ce;
   white-space: nowrap;
 }
 
-.selector-value {
-  flex: 1 1 auto;
+.selector-native {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: transparent;
+  border: none;
+  color: #edf4ff;
+  font-size: 0.95rem;
   font-weight: 600;
-  font-size: 0.96rem;
-  white-space: nowrap;
+  outline: none;
+  flex: 1 1 auto;
+  padding-right: 18px;
+  cursor: pointer;
+}
+
+.selector-native option {
+  background: #0b1723;
   color: #edf4ff;
 }
 
 .selector-caret {
-  color: #a8bfd9;
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #a9bfd8;
   font-size: 1rem;
+  pointer-events: none;
 }
 
 @media (max-width: 980px) {
