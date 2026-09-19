@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { API_BASE_URL, BOT_URL, DIGITS_URL, RISE_FALL_URL, apiUrl } from './config';
+import { API_BASE_URL, BOT_URL, DIGITS_URL, RISE_FALL_APP_URL, apiUrl } from './config';
 
 const nav = [
   ['dashboard', 'Dashboard', '/'],
   ['account', 'Account Setup', '/account'],
   ['contracts', 'Contracts', '/contracts'],
-  ['rise-fall', 'Rise / Fall', RISE_FALL_URL],
+  ['rise-fall', 'Rise / Fall', '/rise-fall'],
   ['digits', 'Digits Trading', DIGITS_URL],
   ['bot-app', 'Deriv Bot', BOT_URL],
   ['builder', 'Bot Builder', '/builder'],
@@ -30,7 +30,7 @@ function useRoute() {
 }
 
 function Link({ href, children, className = '', onClick }) {
-  const external = href.startsWith('http') || href.startsWith('/rise-fall') || href.startsWith('/digits') || href.startsWith('/bot');
+  const external = href.startsWith('http') || href.startsWith('/digits') || href.startsWith('/bot');
   return <a className={className} href={external ? href : `#${href}`} onClick={onClick}>{children}</a>;
 }
 
@@ -68,6 +68,11 @@ function Layout({ route, title, children }) {
       </main>
     </>
   );
+}
+
+function RiseFallApp() {
+  if (!RISE_FALL_APP_URL) return <section className="panel" style={{ marginTop: '34px' }}><p className="kicker">Rise / Fall</p><h2>Production URL not configured.</h2><p>Set <code>VITE_RISE_FALL_URL</code> to the deployed Rise/Fall app URL, then rebuild this project.</p></section>;
+  return <section className="embedded-app"><div className="embedded-toolbar"><div><p className="kicker">Trading application</p><h2>Rise / Fall</h2></div><a className="outline-button" href={RISE_FALL_APP_URL} target="_blank" rel="noreferrer">Open separately ↗</a></div><iframe title="Rise / Fall trading app" src={RISE_FALL_APP_URL} /></section>;
 }
 
 function Hero({ kicker, heading, lede, action }) {
@@ -180,6 +185,7 @@ function App() {
   if (path === '/builder') content = <Builder />;
   if (path === '/manual') content = <ManualTrading />;
   if (path === '/markets') content = <Markets />;
+  if (path === '/rise-fall') content = <RiseFallApp />;
   if (path === '/bots' || path === '/speed') content = <Bots path={path} />;
   if (simplePages[path]) content = <SimplePage path={path} />;
   return <Layout route={route} title={title}>{content}</Layout>;
