@@ -18,6 +18,15 @@
   box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
 }
 
+.trading-card-chart-wrap {
+  margin: 0 0 14px;
+}
+
+.trading-card-chart-wrap .trading-deck-chart {
+  min-height: 240px;
+  border-radius: 14px;
+}
+
 .trading-card-header {
   display: flex;
   align-items: center;

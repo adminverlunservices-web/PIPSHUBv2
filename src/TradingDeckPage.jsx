@@ -272,6 +272,10 @@ function TradingDeckPage() {
           <button type="button" className="demo-account-button">Demo account</button>
         </div>
 
+        <div className="trading-card-chart-wrap">
+          <LiveFeedChart market="R_100" />
+        </div>
+
         <div className="market-title">Volatility 100 Index</div>
 
         <div className="trade-section">
