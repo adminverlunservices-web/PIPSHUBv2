@@ -1,6 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import TradingDeckPage from './TradingDeckPage';
 import { API_BASE_URL, apiUrl } from './config';
+import riseFallPulseBot from '../bots/bots/rise-fall-pulse.json';
+import digitsOverFiveBot from '../bots/bots/digits-over-five.json';
+import accumulatorGrowthBot from '../bots/bots/accumulator-growth.json';
+import evenOddCheckerBot from '../bots/bots/even-odd-checker.json';
 
 const nav = [
   ['dashboard', 'Dashboard', '/'],
@@ -264,31 +268,10 @@ function Builder() { return <><Hero kicker="Visual strategy lab" heading="Assemb
 
 function Bots({ path }) {
   const speed = path === '/speed';
-  const [sampleBots, setSampleBots] = useState([]);
   const [importedBots, setImportedBots] = useState([]);
   const [importStatus, setImportStatus] = useState('');
   const templates = ['Digit Compass', 'Tick Current', 'Quiet Range'];
-  const sampleBotFiles = [
-    'rise-fall-pulse.json',
-    'digits-over-five.json',
-    'accumulator-growth.json',
-    'even-odd-checker.json',
-  ];
-
-  useEffect(() => {
-    let active = true;
-    Promise.all(sampleBotFiles.map((file) => fetch(`/bots/bots/${file}`).then((response) => {
-      if (!response.ok) throw new Error(`Unable to load ${file}.`);
-      return response.json();
-    }))).then((bots) => {
-      if (active) setSampleBots(bots);
-    }).catch(() => {
-      if (active) setImportStatus('Sample bots are unavailable.');
-    });
-    return () => {
-      active = false;
-    };
-  }, []);
+  const sampleBots = [riseFallPulseBot, digitsOverFiveBot, accumulatorGrowthBot, evenOddCheckerBot];
 
   const importBots = async (event) => {
     const file = event.target.files?.[0];
