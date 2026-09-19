@@ -97,13 +97,13 @@ function LiveFeedChart({ market = 'R_100', onMarketChange, onQuoteChange }) {
         const guideY = Math.max(20, Math.min(plotBottom - 2, rawGuideY));
 
         context.save();
-        context.setLineDash([10, 7]);
+        context.setLineDash([]);
         context.strokeStyle = color;
         context.lineWidth = 2;
         context.globalAlpha = 0.95;
         context.beginPath();
-        context.moveTo(0, guideY);
-        context.lineTo(width, guideY);
+        context.moveTo(width * 0.35, guideY);
+        context.lineTo(width * 0.65, guideY);
         context.stroke();
         context.setLineDash([]);
         context.fillStyle = color;
@@ -176,6 +176,22 @@ function LiveFeedChart({ market = 'R_100', onMarketChange, onQuoteChange }) {
       drawGuide(latestPrice - guideOffset, 'Lower guide', '#f0a36b');
 
       const latest = points[points.length - 1];
+      context.save();
+      context.setLineDash([3, 5]);
+      context.strokeStyle = 'rgba(243, 248, 255, 0.9)';
+      context.lineWidth = 1.5;
+      context.beginPath();
+      context.moveTo(width * 0.35, latest.y);
+      context.lineTo(width * 0.65, latest.y);
+      context.stroke();
+      context.setLineDash([]);
+      context.fillStyle = '#f3f8ff';
+      context.font = "600 10px 'Segoe UI', sans-serif";
+      context.textAlign = 'left';
+      context.textBaseline = 'bottom';
+      context.fillText(`Current ${latestPrice.toFixed(2)}`, 8, latest.y - 4);
+      context.restore();
+
       context.beginPath();
       context.arc(latest.x, latest.y, 4.5, 0, Math.PI * 2);
       context.fillStyle = '#f3f8ff';
