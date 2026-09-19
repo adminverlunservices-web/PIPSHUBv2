@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { apiUrl } from './config';
 import './trading-deck.css';
 
@@ -38,11 +38,236 @@ function WalletIcon() {
   );
 }
 
+function LiveFeedChart({ market = 'R_100', onMarketChange }) {
+  const canvasRef = useRef(null);
+  const [tick, setTick] = useState('Waiting for tick');
+  const [viewType, setViewType] = useState('line');
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return undefined;
+
+    const context = canvas.getContext('2d');
+    const prices = [];
+    const times = [];
+    let socket;
+    let closed = false;
+
+    const draw = () => {
+      const ratio = window.devicePixelRatio || 1;
+      const width = canvas.clientWidth;
+      const height = canvas.clientHeight;
+      canvas.width = width * ratio;
+      canvas.height = height * ratio;
+      context.setTransform(ratio, 0, 0, ratio, 0, 0);
+      context.fillStyle = '#0d1b29';
+      context.fillRect(0, 0, width, height);
+      context.strokeStyle = 'rgba(255,255,255,0.06)';
+      context.lineWidth = 1;
+
+      const plotBottom = height - 26;
+      for (let y = 18; y < plotBottom; y += 42) {
+        context.beginPath();
+        context.moveTo(0, y);
+        context.lineTo(width, y);
+        context.stroke();
+      }
+
+      for (let x = 0; x < width; x += Math.max(52, width / 5)) {
+        context.beginPath();
+        context.moveTo(x, 0);
+        context.lineTo(x, plotBottom);
+        context.stroke();
+      }
+
+      if (prices.length < 2) return;
+
+      const low = Math.min(...prices);
+      const high = Math.max(...prices);
+      const spread = high - low || 1;
+      const plotHeight = plotBottom - 18;
+      const points = prices.map((price, index) => ({
+        x: index * width / (prices.length - 1),
+        y: 18 + (high - price) / spread * plotHeight,
+      }));
+
+      const drawLine = () => {
+        context.beginPath();
+        points.forEach(({ x, y }, index) => {
+          if (index === 0) context.moveTo(x, y);
+          else context.lineTo(x, y);
+        });
+        context.strokeStyle = '#dfeaf8';
+        context.lineWidth = 1.5;
+        context.stroke();
+      };
+
+      if (viewType === 'area') {
+        context.beginPath();
+        points.forEach(({ x, y }, index) => {
+          if (index === 0) context.moveTo(x, y);
+          else context.lineTo(x, y);
+        });
+        context.lineTo(points[points.length - 1].x, plotBottom);
+        context.lineTo(points[0].x, plotBottom);
+        context.closePath();
+        context.fillStyle = 'rgba(103, 133, 168, 0.22)';
+        context.fill();
+        drawLine();
+      } else if (viewType === 'bar') {
+        const barWidth = Math.max(3, width / prices.length * 0.65);
+        prices.forEach((price, index) => {
+          const x = points[index].x;
+          const valueY = points[index].y;
+          context.fillStyle = index && price >= prices[index - 1] ? '#63d1a1' : '#e76d6d';
+          context.fillRect(x - barWidth / 2, valueY, barWidth, plotBottom - valueY);
+        });
+      } else if (viewType === 'candles') {
+        const candleWidth = Math.max(3, width / prices.length * 0.6);
+        prices.forEach((price, index) => {
+          const x = points[index].x;
+          const prev = prices[index - 1] ?? price;
+          const openY = 18 + (high - prev) / spread * plotHeight;
+          const closeY = points[index].y;
+          const highY = 18 + (high - Math.max(prev, price) - spread * 0.03) / spread * plotHeight;
+          const lowY = 18 + (high - Math.min(prev, price) + spread * 0.03) / spread * plotHeight;
+          const top = Math.min(openY, closeY);
+          const bottom = Math.max(openY, closeY);
+          const color = price >= prev ? '#63d1a1' : '#e76d6d';
+          context.strokeStyle = color;
+          context.fillStyle = color;
+          context.lineWidth = 1;
+          context.beginPath();
+          context.moveTo(x, highY);
+          context.lineTo(x, lowY);
+          context.stroke();
+          context.fillRect(x - candleWidth / 2, top, candleWidth, Math.max(2, bottom - top));
+        });
+      } else {
+        drawLine();
+      }
+
+      const latest = points[points.length - 1];
+      context.beginPath();
+      context.arc(latest.x, latest.y, 4.5, 0, Math.PI * 2);
+      context.fillStyle = '#f3f8ff';
+      context.fill();
+      context.strokeStyle = '#7b8fa7';
+      context.stroke();
+
+      const label = Number(prices[prices.length - 1]).toFixed(2);
+      const labelWidth = 62;
+      const labelHeight = 24;
+      const x = width - labelWidth - 8;
+      const y = Math.max(8, Math.min(height - labelHeight - 8, latest.y - labelHeight / 2));
+      context.fillStyle = '#f3f8ff';
+      context.beginPath();
+      context.roundRect(x, y, labelWidth, labelHeight, 4);
+      context.fill();
+      context.fillStyle = '#0d1b29';
+      context.font = "600 11px 'Segoe UI', sans-serif";
+      context.textAlign = 'center';
+      context.textBaseline = 'middle';
+      context.fillText(label, x + labelWidth / 2, y + labelHeight / 2 + 1);
+
+      context.fillStyle = 'rgba(220, 228, 240, 0.7)';
+      context.font = "10px 'Segoe UI', sans-serif";
+      context.textAlign = 'right';
+      [high, low + spread / 2, low].forEach((value, index) => {
+        context.fillText(value.toFixed(2), width - 8, 18 + index * plotHeight / 2);
+      });
+
+      const firstTime = times[0] || Date.now();
+      const lastTime = times[times.length - 1] || firstTime;
+      const timeRange = Math.max(lastTime - firstTime, 1);
+      context.textAlign = 'center';
+      context.textBaseline = 'top';
+      [0, 0.33, 0.66, 1].forEach((position) => {
+        const timestamp = firstTime + timeRange * position;
+        context.fillText(new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }), width * position, plotBottom + 8);
+      });
+    };
+
+    try {
+      socket = new WebSocket('wss://api.derivws.com/trading/v1/options/ws/public');
+      socket.addEventListener('open', () => {
+        socket.send(JSON.stringify({ ticks_history: market, end: 'latest', count: 80, style: 'ticks' }));
+      });
+      socket.addEventListener('message', (event) => {
+        const message = JSON.parse(event.data);
+        if (message.error) setTick(message.error.message || 'Market data unavailable');
+
+        if (message.history?.prices) {
+          const historyPrices = message.history.prices.slice(-80);
+          historyPrices.forEach((price) => prices.push(Number(price)));
+          if (message.history.times) {
+            const timesArray = message.history.times.slice(-historyPrices.length);
+            times.push(...timesArray.map((value) => Number(value) * 1000));
+          } else {
+            const now = Date.now();
+            historyPrices.forEach((_, index) => times.push(now - (historyPrices.length - index) * 1000));
+          }
+          draw();
+          socket.send(JSON.stringify({ ticks: market, subscribe: 1 }));
+        }
+
+        if (message.tick) {
+          prices.push(Number(message.tick.quote));
+          times.push(Number(message.tick.epoch || Date.now() / 1000) * 1000);
+          if (prices.length > 80) {
+            prices.shift();
+            times.shift();
+          }
+          draw();
+          setTick(`${Number(message.tick.quote).toFixed(2)} · live`);
+        }
+      });
+      socket.addEventListener('error', () => setTick('Unable to connect to market data'));
+      socket.addEventListener('close', () => {
+        if (!closed) setTick('Market data disconnected');
+      });
+    } catch {
+      setTick('Unable to connect to market data');
+    }
+
+    draw();
+    window.addEventListener('resize', draw);
+    return () => {
+      closed = true;
+      socket?.close();
+      window.removeEventListener('resize', draw);
+    };
+  }, [market, viewType]);
+
+  return (
+    <div className="trading-deck-chart">
+      <div className="trading-deck-chart-header">
+        <div>
+          <span className="chart-kicker">Live feed</span>
+          <strong>{market}</strong>
+        </div>
+        <div className="chart-views">
+          {['line', 'bar', 'area', 'candles'].map((type) => (
+            <button key={type} type="button" className={viewType === type ? 'is-active' : ''} onClick={() => setViewType(type)}>
+              {type === 'line' ? 'Line' : type === 'bar' ? 'Bar' : type === 'area' ? 'Area' : 'Candles'}
+            </button>
+          ))}
+        </div>
+      </div>
+      <canvas ref={canvasRef} />
+      <div className="trading-deck-chart-footer">
+        <span>Deriv live ticks</span>
+        <strong>{tick}</strong>
+      </div>
+    </div>
+  );
+}
+
 function TradingDeckPage() {
   const [balance, setBalance] = useState('--');
   const [currency, setCurrency] = useState('USD');
   const [tradeType, setTradeType] = useState('Higher / Lower');
-  const [volatility, setVolatility] = useState('Volatility 100 (1s)');
+  const [market, setMarket] = useState('R_100');
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
@@ -155,14 +380,18 @@ function TradingDeckPage() {
 
         <label className="selector-card active">
           <span className="selector-label">Volatility</span>
-          <select value={volatility} onChange={(event) => setVolatility(event.target.value)} className="selector-native">
-            <option>Volatility 100 (1s)</option>
-            <option>Volatility 75 (1s)</option>
-            <option>Volatility 50 (1s)</option>
-            <option>Volatility 10 (1s)</option>
+          <select value={market} onChange={(event) => setMarket(event.target.value)} className="selector-native">
+            <option value="R_100">Volatility 100 (1s)</option>
+            <option value="R_75">Volatility 75 (1s)</option>
+            <option value="R_50">Volatility 50 (1s)</option>
+            <option value="1HZ10V">Volatility 10 (1s)</option>
           </select>
           <span className="selector-caret">⌄</span>
         </label>
+      </div>
+
+      <div className="trading-deck-live-panel">
+        <LiveFeedChart market={market} onMarketChange={setMarket} />
       </div>
     </div>
   );
