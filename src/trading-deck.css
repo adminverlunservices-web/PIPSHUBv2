@@ -463,6 +463,12 @@
   color: #7ef0b9;
 }
 
+.market-trend.negative {
+  background: rgba(255, 99, 99, 0.12);
+  border: 1px solid rgba(255, 118, 118, 0.38);
+  color: #ff8d8d;
+}
+
 .trade-chooser {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -488,6 +494,12 @@
 .trade-option.selected {
   background: rgba(66, 129, 255, 0.16);
   border-color: rgba(99, 159, 255, 0.52);
+}
+
+.trade-option.selected[data-direction='fall'],
+.trade-option[data-direction='fall'].selected {
+  background: rgba(255, 99, 99, 0.12);
+  border-color: rgba(255, 117, 117, 0.52);
 }
 
 .option-arrow {
@@ -689,11 +701,19 @@
   min-height: 48px;
   border: none;
   border-radius: 14px;
-  background: linear-gradient(180deg, #6ff0bf 0%, #5fe0b0 100%);
-  color: #061914;
   font-size: 1rem;
   font-weight: 800;
   cursor: pointer;
+}
+
+.trade-submit-button.is-rise {
+  background: linear-gradient(180deg, #6ff0bf 0%, #5fe0b0 100%);
+  color: #061914;
+}
+
+.trade-submit-button.is-fall {
+  background: linear-gradient(180deg, #ff7b7b 0%, #eb5d5d 100%);
+  color: #fff5f5;
 }
 
 .submit-bullet {

@@ -38,7 +38,7 @@ function WalletIcon() {
   );
 }
 
-function LiveFeedChart({ market = 'R_100', onMarketChange }) {
+function LiveFeedChart({ market = 'R_100', onMarketChange, onQuoteChange }) {
   const canvasRef = useRef(null);
   const [tick, setTick] = useState('Waiting for tick');
   const [viewType, setViewType] = useState('line');
@@ -207,19 +207,27 @@ function LiveFeedChart({ market = 'R_100', onMarketChange }) {
             const now = Date.now();
             historyPrices.forEach((_, index) => times.push(now - (historyPrices.length - index) * 1000));
           }
+          const latestHistoryPrice = Number(historyPrices[historyPrices.length - 1]);
+          if (Number.isFinite(latestHistoryPrice)) {
+            onQuoteChange?.(latestHistoryPrice);
+          }
           draw();
           socket.send(JSON.stringify({ ticks: market, subscribe: 1 }));
         }
 
         if (message.tick) {
-          prices.push(Number(message.tick.quote));
+          const latestQuote = Number(message.tick.quote);
+          prices.push(latestQuote);
           times.push(Number(message.tick.epoch || Date.now() / 1000) * 1000);
           if (prices.length > 80) {
             prices.shift();
             times.shift();
           }
           draw();
-          setTick(`${Number(message.tick.quote).toFixed(2)} · live`);
+          setTick(`${latestQuote.toFixed(2)} · live`);
+          if (Number.isFinite(latestQuote)) {
+            onQuoteChange?.(latestQuote);
+          }
         }
       });
       socket.addEventListener('error', () => setTick('Unable to connect to market data'));
@@ -273,6 +281,28 @@ function TradingDeckPage() {
   const [tradeDirection, setTradeDirection] = useState('rise');
   const [duration, setDuration] = useState('1');
   const [stake, setStake] = useState(10);
+  const [liveQuote, setLiveQuote] = useState(null);
+  const marketMeta = {
+    R_10: { name: 'Volatility 10 Index', price: 18.42 },
+    R_25: { name: 'Volatility 25 Index', price: 36.88 },
+    R_50: { name: 'Volatility 50 Index', price: 64.11 },
+    R_75: { name: 'Volatility 75 Index', price: 86.42 },
+    R_100: { name: 'Volatility 100 Index', price: 119.74 },
+    '1HZ10V': { name: 'Volatility 10 (1s) Index', price: 28.91 },
+    '1HZ50V': { name: 'Volatility 50 (1s) Index', price: 63.14 },
+    '1HZ75V': { name: 'Volatility 75 (1s) Index', price: 82.36 },
+    '1HZ100V': { name: 'Volatility 100 (1s) Index', price: 117.82 },
+  };
+  const tradeTypeOptions = {
+    'Higher / Lower': { primary: 'Rise', secondary: 'Fall', primaryValue: 'rise', secondaryValue: 'fall' },
+    'Rise / Fall': { primary: 'Rise', secondary: 'Fall', primaryValue: 'rise', secondaryValue: 'fall' },
+    'Touch / No Touch': { primary: 'Touch', secondary: 'No Touch', primaryValue: 'touch', secondaryValue: 'noTouch' },
+    'Even / Odd': { primary: 'Even', secondary: 'Odd', primaryValue: 'even', secondaryValue: 'odd' },
+  };
+  const activeTradeType = tradeTypeOptions[tradeType] || tradeTypeOptions['Higher / Lower'];
+  const currentMarket = marketMeta[market] || marketMeta.R_100;
+  const currentPrice = liveQuote ?? currentMarket.price;
+  const directionLabel = tradeDirection === activeTradeType.secondaryValue ? activeTradeType.secondary : activeTradeType.primary;
   const navItems = [
     { label: 'Dashboard', href: '#/' },
     { label: 'Trading Deck', href: '#/trading-deck', active: true },
@@ -405,7 +435,16 @@ function TradingDeckPage() {
       <div className="trading-deck-controls">
         <label className="selector-card">
           <span className="selector-label">Trade type</span>
-          <select value={tradeType} onChange={(event) => setTradeType(event.target.value)} className="selector-native">
+          <select
+            value={tradeType}
+            onChange={(event) => {
+              const nextType = event.target.value;
+              setTradeType(nextType);
+              const nextTradeType = tradeTypeOptions[nextType] || tradeTypeOptions['Higher / Lower'];
+              setTradeDirection(nextTradeType.primaryValue);
+            }}
+            className="selector-native"
+          >
             <option>Higher / Lower</option>
             <option>Rise / Fall</option>
             <option>Touch / No Touch</option>
@@ -417,24 +456,29 @@ function TradingDeckPage() {
         <label className="selector-card active">
           <span className="selector-label">Volatility</span>
           <select value={market} onChange={(event) => setMarket(event.target.value)} className="selector-native">
-            <option value="R_100">Volatility 100 (1s)</option>
-            <option value="R_75">Volatility 75 (1s)</option>
-            <option value="R_50">Volatility 50 (1s)</option>
-            <option value="1HZ10V">Volatility 10 (1s)</option>
+            <option value="R_10">Volatility 10 Index</option>
+            <option value="R_25">Volatility 25 Index</option>
+            <option value="R_50">Volatility 50 Index</option>
+            <option value="R_75">Volatility 75 Index</option>
+            <option value="R_100">Volatility 100 Index</option>
+            <option value="1HZ10V">Volatility 10 (1s) Index</option>
+            <option value="1HZ50V">Volatility 50 (1s) Index</option>
+            <option value="1HZ75V">Volatility 75 (1s) Index</option>
+            <option value="1HZ100V">Volatility 100 (1s) Index</option>
           </select>
           <span className="selector-caret">⌄</span>
         </label>
       </div>
 
       <div className="trading-deck-live-panel">
-        <LiveFeedChart market={market} onMarketChange={setMarket} />
+        <LiveFeedChart market={market} onMarketChange={setMarket} onQuoteChange={setLiveQuote} />
 
         <div className="trading-card-wrap">
           <div className="trading-card-shell">
             <div className="trading-card-header">
               <div>
                 <span className="trading-card-kicker">Trade</span>
-                <h2>Volatility 100 Index</h2>
+                <h2>{currentMarket.name}</h2>
               </div>
               <button type="button" className="demo-account-button">Demo account</button>
             </div>
@@ -442,27 +486,31 @@ function TradingDeckPage() {
             <div className="trading-card-market-row">
               <div className="price-stat">
                 <span>Current price</span>
-                <strong>119.74</strong>
+                <strong>{currentPrice.toFixed(2)}</strong>
               </div>
-              <span className="market-trend positive">+2.45%</span>
+              <span className={`market-trend ${tradeDirection === activeTradeType.secondaryValue ? 'negative' : 'positive'}`}>
+                {tradeDirection === activeTradeType.secondaryValue ? '-2.45%' : '+2.45%'}
+              </span>
             </div>
 
             <div className="trade-chooser">
               <button
                 type="button"
-                className={`trade-option ${tradeDirection === 'rise' ? 'selected' : ''}`}
-                onClick={() => setTradeDirection('rise')}
+                className={`trade-option ${tradeDirection === activeTradeType.primaryValue ? 'selected' : ''}`}
+                data-direction={activeTradeType.primaryValue}
+                onClick={() => setTradeDirection(activeTradeType.primaryValue)}
               >
                 <span className="option-arrow up">↗</span>
-                Rise
+                {activeTradeType.primary}
               </button>
               <button
                 type="button"
-                className={`trade-option ${tradeDirection === 'fall' ? 'selected' : ''}`}
-                onClick={() => setTradeDirection('fall')}
+                className={`trade-option ${tradeDirection === activeTradeType.secondaryValue ? 'selected' : ''}`}
+                data-direction={activeTradeType.secondaryValue}
+                onClick={() => setTradeDirection(activeTradeType.secondaryValue)}
               >
                 <span className="option-arrow down">↘</span>
-                Fall
+                {activeTradeType.secondary}
               </button>
             </div>
 
@@ -540,9 +588,12 @@ function TradingDeckPage() {
               </div>
             </div>
 
-            <button type="button" className="trade-submit-button">
+            <button
+              type="button"
+              className={`trade-submit-button ${tradeDirection === activeTradeType.secondaryValue ? 'is-fall' : 'is-rise'}`}
+            >
               <span className="submit-bullet">◔</span>
-              Trade {tradeDirection === 'rise' ? 'Rise' : 'Fall'}
+              Trade {directionLabel}
             </button>
           </div>
         </div>
