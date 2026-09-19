@@ -731,6 +731,13 @@
   line-height: 1;
 }
 
+.trade-status {
+  margin: 10px 0 0;
+  color: #b8c8dd;
+  font-size: 0.76rem;
+  min-height: 1.2em;
+}
+
 .trading-deck-chart {
   position: relative;
   width: 100%;

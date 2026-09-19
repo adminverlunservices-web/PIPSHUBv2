@@ -284,6 +284,8 @@ function TradingDeckPage() {
   const [digit, setDigit] = useState('5');
   const [multiplier, setMultiplier] = useState('1');
   const [liveQuote, setLiveQuote] = useState(null);
+  const [tradeStatus, setTradeStatus] = useState('Ready');
+  const socketRef = useRef(null);
   const marketMeta = {
     R_10: { name: 'Volatility 10 Index', price: 18.42 },
     R_25: { name: 'Volatility 25 Index', price: 36.88 },
@@ -309,6 +311,7 @@ function TradingDeckPage() {
   const directionLabel = tradeDirection === activeTradeType.secondaryValue ? activeTradeType.secondary : activeTradeType.primary;
   const isAccumulatorMode = tradeType === 'Accumulators';
   const isDigitsMode = tradeType === 'Digits';
+  const tradeContractType = ['fall', 'down', 'odd', 'noTouch', 'under'].includes(tradeDirection) ? 'PUT' : 'CALL';
   const navItems = [
     { label: 'Dashboard', href: '#/' },
     { label: 'Trading Deck', href: '#/trading-deck', active: true },
@@ -321,6 +324,79 @@ function TradingDeckPage() {
   const payout = Number((stake * 1.92).toFixed(2));
   const profit = Number((payout - stake).toFixed(2));
   const profitPercent = Number(((profit / stake) * 100).toFixed(1));
+
+  const openTrade = () => {
+    const amount = Number(stake);
+    const contractDuration = Number(duration) || 1;
+
+    if (!Number.isFinite(amount) || amount < 0.35) {
+      setTradeStatus('Enter a valid stake of at least $0.35.');
+      return;
+    }
+
+    setTradeStatus('Requesting a live contract...');
+
+    fetch(apiUrl('api/deriv-session.js'), { credentials: 'include' })
+      .then(async (response) => {
+        const text = await response.text();
+        let data = {};
+
+        try {
+          data = text ? JSON.parse(text) : {};
+        } catch {
+          throw new Error('Live trading is unavailable on this deployment.');
+        }
+
+        if (!response.ok || !data.ws_url) {
+          throw new Error(data.error || data.ws_error || 'Live trading is unavailable on this deployment.');
+        }
+
+        const socket = new WebSocket(data.ws_url);
+        socketRef.current = socket;
+
+        socket.addEventListener('message', (event) => {
+          const message = JSON.parse(event.data);
+
+          if (message.error) {
+            setTradeStatus(message.error.message || 'Unable to create the contract.');
+            socket.close();
+            return;
+          }
+
+          if (message.proposal) {
+            socket.send(JSON.stringify({
+              buy: message.proposal.id,
+              price: message.proposal.ask_price,
+            }));
+          }
+
+          if (message.buy) {
+            setTradeStatus(`Contract opened. ID: ${message.buy.contract_id}`);
+            socket.close();
+          }
+        });
+
+        socket.addEventListener('open', () => {
+          socket.send(JSON.stringify({
+            proposal: 1,
+            amount,
+            basis: 'stake',
+            contract_type: tradeContractType,
+            currency: 'USD',
+            duration: contractDuration,
+            duration_unit: 'm',
+            underlying_symbol: market,
+          }));
+        });
+
+        socket.addEventListener('close', () => {
+          socketRef.current = null;
+        });
+      })
+      .catch((error) => {
+        setTradeStatus(error.message || 'Unable to create the contract.');
+      });
+  };
 
   useEffect(() => {
     let active = true;
@@ -683,10 +759,12 @@ function TradingDeckPage() {
             <button
               type="button"
               className={`trade-submit-button ${tradeDirection === activeTradeType.secondaryValue ? 'is-fall' : 'is-rise'}`}
+              onClick={openTrade}
             >
               <span className="submit-bullet">◔</span>
               Trade {directionLabel}
             </button>
+            <p className="trade-status" aria-live="polite">{tradeStatus}</p>
           </div>
         </div>
       </div>
