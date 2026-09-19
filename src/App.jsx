@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
+import TradingDeckPage from './TradingDeckPage';
 import { API_BASE_URL, apiUrl } from './config';
 
 const nav = [
   ['dashboard', 'Dashboard', '/'],
+  ['trading-deck', 'Trading Deck', '/trading-deck'],
   ['account', 'Account Setup', '/account'],
   ['contracts', 'Contracts', '/contracts'],
   ['rise-fall', 'Rise / Fall', '/rise-fall'],
@@ -272,6 +274,7 @@ function App() {
   if (path === '/contracts') content = <Contracts />;
   if (path === '/builder') content = <Builder />;
   if (path === '/manual') content = <ManualTrading />;
+  if (path === '/trading-deck') content = <TradingDeckPage />;
   if (path === '/markets') content = <Markets />;
   if (path === '/bots' || path === '/speed') content = <Bots path={path} />;
   if (simplePages[path]) content = <SimplePage path={path} />;
