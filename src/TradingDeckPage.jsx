@@ -285,6 +285,7 @@ function TradingDeckPage() {
   const [multiplier, setMultiplier] = useState('1');
   const [liveQuote, setLiveQuote] = useState(null);
   const [tradeStatus, setTradeStatus] = useState('Ready');
+  const [activeTradesMinimized, setActiveTradesMinimized] = useState(false);
   const [activeTrades, setActiveTrades] = useState([
     { id: 1, symbol: 'R_100', direction: 'Rise', stake: 25, price: 119.74 },
     { id: 2, symbol: 'R_50', direction: 'Fall', stake: 15, price: 64.11 },
@@ -788,40 +789,64 @@ function TradingDeckPage() {
         </div>
       </div>
 
-      <div className="active-trades-bar" aria-live="polite">
-        <div className="active-trades-header">
-          <span>Active trades</span>
+      {activeTradesMinimized ? (
+        <button
+          type="button"
+          className="active-trades-activity-button"
+          onClick={() => setActiveTradesMinimized(false)}
+          aria-label={`Show active trades${activeTrades.length ? ` (${activeTrades.length})` : ''}`}
+        >
+          <span className="activity-icon" aria-hidden="true">≋</span>
+          <span>Activity</span>
           <strong>{activeTrades.length}</strong>
-        </div>
+        </button>
+      ) : (
+        <div className="active-trades-bar" aria-live="polite">
+          <div className="active-trades-header">
+            <span>Active trades</span>
+            <div className="active-trades-header-actions">
+              <strong>{activeTrades.length}</strong>
+              <button
+                type="button"
+                className="active-trades-minimize"
+                onClick={() => setActiveTradesMinimized(true)}
+                aria-label="Minimize active trades"
+                title="Minimize active trades"
+              >
+                −
+              </button>
+            </div>
+          </div>
 
-        <div className="active-trades-list">
-          {activeTrades.length > 0 ? (
-            activeTrades.map((trade) => (
-              <div key={trade.id} className="active-trade-item">
-                <div className="active-trade-main">
-                  <span className="active-trade-symbol">{trade.symbol}</span>
-                  <span className={`active-trade-direction ${trade.direction.toLowerCase() === 'fall' || trade.direction.toLowerCase() === 'down' || trade.direction.toLowerCase() === 'odd' || trade.direction.toLowerCase() === 'under' ? 'is-fall' : 'is-rise'}`}>
-                    {trade.direction}
-                  </span>
+          <div className="active-trades-list">
+            {activeTrades.length > 0 ? (
+              activeTrades.map((trade) => (
+                <div key={trade.id} className="active-trade-item">
+                  <div className="active-trade-main">
+                    <span className="active-trade-symbol">{trade.symbol}</span>
+                    <span className={`active-trade-direction ${trade.direction.toLowerCase() === 'fall' || trade.direction.toLowerCase() === 'down' || trade.direction.toLowerCase() === 'odd' || trade.direction.toLowerCase() === 'under' ? 'is-fall' : 'is-rise'}`}>
+                      {trade.direction}
+                    </span>
+                  </div>
+                  <div className="active-trade-meta">
+                    <span>Stake</span>
+                    <strong>${Number(trade.stake).toFixed(2)}</strong>
+                  </div>
+                  <div className="active-trade-meta">
+                    <span>Price</span>
+                    <strong>{Number(trade.price).toFixed(2)}</strong>
+                  </div>
+                  <button type="button" className="stop-trade-button" onClick={() => stopTrade(trade.id)}>
+                    Stop
+                  </button>
                 </div>
-                <div className="active-trade-meta">
-                  <span>Stake</span>
-                  <strong>${Number(trade.stake).toFixed(2)}</strong>
-                </div>
-                <div className="active-trade-meta">
-                  <span>Price</span>
-                  <strong>{Number(trade.price).toFixed(2)}</strong>
-                </div>
-                <button type="button" className="stop-trade-button" onClick={() => stopTrade(trade.id)}>
-                  Stop
-                </button>
-              </div>
-            ))
-          ) : (
-            <div className="active-trades-empty">No Active trades</div>
-          )}
+              ))
+            ) : (
+              <div className="active-trades-empty">No Active trades</div>
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
