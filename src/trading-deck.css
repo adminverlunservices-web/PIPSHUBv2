@@ -280,6 +280,16 @@
   letter-spacing: -0.02em;
 }
 
+.deposit-button.is-locked {
+  opacity: 0.6;
+  cursor: not-allowed;
+  filter: grayscale(0.12);
+}
+
+.deposit-button:disabled {
+  cursor: not-allowed;
+}
+
 .deposit-button svg {
   width: 14px;
   height: 14px;

@@ -430,7 +430,7 @@ function TradingDeckPage() {
             <span className="balance-label">DEMO BALANCE</span>
             <strong>{balance === '--' ? '--' : `$${Number(balance).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currency}`}</strong>
           </div>
-          <button type="button" className="deposit-button">
+          <button type="button" className="deposit-button is-locked" disabled aria-label="Deposit disabled">
             <WalletIcon />
             <span>Deposit</span>
           </button>
