@@ -1,0 +1,8 @@
+{
+  "name": "Rise Fall Pulse",
+  "description": "A simple rise/fall sample that follows the latest tick direction.",
+  "market": "R_100",
+  "tradeType": "Rise / Fall",
+  "contract": "5 ticks",
+  "script": "ON_TICK\n  IF current_price > previous_price\n    SIGNAL Rise\n  ELSE IF current_price < previous_price\n    SIGNAL Fall\n  END IF\nEND"
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Accumulator Growth",
+  "description": "A conservative accumulator sample with a bounded growth target.",
+  "market": "R_50",
+  "tradeType": "Accumulators",
+  "contract": "Growth 2%",
+  "script": "ON_TICK\n  growth_rate = 2%\n  IF barrier_is_clear AND volatility_is_stable\n    SIGNAL Up\n  ELSE\n    WAIT\n  END IF\nEND"
+}

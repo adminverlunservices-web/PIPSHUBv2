@@ -1,0 +1,8 @@
+{
+  "name": "Even Odd Checker",
+  "description": "An even/odd sample strategy based on the last market digit.",
+  "market": "1HZ10V",
+  "tradeType": "Even / Odd",
+  "contract": "3 ticks",
+  "script": "ON_TICK\n  last_digit = LAST_DIGIT(current_price)\n  IF last_digit % 2 == 0\n    SIGNAL Even\n  ELSE\n    SIGNAL Odd\n  END IF\nEND"
+}
