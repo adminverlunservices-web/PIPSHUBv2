@@ -1,14 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
-import { ACCUMULATORS_APP_URL, API_BASE_URL, BOT_URL, DIGITS_URL, RISE_FALL_APP_URL, apiUrl } from './config';
+import { API_BASE_URL, apiUrl } from './config';
 
 const nav = [
   ['dashboard', 'Dashboard', '/'],
   ['account', 'Account Setup', '/account'],
   ['contracts', 'Contracts', '/contracts'],
   ['rise-fall', 'Rise / Fall', '/rise-fall'],
+  ['digits', 'Digits Trading', '/digits'],
   ['accumulators', 'Accumulators', '/accumulators'],
-  ['digits', 'Digits Trading', DIGITS_URL],
-  ['bot-app', 'Deriv Bot', BOT_URL],
   ['builder', 'Bot Builder', '/builder'],
   ['manual', 'Manual Trading', '/manual'],
   ['smart', 'Smart Trading', '/smart'],
@@ -31,7 +30,7 @@ function useRoute() {
 }
 
 function Link({ href, children, className = '', onClick }) {
-  const external = href.startsWith('http') || href.startsWith('/digits') || href.startsWith('/bot');
+  const external = href.startsWith('http');
   return <a className={className} href={external ? href : `#${href}`} onClick={onClick}>{children}</a>;
 }
 
@@ -69,16 +68,6 @@ function Layout({ route, title, children }) {
       </main>
     </>
   );
-}
-
-function RiseFallApp() {
-  if (!RISE_FALL_APP_URL) return <section className="panel" style={{ marginTop: '34px' }}><p className="kicker">Rise / Fall</p><h2>Production URL not configured.</h2><p>Set <code>VITE_RISE_FALL_URL</code> to the deployed Rise/Fall app URL, then rebuild this project.</p></section>;
-  return <section className="embedded-app"><div className="embedded-toolbar"><div><p className="kicker">Trading application</p><h2>Rise / Fall</h2></div><a className="outline-button" href={RISE_FALL_APP_URL} target="_blank" rel="noreferrer">Open separately ↗</a></div><iframe title="Rise / Fall trading app" src={RISE_FALL_APP_URL} /></section>;
-}
-
-function AccumulatorsApp() {
-  if (!ACCUMULATORS_APP_URL) return <section className="panel" style={{ marginTop: '34px' }}><p className="kicker">Accumulators</p><h2>Production URL not configured.</h2><p>Set <code>VITE_ACCUMULATORS_URL</code> to the deployed Accumulators app URL, then rebuild this project.</p></section>;
-  return <section className="embedded-app"><div className="embedded-toolbar"><div><p className="kicker">Trading application</p><h2>Accumulators</h2></div><a className="outline-button" href={ACCUMULATORS_APP_URL} target="_blank" rel="noreferrer">Open separately ↗</a></div><iframe title="Accumulators trading app" src={ACCUMULATORS_APP_URL} /></section>;
 }
 
 function Hero({ kicker, heading, lede, action }) {
@@ -256,6 +245,9 @@ function ManualTrading() {
 }
 
 const simplePages = {
+  '/rise-fall': ['Rise / Fall', 'Rise / Fall trading.', 'Configure a focused upward or downward contract from the PIPSHUB trading workspace.'],
+  '/digits': ['Digits Trading', 'Digits trading.', 'Explore digit-based contract strategies and prepare your next market entry.'],
+  '/accumulators': ['Accumulators', 'Accumulator strategies.', 'Configure controlled growth strategies with clear stake and risk settings.'],
   '/smart': ['Smart Trading', 'Signal assisted execution.', 'Combine clear entry signals with controlled risk and a repeatable workflow.'],
   '/speed': ['Speed Bots', 'Speed bots.', 'Launch lightweight strategies for short contract cycles with clear limits.'],
   '/automated': ['Automated Bots', 'Automated bots.', 'Manage reusable strategies and keep their running state visible.'],
@@ -281,8 +273,6 @@ function App() {
   if (path === '/builder') content = <Builder />;
   if (path === '/manual') content = <ManualTrading />;
   if (path === '/markets') content = <Markets />;
-  if (path === '/rise-fall') content = <RiseFallApp />;
-  if (path === '/accumulators') content = <AccumulatorsApp />;
   if (path === '/bots' || path === '/speed') content = <Bots path={path} />;
   if (simplePages[path]) content = <SimplePage path={path} />;
   return <Layout route={route} title={title}>{content}</Layout>;
