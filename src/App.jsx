@@ -92,6 +92,7 @@ function PanelHeading({ kicker, heading, action }) {
 function PulseChart({ market = 'R_100', onMarketChange }) {
   const canvasRef = useRef(null);
   const [tick, setTick] = useState('Waiting for tick');
+  const [viewType, setViewType] = useState('line');
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return undefined;
@@ -120,18 +121,53 @@ function PulseChart({ market = 'R_100', onMarketChange }) {
       const spread = high - low || 1;
       const plotHeight = plotBottom - 18;
       const points = prices.map((price, index) => ({ x: index * width / (prices.length - 1), y: 18 + (high - price) / spread * plotHeight }));
-      context.beginPath();
-      points.forEach(({ x, y }, index) => { index ? context.lineTo(x, y) : context.moveTo(x, y); });
-      context.lineTo(points[points.length - 1].x, plotBottom);
-      context.lineTo(points[0].x, plotBottom);
-      context.closePath();
-      context.fillStyle = 'rgba(112,118,128,.28)';
-      context.fill();
-      context.beginPath();
-      points.forEach(({ x, y }, index) => { index ? context.lineTo(x, y) : context.moveTo(x, y); });
-      context.strokeStyle = '#c7cbd2';
-      context.lineWidth = 1.35;
-      context.stroke();
+      const drawLine = () => {
+        context.beginPath();
+        points.forEach(({ x, y }, index) => { index ? context.lineTo(x, y) : context.moveTo(x, y); });
+        context.strokeStyle = '#c7cbd2';
+        context.lineWidth = 1.35;
+        context.stroke();
+      };
+      if (viewType === 'area') {
+        context.beginPath();
+        points.forEach(({ x, y }, index) => { index ? context.lineTo(x, y) : context.moveTo(x, y); });
+        context.lineTo(points[points.length - 1].x, plotBottom);
+        context.lineTo(points[0].x, plotBottom);
+        context.closePath();
+        context.fillStyle = 'rgba(112,118,128,.28)';
+        context.fill();
+        drawLine();
+      } else if (viewType === 'bar') {
+        const barWidth = Math.max(2, width / prices.length * .62);
+        prices.forEach((price, index) => {
+          const x = points[index].x;
+          context.fillStyle = index && price >= prices[index - 1] ? '#64b58f' : '#d4777f';
+          context.fillRect(x - barWidth / 2, points[index].y, barWidth, plotBottom - points[index].y);
+        });
+      } else if (viewType === 'candles') {
+        const candleWidth = Math.max(3, width / prices.length * .58);
+        prices.forEach((price, index) => {
+          const previous = prices[index - 1] ?? price;
+          const open = previous;
+          const close = price;
+          const highPrice = Math.max(open, close) + spread * .025;
+          const lowPrice = Math.min(open, close) - spread * .025;
+          const highY = 18 + (high - highPrice) / spread * plotHeight;
+          const lowY = 18 + (high - lowPrice) / spread * plotHeight;
+          const top = Math.min(points[index].y, 18 + (high - open) / spread * plotHeight);
+          const bottom = Math.max(points[index].y, 18 + (high - open) / spread * plotHeight);
+          context.strokeStyle = close >= open ? '#64b58f' : '#d4777f';
+          context.fillStyle = context.strokeStyle;
+          context.lineWidth = 1;
+          context.beginPath();
+          context.moveTo(points[index].x, highY);
+          context.lineTo(points[index].x, lowY);
+          context.stroke();
+          context.fillRect(points[index].x - candleWidth / 2, top, candleWidth, Math.max(2, bottom - top));
+        });
+      } else {
+        drawLine();
+      }
       const latest = points[points.length - 1];
       context.beginPath();
       context.arc(latest.x, latest.y, 4.5, 0, Math.PI * 2);
@@ -184,8 +220,9 @@ function PulseChart({ market = 'R_100', onMarketChange }) {
     draw();
     window.addEventListener('resize', draw);
     return () => { closed = true; socket?.close(); window.removeEventListener('resize', draw); };
-  }, [market]);
-  return <><canvas ref={canvasRef} data-volatility-canvas height="210" /><div className="chart-footer"><span><i className="legend-dot" /> Deriv live ticks</span><strong>{tick}</strong></div><select value={market} onChange={(event) => onMarketChange?.(event.target.value)}><option value="R_100">Volatility 100 Index</option><option value="R_75">Volatility 75 Index</option><option value="R_50">Volatility 50 Index</option><option value="1HZ10V">Volatility 10 (1s)</option></select></>;
+  }, [market, viewType]);
+  const views = [['line', '╱', 'Line'], ['bar', '▥', 'Bar'], ['area', '◢', 'Area'], ['candles', '▥', 'Candles']];
+  return <><canvas ref={canvasRef} data-volatility-canvas height="210" /><div className="chart-footer"><span><i className="legend-dot" /> Deriv live ticks</span><strong>{tick}</strong></div><div className="chart-controls"><select value={market} onChange={(event) => onMarketChange?.(event.target.value)}><option value="R_100">Volatility 100 Index</option><option value="R_75">Volatility 75 Index</option><option value="R_50">Volatility 50 Index</option><option value="1HZ10V">Volatility 10 (1s)</option></select><div className="view-switcher" aria-label="Chart view">{views.map(([value, icon, label]) => <button key={value} type="button" className={viewType === value ? 'is-active' : ''} onClick={() => setViewType(value)} title={label} aria-label={label}><span>{icon}</span>{label}</button>)}</div></div></>;
 }
 
 function Dashboard() {
