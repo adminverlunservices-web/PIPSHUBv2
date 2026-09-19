@@ -92,25 +92,24 @@ function LiveFeedChart({ market = 'R_100', onMarketChange, onQuoteChange }) {
       }));
       const latestPrice = prices[prices.length - 1];
       const guideOffset = Math.max(spread * 0.2, spread * 0.08);
-      const drawGuide = (value, label, color) => {
-        const rawGuideY = 18 + (high - value) / spread * plotHeight;
-        const guideY = Math.max(20, Math.min(plotBottom - 2, rawGuideY));
+      const guideStart = width * 0.25;
+      const guideEnd = width * 0.85;
+      const guideY = (value) => Math.max(20, Math.min(plotBottom - 2, 18 + (high - value) / spread * plotHeight));
+      const drawGuide = (value, label) => {
+        const y = guideY(value);
 
         context.save();
-        context.setLineDash([]);
-        context.strokeStyle = color;
-        context.lineWidth = 2;
-        context.globalAlpha = 0.95;
+        context.strokeStyle = '#1599e8';
+        context.lineWidth = 1.5;
         context.beginPath();
-        context.moveTo(width * 0.3, guideY);
-        context.lineTo(width * 0.6, guideY);
+        context.moveTo(guideStart, y);
+        context.lineTo(guideEnd, y);
         context.stroke();
-        context.setLineDash([]);
-        context.fillStyle = color;
-        context.font = "600 10px 'Segoe UI', sans-serif";
+        context.fillStyle = '#1599e8';
+        context.font = "600 11px 'Segoe UI', sans-serif";
         context.textAlign = 'right';
         context.textBaseline = 'bottom';
-        context.fillText(label, width - 8, guideY - 4);
+        context.fillText(label, guideEnd, y - 5);
         context.restore();
       };
 
@@ -170,10 +169,14 @@ function LiveFeedChart({ market = 'R_100', onMarketChange, onQuoteChange }) {
         drawLine();
       }
 
-      // Keep the growth guides above every chart mode so they remain long,
-      // visible, and readable over the live series.
-      drawGuide(latestPrice + guideOffset, 'Upper guide', '#63d1a1');
-      drawGuide(latestPrice - guideOffset, 'Lower guide', '#f0a36b');
+      const upperGuideY = guideY(latestPrice + guideOffset);
+      const lowerGuideY = guideY(latestPrice - guideOffset);
+      context.save();
+      context.fillStyle = 'rgba(29, 129, 198, 0.14)';
+      context.fillRect(guideStart, upperGuideY, guideEnd - guideStart, lowerGuideY - upperGuideY);
+      context.restore();
+      drawGuide(latestPrice + guideOffset, `+${guideOffset.toFixed(5)}`);
+      drawGuide(latestPrice - guideOffset, `-${guideOffset.toFixed(5)}`);
 
       const latest = points[points.length - 1];
       context.save();
@@ -181,8 +184,8 @@ function LiveFeedChart({ market = 'R_100', onMarketChange, onQuoteChange }) {
       context.strokeStyle = 'rgba(243, 248, 255, 0.9)';
       context.lineWidth = 1.5;
       context.beginPath();
-      context.moveTo(width * 0.3, latest.y);
-      context.lineTo(width * 0.6, latest.y);
+      context.moveTo(guideStart, latest.y);
+      context.lineTo(guideEnd, latest.y);
       context.stroke();
       context.setLineDash([]);
       context.fillStyle = '#f3f8ff';
