@@ -268,6 +268,11 @@ function Bots({ path }) {
   const [importedBots, setImportedBots] = useState([]);
   const [importStatus, setImportStatus] = useState('');
   const templates = ['Digit Compass', 'Tick Current', 'Quiet Range'];
+  const loadBot = (bot) => {
+    localStorage.setItem('pipshub:selected-bot', JSON.stringify(bot));
+    window.location.hash = '/trading-deck';
+  };
+
   const importBots = async (event) => {
     const file = event.target.files?.[0];
     event.target.value = '';
@@ -321,7 +326,7 @@ function Bots({ path }) {
             <div className="bot-top"><span className="bot-icon">◆</span><span className="badge">Sample</span></div>
             <h3>{bot.name}</h3>
             <p>{bot.description}</p>
-            <div className="bot-meta"><span>{bot.market}</span><span>{bot.tradeType}</span><b>Load →</b></div>
+            <div className="bot-meta"><span>{bot.market}</span><span>{bot.tradeType}</span><button type="button" onClick={() => loadBot(bot)}>Load →</button></div>
           </article>
         ))}
         {importedBots.map((bot, index) => (
@@ -329,7 +334,7 @@ function Bots({ path }) {
             <div className="bot-top"><span className="bot-icon">↥</span><span className="badge">Imported</span></div>
             <h3>{bot.name.trim()}</h3>
             <p>{typeof bot.description === 'string' && bot.description.trim() ? bot.description : 'Imported strategy ready to configure.'}</p>
-            <div className="bot-meta"><span>{bot.market || 'Custom'}</span><span>{bot.contract || 'Strategy'}</span><b>Use →</b></div>
+            <div className="bot-meta"><span>{bot.market || 'Custom'}</span><span>{bot.contract || 'Strategy'}</span><button type="button" onClick={() => loadBot(bot)}>Use →</button></div>
           </article>
         ))}
       </section>
