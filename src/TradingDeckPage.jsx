@@ -269,6 +269,22 @@ function TradingDeckPage() {
   const [tradeType, setTradeType] = useState('Higher / Lower');
   const [market, setMarket] = useState('R_100');
   const [searchQuery, setSearchQuery] = useState('');
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [tradeDirection, setTradeDirection] = useState('rise');
+  const [duration, setDuration] = useState('1');
+  const [stake, setStake] = useState(10);
+  const navItems = [
+    { label: 'Dashboard', href: '#/' },
+    { label: 'Trading Deck', href: '#/trading-deck', active: true },
+    { label: 'Account Setup', href: '#/account' },
+    { label: 'Contracts', href: '#/contracts' },
+    { label: 'Manual Trading', href: '#/manual' },
+    { label: 'Bot Builder', href: '#/builder' },
+  ];
+
+  const payout = Number((stake * 1.92).toFixed(2));
+  const profit = Number((payout - stake).toFixed(2));
+  const profitPercent = Number(((profit / stake) * 100).toFixed(1));
 
   useEffect(() => {
     let active = true;
@@ -314,11 +330,31 @@ function TradingDeckPage() {
     <div className="trading-deck-page">
       <header className="trading-deck-topbar">
         <div className="trading-deck-brand-wrap">
-          <button className="trading-deck-menu" type="button" aria-label="Toggle menu">
+          <button
+            className={`trading-deck-menu ${menuOpen ? 'is-open' : ''}`}
+            type="button"
+            aria-label="Toggle menu"
+            onClick={() => setMenuOpen((open) => !open)}
+          >
             <span></span>
             <span></span>
             <span></span>
           </button>
+
+          {menuOpen && (
+            <nav className="trading-deck-nav-panel" aria-label="Main navigation">
+              {navItems.map(({ label, href, active }) => (
+                <a
+                  key={label}
+                  href={href}
+                  className={`trading-deck-nav-link ${active ? 'is-active' : ''}`}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  {label}
+                </a>
+              ))}
+            </nav>
+          )}
 
           <div className="trading-deck-brand-mark" aria-label="Deriv logo">
             <span className="brand-dot">d</span>
@@ -412,59 +448,101 @@ function TradingDeckPage() {
             </div>
 
             <div className="trade-chooser">
-              <button type="button" className="trade-option selected">
+              <button
+                type="button"
+                className={`trade-option ${tradeDirection === 'rise' ? 'selected' : ''}`}
+                onClick={() => setTradeDirection('rise')}
+              >
                 <span className="option-arrow up">↗</span>
                 Rise
               </button>
-              <button type="button" className="trade-option">
+              <button
+                type="button"
+                className={`trade-option ${tradeDirection === 'fall' ? 'selected' : ''}`}
+                onClick={() => setTradeDirection('fall')}
+              >
                 <span className="option-arrow down">↘</span>
                 Fall
               </button>
             </div>
 
             <div className="trade-grid">
-              <div className="field-box">
+              <label className="field-box">
                 <span className="field-label">Duration</span>
                 <div className="field-value">
-                  <span>1 minute</span>
+                  <select value={duration} onChange={(event) => setDuration(event.target.value)} className="field-select">
+                    <option value="1">1 minute</option>
+                    <option value="2">2 minutes</option>
+                    <option value="5">5 minutes</option>
+                    <option value="10">10 minutes</option>
+                  </select>
                   <span className="field-caret">⌄</span>
                 </div>
-              </div>
+              </label>
 
-              <div className="field-box">
+              <label className="field-box">
                 <span className="field-label">Stake</span>
                 <div className="field-value amount-value">
-                  <span>$ 10.00</span>
+                  <input
+                    type="number"
+                    min="1"
+                    step="1"
+                    value={stake}
+                    onChange={(event) => setStake(Math.max(1, Number(event.target.value) || 1))}
+                    className="stake-input"
+                    aria-label="Stake amount"
+                  />
                 </div>
-              </div>
+              </label>
             </div>
 
             <div className="stake-controls">
-              <button type="button" className="step-button" aria-label="Decrease stake">−</button>
-              <div className="stake-display">$ 10.00</div>
-              <button type="button" className="step-button" aria-label="Increase stake">+</button>
+              <button
+                type="button"
+                className="step-button"
+                aria-label="Decrease stake"
+                onClick={() => setStake((value) => Math.max(1, value - 1))}
+              >
+                −
+              </button>
+              <div className="stake-display">$ {stake.toFixed(2)}</div>
+              <button
+                type="button"
+                className="step-button"
+                aria-label="Increase stake"
+                onClick={() => setStake((value) => value + 1)}
+              >
+                +
+              </button>
             </div>
 
             <div className="quick-stakes">
-              <button type="button">$10</button>
-              <button type="button">$50</button>
-              <button type="button" className="is-selected">$100</button>
+              {[10, 50, 100].map((amount) => (
+                <button
+                  key={amount}
+                  type="button"
+                  className={stake === amount ? 'is-selected' : ''}
+                  onClick={() => setStake(amount)}
+                >
+                  ${amount}
+                </button>
+              ))}
             </div>
 
             <div className="summary-panel">
               <div className="summary-row">
                 <span>Potential payout</span>
-                <strong>$ 19.20</strong>
+                <strong>${payout.toFixed(2)}</strong>
               </div>
               <div className="summary-row payout-row">
                 <span>Profit</span>
-                <strong>$ 9.20 (92.0%)</strong>
+                <strong>${profit.toFixed(2)} ({profitPercent}%)</strong>
               </div>
             </div>
 
             <button type="button" className="trade-submit-button">
               <span className="submit-bullet">◔</span>
-              Trade Rise
+              Trade {tradeDirection === 'rise' ? 'Rise' : 'Fall'}
             </button>
           </div>
         </div>
