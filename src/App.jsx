@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
-import { API_BASE_URL, TRADES_URL, apiUrl } from './config';
+import TradesPage from './TradesPage';
+import { API_BASE_URL, apiUrl } from './config';
 
 const nav = [
   ['dashboard', 'Dashboard', '/'],
   ['account', 'Account Setup', '/account'],
   ['contracts', 'Contracts', '/contracts'],
-  ['rise-fall', 'Rise / Fall', TRADES_URL],
+  ['rise-fall', 'Rise / Fall', '/rise-fall'],
   ['digits', 'Digits Trading', '/digits'],
   ['accumulators', 'Accumulators', '/accumulators'],
   ['builder', 'Bot Builder', '/builder'],
@@ -30,7 +31,7 @@ function useRoute() {
 }
 
 function Link({ href, children, className = '', onClick }) {
-  const external = href.startsWith('http') || href === TRADES_URL;
+  const external = href.startsWith('http');
   return <a className={className} href={external ? href : `#${href}`} onClick={onClick}>{children}</a>;
 }
 
@@ -272,6 +273,7 @@ function App() {
   if (path === '/contracts') content = <Contracts />;
   if (path === '/builder') content = <Builder />;
   if (path === '/manual') content = <ManualTrading />;
+  if (path === '/rise-fall') content = <TradesPage />;
   if (path === '/markets') content = <Markets />;
   if (path === '/bots' || path === '/speed') content = <Bots path={path} />;
   if (simplePages[path]) content = <SimplePage path={path} />;
