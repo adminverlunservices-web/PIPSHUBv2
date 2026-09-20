@@ -403,7 +403,6 @@ function TradingDeckPage() {
     { label: 'Trading Deck', href: '#/trading-deck', active: true },
     { label: 'Account Setup', href: '#/account' },
     { label: 'Contracts', href: '#/contracts' },
-    { label: 'Manual Trading', href: '#/manual' },
     { label: 'Bot Builder', href: '#/builder' },
   ];
 
