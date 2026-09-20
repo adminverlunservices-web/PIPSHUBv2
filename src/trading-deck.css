@@ -1711,6 +1711,10 @@
     padding: 0 14px;
   }
 
+  .trading-deck-main-column {
+    width: 100%;
+  }
+
   .trading-card-wrap {
     width: 100%;
     flex-basis: auto;
@@ -1768,6 +1772,21 @@
   .trading-deck-balance-block {
     width: 100%;
     justify-content: space-between;
+  }
+
+  .trading-deck-layout {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .trading-deck-main-column {
+    order: 1;
+    width: 100%;
+  }
+
+  .trading-card-wrap {
+    order: 2;
+    width: 100%;
   }
 
   .trading-deck-controls {
