@@ -669,9 +669,6 @@ function TradingDeckPage() {
           <button type="button" className="tool-pill tool-pill-ghost" aria-label="Filter">
             <FilterIcon />
           </button>
-          <button type="button" className="tool-pill tool-pill-ghost" aria-label="Notifications">
-            <BellIcon />
-          </button>
           <div className="notification-control">
             <button type="button" className="tool-pill tool-pill-notify" onClick={() => setNotificationsOpen((open) => !open)} aria-label="Recent closed trade notifications" aria-expanded={notificationsOpen}>
               <span className="notify-dot"></span>
