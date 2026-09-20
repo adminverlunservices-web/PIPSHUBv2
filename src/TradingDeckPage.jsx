@@ -544,7 +544,6 @@ function TradingDeckPage() {
   return (
     <div className="trading-deck-page">
       <aside className="trading-deck-side-rail" aria-label="Trading deck panel rail">
-        <div className="trading-deck-rail-brand">V</div>
         <a href="#/trading-deck" className="trading-deck-rail-button is-active">Trade</a>
         <button type="button" className="trading-deck-rail-button" onClick={() => setPositionsOpen((open) => !open)}>Positions</button>
         <a href="#/bots" className="trading-deck-rail-button">Bots</a>
