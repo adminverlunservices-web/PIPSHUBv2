@@ -538,92 +538,120 @@ function TradingDeckPage() {
     };
   }, []);
 
+  const sideMenu = [
+    { label: 'Home', icon: '⌂' },
+    { label: 'Positions', icon: '◫', active: true },
+    { label: 'Reports', icon: '▣' },
+    { label: 'Help', icon: '◍' },
+    { label: 'Language', icon: '◌' },
+    { label: 'Theme', icon: '◐' },
+    { label: 'Log out', icon: '↵' },
+  ];
+
   return (
     <div className="trading-deck-page">
-      <header className="trading-deck-topbar">
-        <div className="trading-deck-brand-wrap">
-          <button
-            className={`trading-deck-menu ${menuOpen ? 'is-open' : ''}`}
-            type="button"
-            aria-label="Toggle menu"
-            onClick={() => setMenuOpen((open) => !open)}
-          >
-            <span></span>
-            <span></span>
-            <span></span>
-          </button>
+      <aside className="trading-deck-sidebar" aria-label="Sidebar">
+        <div className="sidebar-brand" aria-label="Brand logo">DT</div>
+        <nav className="sidebar-nav" aria-label="Main navigation">
+          {sideMenu.map(({ label, icon, active }) => (
+            <button
+              key={label}
+              type="button"
+              className={`sidebar-item ${active ? 'is-active' : ''}`}
+              aria-label={label}
+            >
+              <span className="sidebar-icon" aria-hidden="true">{icon}</span>
+              <span className="sidebar-label">{label}</span>
+            </button>
+          ))}
+        </nav>
+      </aside>
 
-          {menuOpen && (
-            <nav className="trading-deck-nav-panel" aria-label="Main navigation">
-              {navItems.map(({ label, href, active }) => (
-                <a
-                  key={label}
-                  href={href}
-                  className={`trading-deck-nav-link ${active ? 'is-active' : ''}`}
-                  onClick={(event) => {
-                    setMenuOpen(false);
-                    if (label === 'History') {
-                      event.preventDefault();
-                      setShowHistory(true);
-                      return;
-                    }
-                    if (label === 'Trading Deck') {
-                      setShowHistory(false);
-                    }
-                  }}
-                >
-                  {label}
-                </a>
-              ))}
-            </nav>
-          )}
+      <div className="trading-deck-main">
+        <header className="trading-deck-topbar">
+          <div className="trading-deck-brand-wrap">
+            <button
+              className={`trading-deck-menu ${menuOpen ? 'is-open' : ''}`}
+              type="button"
+              aria-label="Toggle menu"
+              onClick={() => setMenuOpen((open) => !open)}
+            >
+              <span></span>
+              <span></span>
+              <span></span>
+            </button>
 
-          <div className="trading-deck-brand-mark" aria-label="Brand logo">
-            <span className="brand-dot">V</span>
+            {menuOpen && (
+              <nav className="trading-deck-nav-panel" aria-label="Main navigation">
+                {navItems.map(({ label, href, active }) => (
+                  <a
+                    key={label}
+                    href={href}
+                    className={`trading-deck-nav-link ${active ? 'is-active' : ''}`}
+                    onClick={(event) => {
+                      setMenuOpen(false);
+                      if (label === 'History') {
+                        event.preventDefault();
+                        setShowHistory(true);
+                        return;
+                      }
+                      if (label === 'Trading Deck') {
+                        setShowHistory(false);
+                      }
+                    }}
+                  >
+                    {label}
+                  </a>
+                ))}
+              </nav>
+            )}
+
+            <div className="trading-deck-brand-mark" aria-label="Brand logo">
+              <span className="brand-dot">V</span>
+            </div>
+
+            <span className="trading-deck-brand-name">VERLUN| Trading Deck</span>
           </div>
 
-          <span className="trading-deck-brand-name">VERLUN| Trading Deck</span>
-        </div>
+          <label className="trading-deck-search" aria-label="Search markets">
+            <span className="search-icon"><SearchIcon /></span>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder="Search markets"
+              aria-label="Search markets"
+            />
+            <span className="search-shortcut">⌘ K</span>
+          </label>
 
-        <label className="trading-deck-search" aria-label="Search markets">
-          <span className="search-icon"><SearchIcon /></span>
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(event) => setSearchQuery(event.target.value)}
-            placeholder="Search markets"
-            aria-label="Search markets"
-          />
-          <span className="search-shortcut">⌘ K</span>
-        </label>
-
-        <div className="trading-deck-tools">
-          <button type="button" className="tool-pill tool-pill-ghost" aria-label="Filter">
-            <FilterIcon />
-          </button>
-          <button type="button" className="tool-pill tool-pill-ghost" aria-label="Notifications">
-            <BellIcon />
-          </button>
-          <button type="button" className="tool-pill tool-pill-notify" aria-label="Alerts">
-            <span className="notify-dot"></span>
-            <BellIcon />
-          </button>
-        </div>
-
-        <div className="trading-deck-balance-block">
-          <div className="balance-copy">
-            <span className="balance-label">DEMO BALANCE</span>
-            <strong>{balance === '--' ? '--' : `$${Number(balance).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currency}`}</strong>
+          <div className="trading-deck-tools">
+            <button type="button" className="tool-pill tool-pill-ghost" aria-label="Filter">
+              <FilterIcon />
+            </button>
+            <button type="button" className="tool-pill tool-pill-ghost" aria-label="Notifications">
+              <BellIcon />
+            </button>
+            <button type="button" className="tool-pill tool-pill-notify" aria-label="Alerts">
+              <span className="notify-dot"></span>
+              <BellIcon />
+            </button>
           </div>
-          <button type="button" className="deposit-button is-locked" disabled aria-label="Deposit disabled">
-            <WalletIcon />
-            <span>Deposit</span>
-          </button>
-          <div className="debit-badge">JD</div>
-        </div>
-      </header>
 
-      <div className="trading-deck-controls">
+          <div className="trading-deck-balance-block">
+            <div className="balance-copy">
+              <span className="balance-label">DEMO BALANCE</span>
+              <strong>{balance === '--' ? '--' : `$${Number(balance).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currency}`}</strong>
+            </div>
+            <button type="button" className="deposit-button is-locked" disabled aria-label="Deposit disabled">
+              <WalletIcon />
+              <span>Deposit</span>
+            </button>
+            <div className="debit-badge">JD</div>
+          </div>
+        </header>
+
+        <div className="trading-deck-controls">
         <label className="selector-card">
           <span className="selector-label">Trade type</span>
           <select

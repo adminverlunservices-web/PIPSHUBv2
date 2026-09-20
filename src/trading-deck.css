@@ -1,4 +1,5 @@
 .trading-deck-page {
+  display: flex;
   width: 100%;
   min-height: 100vh;
   background: #071a2c;
@@ -7,6 +8,79 @@
   padding: 0;
   overflow-x: hidden;
   padding-bottom: 120px;
+}
+
+.trading-deck-sidebar {
+  width: 110px;
+  min-height: 100vh;
+  background: rgba(9, 17, 24, 0.96);
+  border-right: 1px solid rgba(171, 188, 206, 0.12);
+  padding: 18px 12px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+}
+
+.sidebar-brand {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #ff4d4f 0%, #e52d34 100%);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 1.15rem;
+  font-weight: 800;
+  box-shadow: 0 10px 22px rgba(255, 77, 79, 0.2);
+}
+
+.sidebar-nav {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.sidebar-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  min-height: 66px;
+  border: 0;
+  background: transparent;
+  color: rgba(232, 240, 250, 0.75);
+  border-radius: 12px;
+  cursor: pointer;
+  padding: 8px 6px;
+  font: inherit;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.sidebar-item.is-active {
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04);
+}
+
+.sidebar-icon {
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+.sidebar-label {
+  font-size: 0.72rem;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.trading-deck-main {
+  flex: 1;
+  min-width: 0;
 }
 
 .trading-deck-topbar {
