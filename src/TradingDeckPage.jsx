@@ -549,7 +549,6 @@ function TradingDeckPage() {
         <a href="#/trading-deck" className="trading-deck-rail-button is-active">Trade</a>
         <button type="button" className="trading-deck-rail-button" onClick={() => setPositionsOpen((open) => !open)}>Positions</button>
         <a href="#/bots" className="trading-deck-rail-button">Bots</a>
-        <a href="#/builder" className="trading-deck-rail-button">Builder</a>
       </aside>
 
       <div className="trading-deck-content">
@@ -650,9 +649,7 @@ function TradingDeckPage() {
           <div className="trading-deck-brand-wrap">
           <div className="trading-deck-brand-mark" aria-label="PIPSHUB logo">
             <span className="brand-dot">P</span>
-          </div>
-
-          <span className="trading-deck-brand-name">VERLUN| PipsHub</span>
+          </div><span className="trading-deck-brand-name">VERLUN| PipsHub</span>
           <span className="trading-deck-trade-label">Trade</span>
         </div>
 
