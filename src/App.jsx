@@ -52,25 +52,10 @@ async function requestJson(url, options) {
 }
 
 function Layout({ route, title, children }) {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const connected = false;
   return (
-    <>
-      <aside className={`sidebar ${menuOpen ? 'open' : ''}`}>
-        <Link className="brand" href="/"><span>VERLUN</span><b>|</b><small> PIPSHIB V3</small></Link>
-        <p className="eyebrow">VERLUN| PIPSHIB V3</p>
-        <nav>{nav.map(([key, label, href]) => <Link key={key} className={`nav-link ${route === key ? 'is-active' : ''}`} href={href} onClick={() => setMenuOpen(false)}><span className="nav-dot" />{label}</Link>)}</nav>
-        <div className="sidebar-foot"><span className="status-dot" /><span>Deriv link ready</span><a href="https://t.me/derivdominator" target="_blank" rel="noreferrer">Community ↗</a></div>
-      </aside>
-      <main className="shell">
-        <header className="topbar">
-          <button className="icon-button menu-button" onClick={() => setMenuOpen((open) => !open)} aria-label="Open menu">☰</button>
-          <div><p className="eyebrow">VERLUN| PIPSHIB V3</p><h1>{title}</h1></div>
-          <div className="top-actions"><span className="connection"><i /> Live gateway</span>{connected ? <><span className="login-button">Connected</span><a className="login-button" href={`${API_BASE_URL}/api/logout.js`}>Logout</a></> : <a className="login-button" href={`${API_BASE_URL}/api/deriv-login.js`}>Connect Deriv</a>}</div>
-        </header>
-        {children}
-      </main>
-    </>
+    <main className="shell">
+      {children}
+    </main>
   );
 }
 

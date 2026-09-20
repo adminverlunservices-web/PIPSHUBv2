@@ -324,8 +324,6 @@ function TradingDeckPage() {
   const [currency, setCurrency] = useState('USD');
   const [tradeType, setTradeType] = useState('Higher / Lower');
   const [market, setMarket] = useState('R_100');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [menuOpen, setMenuOpen] = useState(false);
   const [tradeDirection, setTradeDirection] = useState('rise');
   const [duration, setDuration] = useState('1');
   const [stake, setStake] = useState(10);
@@ -334,8 +332,6 @@ function TradingDeckPage() {
   const [liveQuote, setLiveQuote] = useState(null);
   const [tradeStatus, setTradeStatus] = useState('Ready');
   const [loadedBot, setLoadedBot] = useState(null);
-  const [showHistory, setShowHistory] = useState(true);
-  const [activeSidebarView, setActiveSidebarView] = useState('Positions');
   const [activeTradesMinimized, setActiveTradesMinimized] = useState(false);
   const [activeTrades, setActiveTrades] = useState([]);
   const socketRef = useRef(null);
