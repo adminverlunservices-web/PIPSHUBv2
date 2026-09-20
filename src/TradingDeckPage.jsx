@@ -526,69 +526,55 @@ function TradingDeckPage() {
     };
   }, []);
 
-  const positionsView = (
-    <section className="positions-page">
-      <div className="positions-header">
-        <div>
-          <span className="positions-kicker">Portfolio</span>
-          <h2>Positions</h2>
+  return (
+    <div className="trading-deck-page">
+      <div className="trading-deck-panel">
+        <LiveFeedChart market={market} onMarketChange={setMarket} onQuoteChange={setLiveQuote} />
+      </div>
+
+      <div className="trading-card-shell">
+        <div className="trading-card-header">
+          <div>
+            <span className="trading-card-kicker">Trade</span>
+            <strong>{market}</strong>
+          </div>
+          <div className="quote-pill">{liveQuote ?? currentMarket.price}</div>
         </div>
-        <button type="button" className="positions-action">+ Add position</button>
-      </div>
 
-      <div className="positions-summary-grid">
-        <article className="summary-card">
-          <span>Open positions</span>
-          <strong>12</strong>
-          <small>Across 4 markets</small>
-        </article>
-        <article className="summary-card">
-          <span>P&L today</span>
-          <strong className="positive">+$342.80</strong>
-          <small>+6.8% vs yesterday</small>
-        </article>
-        <article className="summary-card">
-          <span>Margin used</span>
-          <strong>$1,240.00</strong>
-          <small>32% of balance</small>
-        </article>
-      </div>
+        <div className="trade-direction-row">
+          {['Rise', 'Fall'].map((option) => (
+            <button
+              key={option}
+              type="button"
+              className={directionLabel === option ? 'is-selected' : ''}
+              onClick={() => setTradeDirection(option === 'Rise' ? 'rise' : 'fall')}
+            >
+              {option}
+            </button>
+          ))}
+        </div>
 
-      <div className="positions-table-wrap">
-        <table className="positions-table">
-          <thead>
-            <tr>
-              <th>Asset</th>
-              <th>Type</th>
-              <th>Direction</th>
-              <th>Stake</th>
-              <th>P&L</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {[
-              ['R_100', 'Rise / Fall', 'Rise', '$25.00', '+$12.30', 'Open'],
-              ['R_75', 'Digits', 'Over 5', '$18.00', '+$4.90', 'Open'],
-              ['1HZ10V', 'Touch / No Touch', 'Touch', '$40.00', '-$3.40', 'Open'],
-              ['R_50', 'Accumulators', 'Up', '$60.00', '+$16.20', 'Closed'],
-            ].map(([asset, type, direction, stake, pnl, status]) => (
-              <tr key={asset + type}>
-                <td>{asset}</td>
-                <td>{type}</td>
-                <td>{direction}</td>
-                <td>{stake}</td>
-                <td className={pnl.startsWith('+') ? 'positive' : 'negative'}>{pnl}</td>
-                <td><span className={`position-status ${status === 'Open' ? 'open' : 'closed'}`}>{status}</span></td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <div className="trade-form-grid">
+          <label>
+            <span>Stake</span>
+            <input type="number" min="0.35" step="0.01" value={stake} onChange={(event) => setStake(Number(event.target.value) || 0)} />
+          </label>
+
+          <label>
+            <span>Duration</span>
+            <input type="number" min="1" step="1" value={duration} onChange={(event) => setDuration(event.target.value)} />
+          </label>
+        </div>
+
+        <div className="trade-actions">
+          <button type="button" className="trade-action trade-action-rise" onClick={openTrade}>Rise</button>
+          <button type="button" className="trade-action trade-action-fall" onClick={openTrade}>Fall</button>
+        </div>
+
+        <div className="trade-status">{tradeStatus}</div>
       </div>
-    </section>
+    </div>
   );
-
-  return <div className="trading-deck-page" />;
 }
 
 export default TradingDeckPage;

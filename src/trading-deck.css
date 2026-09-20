@@ -1,13 +1,147 @@
 .trading-deck-page {
   display: flex;
+  flex-direction: column;
   width: 100%;
   min-height: 100vh;
   background: #071a2c;
   color: #edf5ff;
   font-family: 'Segoe UI', sans-serif;
-  padding: 0;
-  overflow-x: hidden;
-  padding-bottom: 120px;
+  padding: 24px 18px 30px;
+  box-sizing: border-box;
+  gap: 20px;
+}
+
+.trading-deck-panel {
+  width: min(100%, 1200px);
+  margin: 0 auto;
+}
+
+.trading-card-shell {
+  width: min(100%, 520px);
+  margin: 0 auto;
+  background: rgba(9, 17, 25, 0.9);
+  border: 1px solid rgba(150, 173, 196, 0.25);
+  border-radius: 24px;
+  padding: 18px 18px 20px;
+  box-shadow: 0 16px 32px rgba(2, 10, 20, 0.28);
+}
+
+.trading-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.trading-card-kicker {
+  display: block;
+  color: #99b2ce;
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+
+.trading-card-header strong {
+  color: #edf5ff;
+  font-size: 1.1rem;
+}
+
+.quote-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 88px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(146, 170, 196, 0.25);
+  background: rgba(13, 25, 37, 0.9);
+  color: #edf5ff;
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.trade-direction-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.trade-direction-row button {
+  border: 1px solid rgba(150, 173, 196, 0.25);
+  background: rgba(15, 25, 36, 0.9);
+  color: #dfeaf8;
+  border-radius: 12px;
+  min-height: 42px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.trade-direction-row button.is-selected {
+  background: rgba(62, 118, 222, 0.18);
+  border-color: rgba(120, 180, 255, 0.55);
+  color: #edf5ff;
+}
+
+.trade-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.trade-form-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: #99b2ce;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.trade-form-grid input {
+  background: rgba(12, 21, 30, 0.9);
+  border: 1px solid rgba(146, 170, 196, 0.22);
+  border-radius: 10px;
+  color: #edf5ff;
+  min-height: 42px;
+  padding: 0 12px;
+  font-size: 0.96rem;
+  font-family: inherit;
+}
+
+.trade-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.trade-action {
+  min-height: 46px;
+  border: none;
+  border-radius: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.trade-action-rise {
+  background: linear-gradient(180deg, #46d290 0%, #2cb87d 100%);
+  color: #071d15;
+}
+
+.trade-action-fall {
+  background: linear-gradient(180deg, #ef6e68 0%, #df4d4d 100%);
+  color: #fff;
+}
+
+.trade-status {
+  margin-top: 12px;
+  min-height: 1.2em;
+  color: #b8c8dd;
+  font-size: 0.76rem;
 }
 
 .trading-deck-sidebar,
