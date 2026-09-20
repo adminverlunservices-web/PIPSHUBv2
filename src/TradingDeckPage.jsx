@@ -365,15 +365,6 @@ function TradingDeckPage() {
   const isAccumulatorMode = tradeType === 'Accumulators';
   const isDigitsMode = tradeType === 'Digits';
   const tradeContractType = ['fall', 'down', 'odd', 'noTouch', 'under'].includes(tradeDirection) ? 'PUT' : 'CALL';
-  const navItems = [
-    { label: 'Dashboard', href: '#/' },
-    { label: 'Trading Deck', href: '#/trading-deck', active: !showHistory },
-    { label: 'History', href: '#/trading-deck', active: showHistory },
-    { label: 'Account Setup', href: '#/account' },
-    { label: 'Contracts', href: '#/contracts' },
-    { label: 'Manual Trading', href: '#/manual' },
-    { label: 'Bot Builder', href: '#/builder' },
-  ];
 
   const tradeHistory = [
     { id: 'TR-1048', market: 'R_100', side: 'Rise', stake: 25, status: 'Won', payout: 47.84, time: '09:42 AM' },
