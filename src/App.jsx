@@ -24,13 +24,13 @@ const routeNames = Object.fromEntries(nav.map(([key, label, path]) => [path, [ke
 routeNames['/trading-deck'] = ['trading-deck', 'VERLUN| PIPSHIB V3'];
 
 function useRoute() {
-  const [path, setPath] = useState(() => window.location.hash.slice(1) || '/');
+  const [path, setPath] = useState(() => window.location.hash.slice(1) || '/trading-deck');
   useEffect(() => {
-    const onHashChange = () => setPath(window.location.hash.slice(1) || '/');
+    const onHashChange = () => setPath(window.location.hash.slice(1) || '/trading-deck');
     window.addEventListener('hashchange', onHashChange);
     return () => window.removeEventListener('hashchange', onHashChange);
   }, []);
-  return [routeNames[path] ? path : '/', (nextPath) => { window.location.hash = nextPath; }];
+  return [routeNames[path] ? path : '/trading-deck', (nextPath) => { window.location.hash = nextPath; }];
 }
 
 function Link({ href, children, className = '', onClick }) {
