@@ -1258,12 +1258,6 @@ function TradingDeckPage() {
             </button>
             )}
             <p className="trade-status" aria-live="polite">{tradeStatus}</p>
-            {loadedBotScript && (
-              <details className="loaded-bot-script">
-                <summary>Loaded bot script</summary>
-                <pre>{loadedBotScript}</pre>
-              </details>
-            )}
           </div>
         </div>
       </div>
