@@ -53,7 +53,25 @@ async function requestJson(url, options) {
 
 function Layout({ route, title, children }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const connected = false;
+  const [connected, setConnected] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+
+    fetch(apiUrl('api/deriv-session.js'), { credentials: 'include' })
+      .then((response) => response.json().then((data) => ({ ok: response.ok, data })))
+      .then(({ ok, data }) => {
+        if (active) setConnected(Boolean(ok && data.connected));
+      })
+      .catch(() => {
+        if (active) setConnected(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
   return (
     <>
       <aside className={`sidebar ${menuOpen ? 'open' : ''}`}>
@@ -66,7 +84,7 @@ function Layout({ route, title, children }) {
         <header className="topbar">
           <button className="icon-button menu-button" onClick={() => setMenuOpen((open) => !open)} aria-label="Open menu">☰</button>
           <div><p className="eyebrow">VERLUN| PIPSHIB V3</p><h1>{title}</h1></div>
-          <div className="top-actions"><span className="connection"><i /> Live gateway</span>{connected ? <><span className="login-button">Connected</span><a className="login-button" href={`${API_BASE_URL}/api/logout.js`}>Logout</a></> : <a className="login-button" href={`${API_BASE_URL}/api/deriv-login.js`}>Connect Deriv</a>}</div>
+          <div className="top-actions"><span className="connection"><i /> {connected ? 'Deriv connected' : 'Live gateway'}</span>{connected ? <><span className="login-button is-connected" style={{ background: '#238b68', color: '#f2fff9' }}>Deriv Connected</span><a className="login-button" href={`${API_BASE_URL}/api/logout.js`}>Logout</a></> : <a className="login-button" href={`${API_BASE_URL}/api/deriv-login.js`}>Connect Deriv</a>}</div>
         </header>
         {children}
       </main>
