@@ -348,6 +348,7 @@ function TradingDeckPage() {
   const [loadedBot, setLoadedBot] = useState(null);
   const [activeTradesMinimized, setActiveTradesMinimized] = useState(true);
   const [activeTrades, setActiveTrades] = useState([]);
+  const [smartwaRunning, setSmartwaRunning] = useState(false);
   const [positionsOpen, setPositionsOpen] = useState(false);
   const [positionsTab, setPositionsTab] = useState('open');
   const [closedTrades, setClosedTrades] = useState([]);
@@ -357,6 +358,8 @@ function TradingDeckPage() {
   const socketRef = useRef(null);
   const takeProfitTriggeredRef = useRef(new Set());
   const stopTriggeredRef = useRef(new Set());
+  const smartwaRepeatScheduledRef = useRef(new Set());
+  const smartwaRunningRef = useRef(false);
   const marketMeta = {
     R_10: { name: 'Volatility 10 Index', price: 18.42 },
     R_25: { name: 'Volatility 25 Index', price: 36.88 },
@@ -547,6 +550,10 @@ function TradingDeckPage() {
 
   const loadBot = (bot) => {
     setLoadedBot(bot);
+    if (bot.name !== 'SMARTWA') {
+      smartwaRunningRef.current = false;
+      setSmartwaRunning(false);
+    }
     if (typeof bot.market === 'string' && marketMeta[bot.market]) setMarket(bot.market);
     if (typeof bot.tradeType === 'string' && tradeTypeOptions[bot.tradeType]) {
       setTradeType(bot.tradeType);
@@ -556,7 +563,28 @@ function TradingDeckPage() {
     setBotsOpen(false);
   };
 
+  const startSmartwa = () => {
+    if (loadedBot?.name !== 'SMARTWA') return;
+    const profitLimit = Number(stopProfit);
+    const lossLimit = Number(stopLoss);
+    if (!Number.isFinite(profitLimit) || profitLimit <= 0 || !Number.isFinite(lossLimit) || lossLimit <= 0) {
+      setTradeStatus('Set both a profit limit and a loss limit before starting SMARTWA.');
+      return;
+    }
+    smartwaRunningRef.current = true;
+    setSmartwaRunning(true);
+    openTrade();
+  };
+
+  const stopSmartwa = () => {
+    smartwaRunningRef.current = false;
+    setSmartwaRunning(false);
+    setTradeStatus('SMARTWA stopped. The current contract will finish normally.');
+  };
+
   const openTrade = () => {
+    if (loadedBot?.name === 'SMARTWA' && !smartwaRunningRef.current) return;
+
     const amount = Number(stake);
     const contractDuration = Number(duration) || 1;
 
@@ -581,6 +609,8 @@ function TradingDeckPage() {
         if (!response.ok || !data.ws_url) {
           throw new Error(data.error || data.ws_error || 'Live trading is unavailable on this deployment.');
         }
+
+        if (loadedBot?.name === 'SMARTWA' && !smartwaRunningRef.current) return;
 
         const socket = new WebSocket(data.ws_url);
         socketRef.current = socket;
@@ -629,10 +659,20 @@ function TradingDeckPage() {
                 return nextTrades;
               });
               socket.close();
+              if (smartwaRunningRef.current && !smartwaRepeatScheduledRef.current.has(contractId)) {
+                smartwaRepeatScheduledRef.current.add(contractId);
+                window.setTimeout(() => {
+                  if (smartwaRunningRef.current) openTrade();
+                }, 250);
+              }
             }
           }
 
           if (message.proposal) {
+            if (loadedBot?.name === 'SMARTWA' && !smartwaRunningRef.current) {
+              socket.close();
+              return;
+            }
             socket.send(JSON.stringify({
               buy: message.proposal.id,
               price: message.proposal.ask_price,
@@ -1199,6 +1239,16 @@ function TradingDeckPage() {
               </div>
             </div>
 
+            {loadedBot?.name === 'SMARTWA' ? (
+              <button
+                type="button"
+                className={`trade-submit-button ${smartwaRunning ? 'is-fall' : 'is-rise'}`}
+                onClick={smartwaRunning ? stopSmartwa : startSmartwa}
+              >
+                <span className="submit-bullet">{smartwaRunning ? '■' : '◔'}</span>
+                {smartwaRunning ? 'Stop SMARTWA' : 'Start SMARTWA'}
+              </button>
+            ) : (
             <button
               type="button"
               className={`trade-submit-button ${tradeDirection === activeTradeType.secondaryValue ? 'is-fall' : 'is-rise'}`}
@@ -1207,6 +1257,7 @@ function TradingDeckPage() {
               <span className="submit-bullet">◔</span>
               {isAccumulatorMode ? 'Buy' : `Trade ${directionLabel}`}
             </button>
+            )}
             <p className="trade-status" aria-live="polite">{tradeStatus}</p>
             {loadedBotScript && (
               <details className="loaded-bot-script">

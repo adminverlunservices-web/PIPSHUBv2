@@ -1,5 +1,14 @@
 export const sampleBots = [
   {
+    name: 'SMARTWA',
+    description: 'Automatically repeats contracts until you stop the bot, using your profit and loss limits.',
+    market: 'R_100',
+    tradeType: 'Rise / Fall',
+    contract: 'Auto repeat',
+    autoTrade: true,
+    script: 'START SMARTWA\n  SET PROFIT LIMIT\n  SET LOSS LIMIT\n  REPEAT CONTRACT\n  UNTIL STOPPED\nEND',
+  },
+  {
     name: 'Rise Fall Pulse',
     description: 'A simple rise/fall sample that follows the latest tick direction.',
     market: 'R_100',

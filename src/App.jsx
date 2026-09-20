@@ -298,8 +298,29 @@ function Bots({ path }) {
     if (!file) return;
 
     try {
-      const parsed = JSON.parse(await file.text());
-      const candidates = Array.isArray(parsed) ? parsed : parsed?.bots;
+      const fileText = await file.text();
+      let candidates;
+
+      if (file.name.toLowerCase().endsWith('.xml')) {
+        const xmlDocument = new DOMParser().parseFromString(fileText, 'application/xml');
+        if (xmlDocument.getElementsByTagName('parsererror').length || !xmlDocument.querySelector('xml, block')) {
+          throw new Error('The XML file does not contain a valid bot strategy.');
+        }
+        const fileName = file.name.replace(/\.xml$/i, '').trim() || 'Imported XML bot';
+        candidates = [{
+          name: fileName,
+          description: 'Imported XML bot strategy.',
+          market: 'R_100',
+          tradeType: 'Rise / Fall',
+          contract: 'XML strategy',
+          script: fileText,
+          format: 'xml',
+        }];
+      } else {
+        const parsed = JSON.parse(fileText);
+        candidates = Array.isArray(parsed) ? parsed : parsed?.bots;
+      }
+
       if (!Array.isArray(candidates) || candidates.length === 0) {
         throw new Error('The file must contain a non-empty bot list.');
       }
@@ -324,7 +345,7 @@ function Bots({ path }) {
           <div className="hero-actions">
             <label className="outline-button import-bots-button">
               Import bots
-              <input type="file" accept=".json,application/json" onChange={importBots} />
+              <input type="file" accept=".json,.xml,application/json,application/xml,text/xml" onChange={importBots} />
             </label>
             <Link className="primary-button" href="/builder">Build custom <span>+</span></Link>
           </div>
