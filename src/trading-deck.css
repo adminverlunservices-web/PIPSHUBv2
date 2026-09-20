@@ -1160,6 +1160,145 @@
   }
 }
 
+.positions-page {
+  padding: 24px 24px 32px;
+}
+
+.positions-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.positions-kicker {
+  display: block;
+  color: #9bb1cf;
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.positions-header h2 {
+  margin: 0;
+  color: #edf5ff;
+  font-size: 2rem;
+}
+
+.positions-action {
+  border: 1px solid rgba(153, 172, 196, 0.22);
+  background: rgba(19, 31, 45, 0.9);
+  color: #edf5ff;
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.positions-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.summary-card {
+  background: rgba(15, 25, 36, 0.9);
+  border: 1px solid rgba(151, 170, 194, 0.18);
+  border-radius: 16px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.summary-card span {
+  color: #9bb1cf;
+  font-size: 0.74rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.summary-card strong {
+  color: #edf5ff;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.summary-card small {
+  color: #a9bfd7;
+  font-size: 0.72rem;
+}
+
+.summary-card .positive {
+  color: #6ee4b4;
+}
+
+.positions-table-wrap {
+  background: rgba(15, 25, 36, 0.9);
+  border: 1px solid rgba(151, 170, 194, 0.18);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.positions-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.positions-table th,
+.positions-table td {
+  padding: 14px 16px;
+  text-align: left;
+  border-bottom: 1px solid rgba(151, 170, 194, 0.12);
+}
+
+.positions-table th {
+  color: #9bb1cf;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: rgba(9, 17, 25, 0.7);
+}
+
+.positions-table td {
+  color: #edf5ff;
+  font-size: 0.88rem;
+}
+
+.positions-table td.positive,
+.positive {
+  color: #6ee4b4;
+}
+
+.positions-table td.negative,
+.negative {
+  color: #f29292;
+}
+
+.position-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 72px;
+  padding: 5px 8px;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.position-status.open {
+  background: rgba(20, 150, 93, 0.18);
+  color: #6ee4b4;
+}
+
+.position-status.closed {
+  background: rgba(216, 82, 82, 0.14);
+  color: #f29292;
+}
+
 .trading-deck-chart {
   position: relative;
   width: 100%;

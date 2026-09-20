@@ -335,6 +335,7 @@ function TradingDeckPage() {
   const [tradeStatus, setTradeStatus] = useState('Ready');
   const [loadedBot, setLoadedBot] = useState(null);
   const [showHistory, setShowHistory] = useState(true);
+  const [activeSidebarView, setActiveSidebarView] = useState('Positions');
   const [activeTradesMinimized, setActiveTradesMinimized] = useState(false);
   const [activeTrades, setActiveTrades] = useState([]);
   const socketRef = useRef(null);
@@ -540,13 +541,108 @@ function TradingDeckPage() {
 
   const sideMenu = [
     { label: 'Home', icon: '⌂' },
-    { label: 'Positions', icon: '◫', active: true },
-    { label: 'Reports', icon: '▣' },
-    { label: 'Help', icon: '◍' },
-    { label: 'Language', icon: '◌' },
-    { label: 'Theme', icon: '◐' },
-    { label: 'Log out', icon: '↵' },
+    { label: 'Positions', icon: '◫', active: activeSidebarView === 'Positions' },
+    { label: 'Reports', icon: '▣', active: activeSidebarView === 'Reports' },
+    { label: 'Help', icon: '◍', active: activeSidebarView === 'Help' },
+    { label: 'Language', icon: '◌', active: activeSidebarView === 'Language' },
+    { label: 'Theme', icon: '◐', active: activeSidebarView === 'Theme' },
+    { label: 'Log out', icon: '↵', active: activeSidebarView === 'Log out' },
   ];
+
+  if (activeSidebarView === 'Positions') {
+    return (
+      <div className="trading-deck-page">
+        <aside className="trading-deck-sidebar" aria-label="Sidebar">
+          <div className="sidebar-brand" aria-label="Brand logo">DT</div>
+          <nav className="sidebar-nav" aria-label="Main navigation">
+            {sideMenu.map(({ label, icon, active }) => (
+              <button
+                key={label}
+                type="button"
+                className={`sidebar-item ${active ? 'is-active' : ''}`}
+                aria-label={label}
+                onClick={() => setActiveSidebarView(label)}
+              >
+                <span className="sidebar-icon" aria-hidden="true">{icon}</span>
+                <span className="sidebar-label">{label}</span>
+              </button>
+            ))}
+          </nav>
+        </aside>
+
+        <div className="trading-deck-main">
+          <header className="trading-deck-topbar">
+            <div className="trading-deck-brand-wrap">
+              <div className="trading-deck-brand-mark" aria-label="Brand logo">
+                <span className="brand-dot">V</span>
+              </div>
+              <span className="trading-deck-brand-name">VERLUN| Trading Deck</span>
+            </div>
+          </header>
+
+          <section className="positions-page">
+            <div className="positions-header">
+              <div>
+                <span className="positions-kicker">Portfolio</span>
+                <h2>Positions</h2>
+              </div>
+              <button type="button" className="positions-action">+ Add position</button>
+            </div>
+
+            <div className="positions-summary-grid">
+              <article className="summary-card">
+                <span>Open positions</span>
+                <strong>12</strong>
+                <small>Across 4 markets</small>
+              </article>
+              <article className="summary-card">
+                <span>P&L today</span>
+                <strong className="positive">+$342.80</strong>
+                <small>+6.8% vs yesterday</small>
+              </article>
+              <article className="summary-card">
+                <span>Margin used</span>
+                <strong>$1,240.00</strong>
+                <small>32% of balance</small>
+              </article>
+            </div>
+
+            <div className="positions-table-wrap">
+              <table className="positions-table">
+                <thead>
+                  <tr>
+                    <th>Asset</th>
+                    <th>Type</th>
+                    <th>Direction</th>
+                    <th>Stake</th>
+                    <th>P&L</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    ['R_100', 'Rise / Fall', 'Rise', '$25.00', '+$12.30', 'Open'],
+                    ['R_75', 'Digits', 'Over 5', '$18.00', '+$4.90', 'Open'],
+                    ['1HZ10V', 'Touch / No Touch', 'Touch', '$40.00', '-$3.40', 'Open'],
+                    ['R_50', 'Accumulators', 'Up', '$60.00', '+$16.20', 'Closed'],
+                  ].map(([asset, type, direction, stake, pnl, status]) => (
+                    <tr key={asset + type}>
+                      <td>{asset}</td>
+                      <td>{type}</td>
+                      <td>{direction}</td>
+                      <td>{stake}</td>
+                      <td className={pnl.startsWith('+') ? 'positive' : 'negative'}>{pnl}</td>
+                      <td><span className={`position-status ${status === 'Open' ? 'open' : 'closed'}`}>{status}</span></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="trading-deck-page">
