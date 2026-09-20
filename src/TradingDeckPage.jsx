@@ -591,46 +591,6 @@ function TradingDeckPage() {
   return (
     <div className="trading-deck-page">
       <div className="trading-deck-main">
-        <div className="trading-deck-controls">
-        <label className="selector-card">
-          <span className="selector-label">Trade type</span>
-          <select
-            value={tradeType}
-            onChange={(event) => {
-              const nextType = event.target.value;
-              setTradeType(nextType);
-              const nextTradeType = tradeTypeOptions[nextType] || tradeTypeOptions['Higher / Lower'];
-              setTradeDirection(nextTradeType.primaryValue);
-            }}
-            className="selector-native"
-          >
-            <option>Higher / Lower</option>
-            <option>Rise / Fall</option>
-            <option>Touch / No Touch</option>
-            <option>Even / Odd</option>
-            <option>Accumulators</option>
-            <option>Digits</option>
-          </select>
-          <span className="selector-caret">⌄</span>
-        </label>
-
-        <label className="selector-card active">
-          <span className="selector-label">Volatility</span>
-          <select value={market} onChange={(event) => setMarket(event.target.value)} className="selector-native">
-            <option value="R_10">Volatility 10 Index</option>
-            <option value="R_25">Volatility 25 Index</option>
-            <option value="R_50">Volatility 50 Index</option>
-            <option value="R_75">Volatility 75 Index</option>
-            <option value="R_100">Volatility 100 Index</option>
-            <option value="1HZ10V">Volatility 10 (1s) Index</option>
-            <option value="1HZ50V">Volatility 50 (1s) Index</option>
-            <option value="1HZ75V">Volatility 75 (1s) Index</option>
-            <option value="1HZ100V">Volatility 100 (1s) Index</option>
-          </select>
-          <span className="selector-caret">⌄</span>
-        </label>
-      </div>
-
       <div className="trading-deck-live-panel">
         <LiveFeedChart market={market} onMarketChange={setMarket} onQuoteChange={setLiveQuote} />
 
@@ -912,63 +872,6 @@ function TradingDeckPage() {
         </div>
       )}
 
-      {showHistory && (
-        <section className="history-panel" aria-live="polite">
-          <div className="history-panel-header">
-            <div>
-              <span className="history-kicker">Activity history</span>
-              <h3>Trades & contracts</h3>
-            </div>
-            <span className="history-badge">{tradeHistory.length + contractHistory.length} records</span>
-          </div>
-
-          <div className="history-grid">
-            <article className="history-card">
-              <div className="history-card-header">
-                <span className="history-card-label">Recent trades</span>
-                <strong>{tradeHistory.length}</strong>
-              </div>
-              {tradeHistory.map((trade) => (
-                <div className="history-row" key={trade.id}>
-                  <div>
-                    <span className="history-row-title">{trade.id}</span>
-                    <small>{trade.market} · {trade.side}</small>
-                  </div>
-                  <div className="history-row-meta">
-                    <span>{trade.time}</span>
-                    <strong>${trade.stake.toFixed(2)}</strong>
-                  </div>
-                  <div className={`history-status ${trade.status === 'Won' ? 'is-win' : 'is-loss'}`}>
-                    {trade.status}
-                  </div>
-                </div>
-              ))}
-            </article>
-
-            <article className="history-card">
-              <div className="history-card-header">
-                <span className="history-card-label">Recent contracts</span>
-                <strong>{contractHistory.length}</strong>
-              </div>
-              {contractHistory.map((contract) => (
-                <div className="history-row" key={contract.id}>
-                  <div>
-                    <span className="history-row-title">{contract.id}</span>
-                    <small>{contract.market} · {contract.type}</small>
-                  </div>
-                  <div className="history-row-meta">
-                    <span>{contract.time}</span>
-                    <strong>{contract.profit}</strong>
-                  </div>
-                  <div className={`history-status ${contract.status === 'Settled' ? 'is-win' : 'is-loss'}`}>
-                    {contract.status}
-                  </div>
-                </div>
-              ))}
-            </article>
-          </div>
-        </section>
-      )}
     </div>
   );
 }
