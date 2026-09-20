@@ -52,9 +52,38 @@ async function requestJson(url, options) {
 
 function Layout({ route, title, children }) {
   return (
-    <main className="shell">
-      {children}
-    </main>
+    <>
+      <aside className="sidebar" data-sidebar>
+        <div className="brand"><b>PIP</b><small>HUB</small></div>
+        <p className="eyebrow">Navigation</p>
+        <nav aria-label="Main navigation">
+          {nav.map(([key, label, path]) => (
+            <Link key={path} href={path} className={`nav-link ${route === key ? 'is-active' : ''}`}>
+              <span className="nav-dot" />
+              <span>{label}</span>
+            </Link>
+          ))}
+        </nav>
+        <div className="sidebar-foot">
+          <span className="connection"><i /> Match connected</span>
+          <a href="#/account">Refresh session</a>
+        </div>
+      </aside>
+
+      <main className="shell">
+        <header className="topbar">
+          <div>
+            <p className="eyebrow">Workspace</p>
+            <h1>{title || 'PIPSHUB V3'}</h1>
+          </div>
+          <div className="top-actions">
+            <span className="connection"><i /> Live</span>
+            <button type="button" className="login-button">Connect Deriv</button>
+          </div>
+        </header>
+        {children}
+      </main>
+    </>
   );
 }
 
