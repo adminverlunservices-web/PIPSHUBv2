@@ -19,6 +19,167 @@
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
+  position: relative;
+}
+
+.positions-popup {
+  position: absolute;
+  top: 16px;
+  left: 18px;
+  width: min(420px, calc(100% - 32px));
+  background: rgba(7, 17, 26, 0.96);
+  border: 1px solid rgba(150, 171, 196, 0.22);
+  border-radius: 18px;
+  box-shadow: 0 24px 44px rgba(4, 9, 16, 0.5);
+  z-index: 45;
+  overflow: hidden;
+}
+
+.positions-popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid rgba(150, 171, 196, 0.15);
+  color: #edf5ff;
+}
+
+.positions-close-button {
+  width: 28px;
+  height: 28px;
+  border: 1px solid rgba(150, 171, 196, 0.24);
+  border-radius: 50%;
+  background: rgba(17, 31, 47, 0.9);
+  color: #edf5ff;
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.positions-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  padding: 10px 12px 0;
+}
+
+.positions-tabs button {
+  border: 1px solid rgba(150, 171, 196, 0.2);
+  background: rgba(17, 27, 37, 0.9);
+  color: #dfeaf8;
+  border-radius: 10px;
+  min-height: 38px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.positions-tabs button.is-active {
+  background: rgba(62, 118, 222, 0.18);
+  border-color: rgba(120, 180, 255, 0.55);
+  color: #edf5ff;
+}
+
+.positions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  max-height: 380px;
+  overflow-y: auto;
+}
+
+.positions-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 10px;
+  border-radius: 12px;
+  background: rgba(15, 25, 36, 0.9);
+  border: 1px solid rgba(150, 170, 196, 0.18);
+}
+
+.positions-item-main {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 74px;
+}
+
+.positions-symbol {
+  color: #edf5ff;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.positions-direction {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  min-width: 52px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.66rem;
+  font-weight: 700;
+}
+
+.positions-direction.is-rise {
+  background: rgba(20, 150, 93, 0.18);
+  color: #6ee4b4;
+}
+
+.positions-direction.is-fall {
+  background: rgba(216, 82, 82, 0.14);
+  color: #f29292;
+}
+
+.positions-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 60px;
+  color: #aabed8;
+  font-size: 0.68rem;
+}
+
+.positions-meta strong {
+  color: #edf5ff;
+  font-size: 0.78rem;
+}
+
+.positions-badge {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 72px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.positions-badge.is-winning {
+  background: rgba(20, 150, 93, 0.18);
+  color: #6ee4b4;
+}
+
+.positions-badge.is-losing {
+  background: rgba(216, 82, 82, 0.14);
+  color: #f29292;
+}
+
+.positions-empty {
+  padding: 16px 10px;
+  color: rgba(221, 232, 245, 0.7);
+  font-size: 0.82rem;
+  text-align: center;
+  border: 1px dashed rgba(160, 178, 200, 0.25);
+  border-radius: 12px;
 }
 
 .trading-deck-side-rail {

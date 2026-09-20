@@ -336,7 +336,14 @@ function TradingDeckPage() {
   const [loadedBot, setLoadedBot] = useState(null);
   const [activeTradesMinimized, setActiveTradesMinimized] = useState(false);
   const [activeTrades, setActiveTrades] = useState([]);
+  const [positionsOpen, setPositionsOpen] = useState(false);
+  const [positionsTab, setPositionsTab] = useState('open');
   const socketRef = useRef(null);
+  const closedTrades = [
+    { id: 1, symbol: 'R_100', direction: 'Rise', status: 'Winning', stake: 25, price: 119.42, closedAt: 'Yesterday • 17:14' },
+    { id: 2, symbol: '1HZ50V', direction: 'Fall', status: 'Losing', stake: 40, price: 62.88, closedAt: 'Mon • 11:08' },
+    { id: 3, symbol: 'R_75', direction: 'Rise', status: 'Winning', stake: 18, price: 86.91, closedAt: 'Sun • 09:42' },
+  ];
   const marketMeta = {
     R_10: { name: 'Volatility 10 Index', price: 18.42 },
     R_25: { name: 'Volatility 25 Index', price: 36.88 },
@@ -530,12 +537,99 @@ function TradingDeckPage() {
       <aside className="trading-deck-side-rail" aria-label="Trading deck panel rail">
         <div className="trading-deck-rail-brand">V</div>
         <a href="#/trading-deck" className="trading-deck-rail-button is-active">Trade</a>
-        <a href="#/markets" className="trading-deck-rail-button">Markets</a>
+        <button type="button" className="trading-deck-rail-button" onClick={() => setPositionsOpen((open) => !open)}>Positions</button>
         <a href="#/bots" className="trading-deck-rail-button">Bots</a>
         <a href="#/builder" className="trading-deck-rail-button">Builder</a>
       </aside>
 
       <div className="trading-deck-content">
+        {positionsOpen && (
+          <div className="positions-popup" role="dialog" aria-modal="false" aria-label="Positions panel">
+            <div className="positions-popup-header">
+              <strong>Positions</strong>
+              <button type="button" className="positions-close-button" onClick={() => setPositionsOpen(false)} aria-label="Close positions panel">
+                ×
+              </button>
+            </div>
+
+            <div className="positions-tabs" role="tablist" aria-label="Positions tabs">
+              <button
+                type="button"
+                className={positionsTab === 'open' ? 'is-active' : ''}
+                onClick={() => setPositionsTab('open')}
+                role="tab"
+                aria-selected={positionsTab === 'open'}
+              >
+                Open
+              </button>
+              <button
+                type="button"
+                className={positionsTab === 'closed' ? 'is-active' : ''}
+                onClick={() => setPositionsTab('closed')}
+                role="tab"
+                aria-selected={positionsTab === 'closed'}
+              >
+                Closed
+              </button>
+            </div>
+
+            <div className="positions-list">
+              {positionsTab === 'open' ? (
+                activeTrades.length > 0 ? (
+                  activeTrades.map((trade) => (
+                    <div key={trade.id} className="positions-item">
+                      <div className="positions-item-main">
+                        <span className="positions-symbol">{trade.symbol}</span>
+                        <span className={`positions-direction ${trade.direction.toLowerCase() === 'fall' || trade.direction.toLowerCase() === 'down' || trade.direction.toLowerCase() === 'odd' || trade.direction.toLowerCase() === 'under' ? 'is-fall' : 'is-rise'}`}>
+                          {trade.direction}
+                        </span>
+                      </div>
+                      <div className="positions-meta">
+                        <span>Stake</span>
+                        <strong>${Number(trade.stake).toFixed(2)}</strong>
+                      </div>
+                      <div className="positions-meta">
+                        <span>Price</span>
+                        <strong>{Number(trade.price).toFixed(2)}</strong>
+                      </div>
+                      <span className={`positions-badge ${trade.status === 'Losing' ? 'is-losing' : 'is-winning'}`}>
+                        {trade.status || 'Winning'}
+                      </span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="positions-empty">No open trades</div>
+                )
+              ) : (
+                closedTrades.length > 0 ? (
+                  closedTrades.map((trade) => (
+                    <div key={trade.id} className="positions-item">
+                      <div className="positions-item-main">
+                        <span className="positions-symbol">{trade.symbol}</span>
+                        <span className={`positions-direction ${trade.direction.toLowerCase() === 'fall' ? 'is-fall' : 'is-rise'}`}>
+                          {trade.direction}
+                        </span>
+                      </div>
+                      <div className="positions-meta">
+                        <span>Payout</span>
+                        <strong>${Number(trade.stake).toFixed(2)}</strong>
+                      </div>
+                      <div className="positions-meta">
+                        <span>Closed</span>
+                        <strong>{trade.closedAt}</strong>
+                      </div>
+                      <span className={`positions-badge ${trade.status === 'Losing' ? 'is-losing' : 'is-winning'}`}>
+                        {trade.status}
+                      </span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="positions-empty">No closed trades</div>
+                )
+              )}
+            </div>
+          </div>
+        )}
         <header className="trading-deck-topbar">
           <div className="trading-deck-brand-wrap">
           <div className="trading-deck-brand-mark" aria-label="Deriv logo">
