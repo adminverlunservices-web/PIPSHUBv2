@@ -333,6 +333,7 @@ function TradingDeckPage() {
   const [multiplier, setMultiplier] = useState('1');
   const [liveQuote, setLiveQuote] = useState(null);
   const [tradeStatus, setTradeStatus] = useState('Ready');
+  const [tradeSuccessMessage, setTradeSuccessMessage] = useState('');
   const [loadedBot, setLoadedBot] = useState(null);
   const [activeTradesMinimized, setActiveTradesMinimized] = useState(false);
   const [activeTrades, setActiveTrades] = useState([]);
@@ -340,9 +341,9 @@ function TradingDeckPage() {
   const [positionsTab, setPositionsTab] = useState('open');
   const socketRef = useRef(null);
   const closedTrades = [
-    { id: 1, symbol: 'R_100', direction: 'Rise', status: 'Winning', stake: 25, price: 119.42, closedAt: 'Yesterday • 17:14' },
-    { id: 2, symbol: '1HZ50V', direction: 'Fall', status: 'Losing', stake: 40, price: 62.88, closedAt: 'Mon • 11:08' },
-    { id: 3, symbol: 'R_75', direction: 'Rise', status: 'Winning', stake: 18, price: 86.91, closedAt: 'Sun • 09:42' },
+    { id: 1, symbol: 'R_100', direction: 'Rise', status: 'Won', stake: 25, price: 119.42, closedAt: 'Yesterday • 17:14' },
+    { id: 2, symbol: '1HZ50V', direction: 'Fall', status: 'Lost', stake: 40, price: 62.88, closedAt: 'Mon • 11:08' },
+    { id: 3, symbol: 'R_75', direction: 'Rise', status: 'Won', stake: 18, price: 86.91, closedAt: 'Sun • 09:42' },
   ];
   const marketMeta = {
     R_10: { name: 'Volatility 10 Index', price: 18.42 },
@@ -404,6 +405,13 @@ function TradingDeckPage() {
     }
   }, []);
 
+  useEffect(() => {
+    if (!tradeSuccessMessage) return undefined;
+
+    const timeoutId = window.setTimeout(() => setTradeSuccessMessage(''), 3500);
+    return () => window.clearTimeout(timeoutId);
+  }, [tradeSuccessMessage]);
+
   const stopTrade = (tradeId) => {
     setActiveTrades((current) => current.filter((trade) => trade.id !== tradeId));
   };
@@ -455,6 +463,7 @@ function TradingDeckPage() {
 
           if (message.buy) {
             setTradeStatus(`Contract opened. ID: ${message.buy.contract_id}`);
+            setTradeSuccessMessage(`Trade placed successfully · Contract ${message.buy.contract_id}`);
             setActiveTrades((current) => [
               {
                 id: Date.now(),
@@ -543,6 +552,12 @@ function TradingDeckPage() {
       </aside>
 
       <div className="trading-deck-content">
+        {tradeSuccessMessage && (
+          <div className="trade-success-popup" role="status" aria-live="polite">
+            <span className="trade-success-icon" aria-hidden="true">✓</span>
+            <span>{tradeSuccessMessage}</span>
+          </div>
+        )}
         {positionsOpen && (
           <div className="positions-popup" role="dialog" aria-modal="false" aria-label="Positions panel">
             <div className="positions-popup-header">
@@ -618,7 +633,7 @@ function TradingDeckPage() {
                         <span>Closed</span>
                         <strong>{trade.closedAt}</strong>
                       </div>
-                      <span className={`positions-badge ${trade.status === 'Losing' ? 'is-losing' : 'is-winning'}`}>
+                      <span className={`positions-badge ${trade.status === 'Lost' ? 'is-losing' : 'is-winning'}`}>
                         {trade.status}
                       </span>
                     </div>

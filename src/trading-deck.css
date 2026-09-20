@@ -22,6 +22,50 @@
   position: relative;
 }
 
+.trade-success-popup {
+  position: fixed;
+  top: 22px;
+  left: 50%;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: min(420px, calc(100vw - 32px));
+  padding: 13px 18px 13px 13px;
+  border: 1px solid rgba(109, 226, 178, 0.42);
+  border-radius: 14px;
+  background: rgba(8, 35, 31, 0.97);
+  box-shadow: 0 16px 34px rgba(3, 12, 15, 0.4);
+  color: #eafff6;
+  font-size: 0.82rem;
+  font-weight: 700;
+  transform: translateX(-50%);
+  animation: trade-success-popup-in 180ms ease-out;
+}
+
+.trade-success-icon {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  place-items: center;
+  border-radius: 50%;
+  background: #48c995;
+  color: #06231c;
+  font-size: 0.9rem;
+}
+
+@keyframes trade-success-popup-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -8px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
 .positions-popup {
   position: absolute;
   top: 16px;
@@ -2090,6 +2134,7 @@
     right: 12px;
     width: auto;
     bottom: 12px;
+    transform: none;
     padding: 10px 10px 12px;
   }
 
