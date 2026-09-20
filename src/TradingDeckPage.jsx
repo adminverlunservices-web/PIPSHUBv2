@@ -554,9 +554,11 @@ function TradingDeckPage() {
             </nav>
           )}
 
-          <div className="trading-deck-brand-mark" aria-label="Deriv logo">
-            <span className="brand-dot">d</span>
+          <div className="trading-deck-brand-mark" aria-label="Brand logo">
+            <span className="brand-dot">V</span>
           </div>
+
+          <span className="trading-deck-brand-name">VERLUN| Trading Deck</span>
         </div>
 
         <label className="trading-deck-search" aria-label="Search markets">
