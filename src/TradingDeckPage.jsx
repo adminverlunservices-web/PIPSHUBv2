@@ -365,7 +365,7 @@ function TradingDeckPage() {
   const tradeContractType = ['fall', 'down', 'odd', 'noTouch', 'under'].includes(tradeDirection) ? 'PUT' : 'CALL';
   const navItems = [
     { label: 'Dashboard', href: '#/' },
-    { label: 'Trading Deck', href: '#/trading-deck', active: true },
+    { label: 'VERLUN| PIPSHIB V3', href: '#/trading-deck', active: true },
     { label: 'Account Setup', href: '#/account' },
     { label: 'Contracts', href: '#/contracts' },
     { label: 'Manual Trading', href: '#/manual' },
