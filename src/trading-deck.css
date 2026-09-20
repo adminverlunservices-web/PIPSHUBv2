@@ -1706,22 +1706,22 @@
   }
 
   .trading-deck-layout {
-    display: flex;
-    flex-direction: column;
+    display: flex !important;
+    flex-direction: column !important;
     padding: 0 14px;
   }
 
   .trading-deck-main-column {
     width: 100%;
     max-width: 100%;
-    order: 1;
+    order: 1 !important;
   }
 
   .trading-card-wrap {
     width: 100%;
     max-width: 100%;
     flex-basis: auto;
-    order: 2;
+    order: 2 !important;
   }
 
   .trading-deck-topbar {
