@@ -756,11 +756,15 @@
 }
 
 .trading-deck-brand-wrap {
-  position: relative;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
-  min-width: 290px;
+  min-width: 0;
+  white-space: nowrap;
 }
 
 .trading-deck-menu {
@@ -1073,6 +1077,13 @@
   max-width: 460px;
 }
 
+.balance-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
 .balance-copy {
   display: flex;
   flex-direction: column;
@@ -1191,6 +1202,11 @@
 }
 
 .selector-native {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -1200,9 +1216,24 @@
   font-size: 0.95rem;
   font-weight: 600;
   outline: none;
-  flex: 1 1 auto;
-  padding-right: 18px;
+  opacity: 0;
   cursor: pointer;
+}
+
+.selector-label,
+.selector-value,
+.selector-caret {
+  pointer-events: none;
+}
+
+.selector-value {
+  min-width: 0;
+  overflow: hidden;
+  color: #edf4ff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .selector-native option {
@@ -2235,8 +2266,12 @@
   }
 
   .trading-deck-brand-wrap {
+    position: static;
+    transform: none;
     min-width: 0;
     flex: 1 1 auto;
+    justify-content: flex-start;
+    white-space: normal;
   }
 
   .trading-deck-search {

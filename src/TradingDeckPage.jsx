@@ -323,6 +323,7 @@ function LiveFeedChart({ market = 'R_100', onMarketChange, onQuoteChange }) {
 function TradingDeckPage() {
   const [balance, setBalance] = useState('--');
   const [currency, setCurrency] = useState('USD');
+  const [accountType, setAccountType] = useState('demo');
   const [tradeType, setTradeType] = useState('Higher / Lower');
   const [market, setMarket] = useState('R_100');
   const [searchQuery, setSearchQuery] = useState('');
@@ -336,7 +337,7 @@ function TradingDeckPage() {
   const [tradeStatus, setTradeStatus] = useState('Ready');
   const [tradeSuccessMessage, setTradeSuccessMessage] = useState('');
   const [loadedBot, setLoadedBot] = useState(null);
-  const [activeTradesMinimized, setActiveTradesMinimized] = useState(false);
+  const [activeTradesMinimized, setActiveTradesMinimized] = useState(true);
   const [activeTrades, setActiveTrades] = useState([]);
   const [positionsOpen, setPositionsOpen] = useState(false);
   const [positionsTab, setPositionsTab] = useState('open');
@@ -472,7 +473,11 @@ function TradingDeckPage() {
   }, [positionsOpen, positionsTab]);
 
   const stopTrade = (tradeId) => {
-    setActiveTrades((current) => current.filter((trade) => trade.id !== tradeId));
+    setActiveTrades((current) => {
+      const nextTrades = current.filter((trade) => trade.id !== tradeId);
+      if (nextTrades.length === 0) setActiveTradesMinimized(true);
+      return nextTrades;
+    });
   };
 
   const loadBot = (bot) => {
@@ -534,6 +539,7 @@ function TradingDeckPage() {
           if (message.buy) {
             setTradeStatus(`Contract opened. ID: ${message.buy.contract_id}`);
             setTradeSuccessMessage(`Trade placed successfully · Contract ${message.buy.contract_id}`);
+            setActiveTradesMinimized(false);
             setActiveTrades((current) => [
               {
                 id: Date.now(),
@@ -594,6 +600,7 @@ function TradingDeckPage() {
         if (payload && typeof payload.balance === 'number') {
           setBalance(`${payload.balance.toFixed(2)}`);
           setCurrency(payload.currency || 'USD');
+          setAccountType(payload.account_type === 'real' ? 'real' : 'demo');
         } else {
           setBalance('--');
           setCurrency('USD');
@@ -603,6 +610,7 @@ function TradingDeckPage() {
         if (active) {
           setBalance('--');
           setCurrency('USD');
+          setAccountType('demo');
         }
       });
 
@@ -746,7 +754,7 @@ function TradingDeckPage() {
         )}
         <header className="trading-deck-topbar">
           <div className="trading-deck-brand-wrap">
-          <span className="trading-deck-trade-label">Trade</span>
+          <span className="trading-deck-trade-label">Trading with {accountType} account</span>
         </div>
 
         <label className="trading-deck-search" aria-label="Search markets">
@@ -761,39 +769,6 @@ function TradingDeckPage() {
           <span className="search-shortcut">⌘ K</span>
         </label>
 
-        <div className="trading-deck-tools">
-          <button type="button" className="tool-pill tool-pill-ghost" aria-label="Filter">
-            <FilterIcon />
-          </button>
-          <div className="notification-control">
-            <button type="button" className="tool-pill tool-pill-notify" onClick={() => setNotificationsOpen((open) => !open)} aria-label="Recent closed trade notifications" aria-expanded={notificationsOpen}>
-              <span className="notify-dot"></span>
-              <BellIcon />
-            </button>
-            {notificationsOpen && (
-              <div className="trade-notifications-popup" role="dialog" aria-label="Recent closed trade notifications">
-                <div className="trade-notifications-header">
-                  <strong>Recent closed trades</strong>
-                  <button type="button" onClick={() => setNotificationsOpen(false)} aria-label="Close notifications">×</button>
-                </div>
-                <div className="trade-notifications-list">
-                  {closedTrades.slice(0, 3).map((trade) => (
-                    <div key={trade.id} className="trade-notification-item">
-                      <span className={`trade-notification-icon ${trade.status === 'Lost' ? 'is-lost' : 'is-won'}`} aria-hidden="true">
-                        {trade.status === 'Lost' ? '!' : '✓'}
-                      </span>
-                      <div>
-                        <strong>{trade.symbol} trade {trade.status.toLowerCase()}</strong>
-                        <span>${Number(trade.stake).toFixed(2)} stake · {trade.closedAt}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
         <div className="trading-deck-balance-block">
           <div className="balance-copy">
             <span className="balance-label">DEMO BALANCE</span>
@@ -803,7 +778,38 @@ function TradingDeckPage() {
             <WalletIcon />
             <span>Deposit</span>
           </button>
-          <div className="debit-badge">JD</div>
+          <div className="balance-actions">
+            <button type="button" className="tool-pill tool-pill-ghost" aria-label="Filter">
+              <FilterIcon />
+            </button>
+            <div className="notification-control">
+              <button type="button" className="tool-pill tool-pill-notify" onClick={() => setNotificationsOpen((open) => !open)} aria-label="Recent closed trade notifications" aria-expanded={notificationsOpen}>
+                <span className="notify-dot"></span>
+                <BellIcon />
+              </button>
+              {notificationsOpen && (
+                <div className="trade-notifications-popup" role="dialog" aria-label="Recent closed trade notifications">
+                  <div className="trade-notifications-header">
+                    <strong>Recent closed trades</strong>
+                    <button type="button" onClick={() => setNotificationsOpen(false)} aria-label="Close notifications">×</button>
+                  </div>
+                  <div className="trade-notifications-list">
+                    {closedTrades.slice(0, 3).map((trade) => (
+                      <div key={trade.id} className="trade-notification-item">
+                        <span className={`trade-notification-icon ${trade.status === 'Lost' ? 'is-lost' : 'is-won'}`} aria-hidden="true">
+                          {trade.status === 'Lost' ? '!' : '✓'}
+                        </span>
+                        <div>
+                          <strong>{trade.symbol} trade {trade.status.toLowerCase()}</strong>
+                          <span>${Number(trade.stake).toFixed(2)} stake · {trade.closedAt}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
           </div>
         </header>
 
@@ -829,6 +835,7 @@ function TradingDeckPage() {
                 <option>Accumulators</option>
                 <option>Digits</option>
               </select>
+              <span className="selector-value">{tradeType}</span>
               <span className="selector-caret">⌄</span>
             </label>
 
@@ -845,6 +852,7 @@ function TradingDeckPage() {
                 <option value="1HZ75V">Volatility 75 (1s) Index</option>
                 <option value="1HZ100V">Volatility 100 (1s) Index</option>
               </select>
+              <span className="selector-value">{currentMarket.name}</span>
               <span className="selector-caret">⌄</span>
             </label>
           </div>
