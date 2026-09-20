@@ -380,7 +380,8 @@ function TradingDeckPage() {
     { label: 'Bot Builder', href: '#/builder' },
   ];
 
-  const payout = Number((stake * 1.92).toFixed(2));
+  const marketMovement = currentMarket.price > 0 ? currentPrice / currentMarket.price : 1;
+  const payout = Number((Number(stake) * 1.92 * marketMovement).toFixed(2));
   const profit = Number((payout - stake).toFixed(2));
   const profitPercent = Number(((profit / stake) * 100).toFixed(1));
   const loadedBotScript = loadedBot?.script
