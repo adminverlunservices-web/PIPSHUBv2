@@ -528,10 +528,10 @@ function TradingDeckPage() {
     <div className="trading-deck-page">
       <aside className="trading-deck-side-rail" aria-label="Trading deck panel rail">
         <div className="trading-deck-rail-brand">V</div>
-        <button type="button" className="trading-deck-rail-button is-active">Trade</button>
-        <button type="button" className="trading-deck-rail-button">Markets</button>
-        <button type="button" className="trading-deck-rail-button">Bots</button>
-        <button type="button" className="trading-deck-rail-button">Signals</button>
+        <a href="#/trading-deck" className="trading-deck-rail-button is-active">Trade</a>
+        <a href="#/markets" className="trading-deck-rail-button">Markets</a>
+        <a href="#/bots" className="trading-deck-rail-button">Bots</a>
+        <a href="#/builder" className="trading-deck-rail-button">Builder</a>
       </aside>
 
       <div className="trading-deck-content">
