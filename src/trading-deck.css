@@ -1275,6 +1275,30 @@
   color: #f29292;
 }
 
+.active-trade-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  min-width: 62px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.active-trade-status.is-winning {
+  background: rgba(20, 150, 93, 0.18);
+  color: #6ee4b4;
+}
+
+.active-trade-status.is-losing {
+  background: rgba(216, 82, 82, 0.14);
+  color: #f29292;
+}
+
 .active-trade-meta {
   display: flex;
   flex-direction: column;

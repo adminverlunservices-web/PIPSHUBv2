@@ -453,6 +453,7 @@ function TradingDeckPage() {
                 id: Date.now(),
                 symbol: market,
                 direction: directionLabel,
+                status: tradeDirection === activeTradeType.secondaryValue ? 'Losing' : 'Winning',
                 stake: amount,
                 price: Number(currentPrice || liveQuote || currentMarket.price),
               },
@@ -887,6 +888,9 @@ function TradingDeckPage() {
                     <span className={`active-trade-direction ${trade.direction.toLowerCase() === 'fall' || trade.direction.toLowerCase() === 'down' || trade.direction.toLowerCase() === 'odd' || trade.direction.toLowerCase() === 'under' ? 'is-fall' : 'is-rise'}`}>
                       {trade.direction}
                     </span>
+                    <span className={`active-trade-status ${trade.status === 'Losing' ? 'is-losing' : 'is-winning'}`}>
+                      {trade.status || 'Winning'}
+                    </span>
                   </div>
                   <div className="active-trade-meta">
                     <span>Stake</span>
@@ -907,8 +911,8 @@ function TradingDeckPage() {
           </div>
         </div>
       )}
-      </div>
     </div>
+  </div>
   );
 }
 
