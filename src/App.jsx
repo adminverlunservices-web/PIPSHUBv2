@@ -287,6 +287,16 @@ function Bots({ path }) {
   const [importedBots, setImportedBots] = useState([]);
   const [importStatus, setImportStatus] = useState('');
   const templates = ['Digit Compass', 'Tick Current', 'Quiet Range'];
+
+  useEffect(() => {
+    try {
+      const storedBots = JSON.parse(localStorage.getItem('pipshub:imported-bots') || '[]');
+      if (Array.isArray(storedBots)) setImportedBots(storedBots);
+    } catch {
+      localStorage.removeItem('pipshub:imported-bots');
+    }
+  }, []);
+
   const loadBot = (bot) => {
     localStorage.setItem('pipshub:selected-bot', JSON.stringify(bot));
     window.location.hash = '/trading-deck';
@@ -326,8 +336,17 @@ function Bots({ path }) {
       }
       const validBots = candidates.filter((bot) => bot && typeof bot === 'object' && typeof bot.name === 'string' && bot.name.trim());
       if (!validBots.length) throw new Error('No named bots were found in the selected file.');
-      setImportedBots(validBots);
-      setImportStatus(`${validBots.length} bot${validBots.length === 1 ? '' : 's'} imported.`);
+      setImportedBots((currentBots) => {
+        const mergedBots = [...currentBots];
+        validBots.forEach((bot) => {
+          const existingIndex = mergedBots.findIndex((currentBot) => currentBot.name.trim() === bot.name.trim());
+          if (existingIndex >= 0) mergedBots[existingIndex] = bot;
+          else mergedBots.push(bot);
+        });
+        localStorage.setItem('pipshub:imported-bots', JSON.stringify(mergedBots));
+        return mergedBots;
+      });
+      setImportStatus(`${validBots.length} bot${validBots.length === 1 ? '' : 's'} imported and saved.`);
       localStorage.setItem('pipshub:selected-bot', JSON.stringify(validBots[0]));
       window.location.hash = '/trading-deck';
     } catch (error) {
