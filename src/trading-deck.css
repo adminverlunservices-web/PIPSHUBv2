@@ -13,6 +13,14 @@
   overflow-x: hidden;
 }
 
+.trading-deck-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
 .trading-deck-side-rail {
   width: 92px;
   background: rgba(9, 17, 25, 0.92);
@@ -1718,17 +1726,20 @@
 
   .trading-deck-topbar {
     flex-wrap: wrap;
-    padding-bottom: 12px;
+    padding: 10px 12px 12px;
+    gap: 12px;
   }
 
   .trading-deck-brand-wrap {
-    min-width: unset;
+    min-width: 0;
+    flex: 1 1 auto;
   }
 
   .trading-deck-search {
     order: 3;
     width: 100%;
     max-width: none;
+    margin-left: 0;
   }
 
   .trading-deck-tools {
@@ -1736,19 +1747,28 @@
   }
 
   .trading-deck-balance-block {
-    margin-left: auto;
+    width: 100%;
+    max-width: none;
+    margin-left: 0;
+    justify-content: space-between;
   }
 }
 
 @media (max-width: 640px) {
   .trading-deck-page {
-    padding: 0 0 20px;
+    padding: 0 0 96px;
   }
 
   .trading-deck-side-rail {
     gap: 8px;
     overflow-x: auto;
     justify-content: flex-start;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .trading-deck-side-rail::-webkit-scrollbar {
+    display: none;
   }
 
   .trading-deck-rail-button {
@@ -1759,27 +1779,49 @@
   .trading-deck-brand-wrap {
     width: 100%;
     justify-content: space-between;
+    min-width: 0;
+  }
+
+  .trading-deck-trade-label {
+    display: none;
   }
 
   .trading-deck-topbar {
     gap: 12px;
   }
 
+  .trading-deck-tools {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
   .trading-deck-balance-block {
     width: 100%;
     justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .balance-copy {
+    flex: 1 1 100%;
+  }
+
+  .deposit-button {
+    flex: 1 1 auto;
   }
 
   .trading-deck-layout {
     display: flex !important;
     flex-direction: column !important;
     gap: 16px !important;
+    padding: 0 12px;
   }
 
   .trading-deck-main-column {
     order: 1 !important;
     width: 100% !important;
     max-width: 100% !important;
+    gap: 12px;
   }
 
   .trading-card-wrap {
@@ -1802,14 +1844,78 @@
     flex: 1 1 auto;
   }
 
+  .trading-deck-chart {
+    min-height: 260px;
+  }
+
+  .trading-deck-chart canvas {
+    height: 220px;
+  }
+
+  .trade-chooser,
   .trade-grid,
-  .trade-actions,
-  .summary-row {
+  .quick-stakes,
+  .summary-row,
+  .trade-actions {
     grid-template-columns: 1fr;
+  }
+
+  .quick-stakes {
+    display: grid;
+    gap: 8px;
   }
 
   .trading-card-shell,
   .trading-deck-chart {
     border-radius: 14px;
+  }
+
+  .trading-card-shell {
+    padding: 14px 12px 16px;
+  }
+
+  .trading-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .trading-card-market-row {
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .summary-row {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .active-trades-bar {
+    left: 12px;
+    right: 12px;
+    width: auto;
+    bottom: 12px;
+    padding: 10px 10px 12px;
+  }
+
+  .active-trades-list {
+    grid-template-columns: 1fr;
+  }
+
+  .active-trade-item {
+    flex-wrap: wrap;
+  }
+
+  .active-trade-meta {
+    min-width: 0;
+    flex: 1 1 32%;
+  }
+
+  .stop-trade-button {
+    width: 100%;
+    margin-left: 0;
+    margin-top: 6px;
   }
 }
