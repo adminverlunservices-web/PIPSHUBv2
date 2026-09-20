@@ -526,18 +526,27 @@ function TradingDeckPage() {
 
   return (
     <div className="trading-deck-page">
-      <header className="trading-deck-topbar">
-        <div className="trading-deck-brand-wrap">
-          <button
-            className={`trading-deck-menu ${menuOpen ? 'is-open' : ''}`}
-            type="button"
-            aria-label="Toggle menu"
-            onClick={() => setMenuOpen((open) => !open)}
-          >
-            <span></span>
-            <span></span>
-            <span></span>
-          </button>
+      <aside className="trading-deck-side-rail" aria-label="Trading deck panel rail">
+        <div className="trading-deck-rail-brand">V</div>
+        <button type="button" className="trading-deck-rail-button is-active">Trade</button>
+        <button type="button" className="trading-deck-rail-button">Markets</button>
+        <button type="button" className="trading-deck-rail-button">Bots</button>
+        <button type="button" className="trading-deck-rail-button">Signals</button>
+      </aside>
+
+      <div className="trading-deck-content">
+        <header className="trading-deck-topbar">
+          <div className="trading-deck-brand-wrap">
+            <button
+              className={`trading-deck-menu ${menuOpen ? 'is-open' : ''}`}
+              type="button"
+              aria-label="Toggle menu"
+              onClick={() => setMenuOpen((open) => !open)}
+            >
+              <span></span>
+              <span></span>
+              <span></span>
+            </button>
 
           {menuOpen && (
             <nav className="trading-deck-nav-panel" aria-label="Main navigation">
@@ -597,10 +606,10 @@ function TradingDeckPage() {
             <span>Deposit</span>
           </button>
           <div className="debit-badge">JD</div>
-        </div>
-      </header>
+          </div>
+        </header>
 
-      <div className="trading-deck-layout">
+        <div className="trading-deck-layout">
         <div className="trading-deck-main-column">
           <div className="trading-deck-controls">
             <label className="selector-card">

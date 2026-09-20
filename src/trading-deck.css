@@ -1,7 +1,7 @@
 .trading-deck-page {
   display: flex;
   flex-direction: row;
-  align-items: flex-start;
+  align-items: stretch;
   width: 100%;
   min-height: 100vh;
   background: #071a2c;
@@ -9,6 +9,59 @@
   font-family: 'Segoe UI', sans-serif;
   padding: 0;
   box-sizing: border-box;
+}
+
+.trading-deck-side-rail {
+  width: 92px;
+  background: rgba(9, 17, 25, 0.92);
+  border-right: 1px solid rgba(165, 183, 203, 0.18);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 18px 10px 16px;
+  box-sizing: border-box;
+}
+
+.trading-deck-rail-brand {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #2d9cf8 0%, #0d69ff 100%);
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+.trading-deck-rail-button {
+  width: 100%;
+  border: 1px solid rgba(152, 170, 191, 0.18);
+  background: rgba(17, 27, 36, 0.8);
+  color: #dfeaf8;
+  border-radius: 12px;
+  min-height: 56px;
+  padding: 8px 6px;
+  font: inherit;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.trading-deck-rail-button.is-active {
+  background: rgba(52, 111, 214, 0.22);
+  border-color: rgba(121, 173, 255, 0.5);
+  color: #ffffff;
+}
+
+.trading-deck-content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .trading-deck-sidebar {
