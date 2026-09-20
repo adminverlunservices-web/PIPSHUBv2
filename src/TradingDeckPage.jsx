@@ -340,14 +340,11 @@ function TradingDeckPage() {
   const [activeTrades, setActiveTrades] = useState([]);
   const [positionsOpen, setPositionsOpen] = useState(false);
   const [positionsTab, setPositionsTab] = useState('open');
+  const [closedTrades, setClosedTrades] = useState([]);
+  const [closedTradesLoading, setClosedTradesLoading] = useState(false);
   const [botsOpen, setBotsOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const socketRef = useRef(null);
-  const closedTrades = [
-    { id: 1, symbol: 'R_100', direction: 'Rise', status: 'Won', stake: 25, price: 119.42, closedAt: 'Yesterday • 17:14' },
-    { id: 2, symbol: '1HZ50V', direction: 'Fall', status: 'Lost', stake: 40, price: 62.88, closedAt: 'Mon • 11:08' },
-    { id: 3, symbol: 'R_75', direction: 'Rise', status: 'Won', stake: 18, price: 86.91, closedAt: 'Sun • 09:42' },
-  ];
   const marketMeta = {
     R_10: { name: 'Volatility 10 Index', price: 18.42 },
     R_25: { name: 'Volatility 25 Index', price: 36.88 },
@@ -414,6 +411,64 @@ function TradingDeckPage() {
     const timeoutId = window.setTimeout(() => setTradeSuccessMessage(''), 3500);
     return () => window.clearTimeout(timeoutId);
   }, [tradeSuccessMessage]);
+
+  useEffect(() => {
+    if (!positionsOpen || positionsTab !== 'closed') return undefined;
+
+    let socket;
+    let active = true;
+    setClosedTradesLoading(true);
+
+    fetch(apiUrl('api/deriv-session.js'), { credentials: 'include' })
+      .then(async (response) => {
+        const data = await response.json();
+        if (!response.ok || !data.ws_url) throw new Error(data.error || data.ws_error || 'Unable to load closed positions.');
+        return data.ws_url;
+      })
+      .then((wsUrl) => {
+        if (!active) return;
+        socket = new WebSocket(wsUrl);
+        socket.addEventListener('open', () => {
+          socket.send(JSON.stringify({ profit_table: 1, description: 1, sort: 'DESC', limit: 50 }));
+        });
+        socket.addEventListener('message', (event) => {
+          const message = JSON.parse(event.data);
+          if (message.error) {
+            if (active) setClosedTradesLoading(false);
+            socket.close();
+            return;
+          }
+          if (message.profit_table) {
+            const transactions = Array.isArray(message.profit_table.transactions) ? message.profit_table.transactions : [];
+            setClosedTrades(transactions.map((trade) => {
+              const profit = Number(trade.sell_price || 0) - Number(trade.buy_price || 0);
+              return {
+                id: trade.contract_id,
+                symbol: trade.underlying_symbol || 'Unknown market',
+                direction: trade.contract_type || 'Contract',
+                status: profit >= 0 ? 'Won' : 'Lost',
+                stake: Number(trade.buy_price || 0),
+                price: Number(trade.sell_price || 0),
+                closedAt: trade.sell_time ? new Date(Number(trade.sell_time) * 1000).toLocaleString() : 'Closed',
+              };
+            }));
+            setClosedTradesLoading(false);
+            socket.close();
+          }
+        });
+        socket.addEventListener('error', () => {
+          if (active) setClosedTradesLoading(false);
+        });
+      })
+      .catch(() => {
+        if (active) setClosedTradesLoading(false);
+      });
+
+    return () => {
+      active = false;
+      socket?.close();
+    };
+  }, [positionsOpen, positionsTab]);
 
   const stopTrade = (tradeId) => {
     setActiveTrades((current) => current.filter((trade) => trade.id !== tradeId));
@@ -633,7 +688,9 @@ function TradingDeckPage() {
                   <div className="positions-empty">No open trades</div>
                 )
               ) : (
-                closedTrades.length > 0 ? (
+                closedTradesLoading ? (
+                  <div className="positions-empty">Loading closed trades...</div>
+                ) : closedTrades.length > 0 ? (
                   closedTrades.map((trade) => (
                     <div key={trade.id} className="positions-item">
                       <div className="positions-item-main">
