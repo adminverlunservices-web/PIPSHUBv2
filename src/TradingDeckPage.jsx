@@ -528,50 +528,68 @@ function TradingDeckPage() {
 
   return (
     <div className="trading-deck-page">
-      <div className="trading-deck-panel">
-        <LiveFeedChart market={market} onMarketChange={setMarket} onQuoteChange={setLiveQuote} />
-      </div>
-
-      <div className="trading-card-shell">
-        <div className="trading-card-header">
-          <div>
-            <span className="trading-card-kicker">Trade</span>
-            <strong>{market}</strong>
-          </div>
-          <div className="quote-pill">{liveQuote ?? currentMarket.price}</div>
-        </div>
-
-        <div className="trade-direction-row">
-          {['Rise', 'Fall'].map((option) => (
+      <aside className="trading-deck-sidebar">
+        <div className="sidebar-brand">P</div>
+        <nav className="sidebar-nav" aria-label="Pipshub navigation">
+          {['Trade', 'History', 'Positions', 'Bots'].map((item, index) => (
             <button
-              key={option}
+              key={item}
               type="button"
-              className={directionLabel === option ? 'is-selected' : ''}
-              onClick={() => setTradeDirection(option === 'Rise' ? 'rise' : 'fall')}
+              className={`sidebar-item ${index === 0 ? 'is-active' : ''}`}
             >
-              {option}
+              <span className="sidebar-icon">{index === 0 ? '◈' : index === 1 ? '◫' : index === 2 ? '▣' : '✦'}</span>
+              <span className="sidebar-label">{item}</span>
             </button>
           ))}
+        </nav>
+      </aside>
+
+      <div className="trading-deck-main">
+        <div className="trading-deck-panel">
+          <LiveFeedChart market={market} onMarketChange={setMarket} onQuoteChange={setLiveQuote} />
         </div>
 
-        <div className="trade-form-grid">
-          <label>
-            <span>Stake</span>
-            <input type="number" min="0.35" step="0.01" value={stake} onChange={(event) => setStake(Number(event.target.value) || 0)} />
-          </label>
+        <div className="trading-card-shell">
+          <div className="trading-card-header">
+            <div>
+              <span className="trading-card-kicker">Trade</span>
+              <strong>{market}</strong>
+            </div>
+            <div className="quote-pill">{liveQuote ?? currentMarket.price}</div>
+          </div>
 
-          <label>
-            <span>Duration</span>
-            <input type="number" min="1" step="1" value={duration} onChange={(event) => setDuration(event.target.value)} />
-          </label>
+          <div className="trade-direction-row">
+            {['Rise', 'Fall'].map((option) => (
+              <button
+                key={option}
+                type="button"
+                className={directionLabel === option ? 'is-selected' : ''}
+                onClick={() => setTradeDirection(option === 'Rise' ? 'rise' : 'fall')}
+              >
+                {option}
+              </button>
+            ))}
+          </div>
+
+          <div className="trade-form-grid">
+            <label>
+              <span>Stake</span>
+              <input type="number" min="0.35" step="0.01" value={stake} onChange={(event) => setStake(Number(event.target.value) || 0)} />
+            </label>
+
+            <label>
+              <span>Duration</span>
+              <input type="number" min="1" step="1" value={duration} onChange={(event) => setDuration(event.target.value)} />
+            </label>
+          </div>
+
+          <div className="trade-actions">
+            <button type="button" className="trade-action trade-action-rise" onClick={openTrade}>Rise</button>
+            <button type="button" className="trade-action trade-action-fall" onClick={openTrade}>Fall</button>
+          </div>
+
+          <div className="trade-status">{tradeStatus}</div>
         </div>
-
-        <div className="trade-actions">
-          <button type="button" className="trade-action trade-action-rise" onClick={openTrade}>Rise</button>
-          <button type="button" className="trade-action trade-action-fall" onClick={openTrade}>Fall</button>
-        </div>
-
-        <div className="trade-status">{tradeStatus}</div>
       </div>
     </div>
   );
