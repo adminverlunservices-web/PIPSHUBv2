@@ -327,6 +327,7 @@ function TradingDeckPage() {
   const [currency, setCurrency] = useState('USD');
   const [accountType, setAccountType] = useState('demo');
   const [accountSwitching, setAccountSwitching] = useState(false);
+  const [localTime, setLocalTime] = useState(() => new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
   const [tradeType, setTradeType] = useState('Higher / Lower');
   const [market, setMarket] = useState('R_100');
   const [searchQuery, setSearchQuery] = useState('');
@@ -410,6 +411,14 @@ function TradingDeckPage() {
     || (Array.isArray(loadedBot?.scripts) ? loadedBot.scripts.join('\n') : '');
 
   useEffect(() => {
+    const timerId = window.setInterval(() => {
+      setLocalTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+    }, 1000);
+
+    return () => window.clearInterval(timerId);
+  }, []);
+
+  useEffect(() => {
     try {
       const storedBot = localStorage.getItem('pipshub:selected-bot');
       if (storedBot) {
@@ -472,6 +481,7 @@ function TradingDeckPage() {
                 status: profit >= 0 ? 'Won' : 'Lost',
                 stake: Number(trade.buy_price || 0),
                 price: Number(trade.sell_price || 0),
+                profit,
                 closedAt: trade.sell_time ? new Date(Number(trade.sell_time) * 1000).toLocaleString() : 'Closed',
               };
             }));
@@ -792,12 +802,14 @@ function TradingDeckPage() {
                         </span>
                       </div>
                       <div className="positions-meta">
-                        <span>Payout</span>
+                        <span>Stake</span>
                         <strong>${Number(trade.stake).toFixed(2)}</strong>
                       </div>
                       <div className="positions-meta">
-                        <span>Closed</span>
-                        <strong>{trade.closedAt}</strong>
+                        <span>Profit</span>
+                        <strong className={trade.status === 'Lost' ? 'is-loss-value' : 'is-profit-value'}>
+                          {trade.profit >= 0 ? '+' : '-'}${Math.abs(Number(trade.profit)).toFixed(2)}
+                        </strong>
                       </div>
                       <span className={`positions-badge ${trade.status === 'Lost' ? 'is-losing' : 'is-winning'}`}>
                         {trade.status}
@@ -837,7 +849,7 @@ function TradingDeckPage() {
         )}
         <header className="trading-deck-topbar">
           <div className="trading-deck-brand-wrap">
-          <span className="trading-deck-trade-label">Trading with {accountType} account</span>
+          <span className="trading-deck-trade-label">Trading with {accountType} account · {localTime}</span>
         </div>
 
         <label className="trading-deck-search" aria-label="Search markets">
@@ -884,7 +896,7 @@ function TradingDeckPage() {
                         </span>
                         <div>
                           <strong>{trade.symbol} trade {trade.status.toLowerCase()}</strong>
-                          <span>${Number(trade.stake).toFixed(2)} stake · {trade.closedAt}</span>
+                          <span>Stake ${Number(trade.stake).toFixed(2)} · Profit {trade.profit >= 0 ? '+' : '-'}${Math.abs(Number(trade.profit)).toFixed(2)}</span>
                         </div>
                       </div>
                     ))}
