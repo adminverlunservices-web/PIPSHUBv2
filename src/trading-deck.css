@@ -762,6 +762,101 @@
   margin-left: auto;
 }
 
+.notification-control {
+  position: relative;
+}
+
+.trade-notifications-popup {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  z-index: 55;
+  width: min(330px, calc(100vw - 28px));
+  overflow: hidden;
+  border: 1px solid rgba(150, 171, 196, 0.24);
+  border-radius: 14px;
+  background: rgba(7, 17, 26, 0.98);
+  box-shadow: 0 18px 34px rgba(4, 9, 16, 0.5);
+}
+
+.trade-notifications-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(150, 171, 196, 0.16);
+  color: #edf5ff;
+  font-size: 0.78rem;
+}
+
+.trade-notifications-header button {
+  border: 0;
+  background: transparent;
+  color: #aabed8;
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.trade-notifications-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.trade-notification-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(150, 171, 196, 0.1);
+}
+
+.trade-notification-item:last-child {
+  border-bottom: 0;
+}
+
+.trade-notification-icon {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.trade-notification-icon.is-won {
+  background: rgba(20, 150, 93, 0.2);
+  color: #6ee4b4;
+}
+
+.trade-notification-icon.is-lost {
+  background: rgba(216, 82, 82, 0.16);
+  color: #f29292;
+}
+
+.trade-notification-item div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.trade-notification-item strong {
+  overflow: hidden;
+  color: #edf5ff;
+  font-size: 0.74rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.trade-notification-item span:not(.trade-notification-icon) {
+  color: #aabed8;
+  font-size: 0.66rem;
+}
+
 .tool-pill {
   position: relative;
   width: 28px;

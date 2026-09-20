@@ -339,6 +339,7 @@ function TradingDeckPage() {
   const [activeTrades, setActiveTrades] = useState([]);
   const [positionsOpen, setPositionsOpen] = useState(false);
   const [positionsTab, setPositionsTab] = useState('open');
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
   const socketRef = useRef(null);
   const closedTrades = [
     { id: 1, symbol: 'R_100', direction: 'Rise', status: 'Won', stake: 25, price: 119.42, closedAt: 'Yesterday • 17:14' },
@@ -673,10 +674,33 @@ function TradingDeckPage() {
           <button type="button" className="tool-pill tool-pill-ghost" aria-label="Notifications">
             <BellIcon />
           </button>
-          <button type="button" className="tool-pill tool-pill-notify" aria-label="Alerts">
-            <span className="notify-dot"></span>
-            <BellIcon />
-          </button>
+          <div className="notification-control">
+            <button type="button" className="tool-pill tool-pill-notify" onClick={() => setNotificationsOpen((open) => !open)} aria-label="Recent closed trade notifications" aria-expanded={notificationsOpen}>
+              <span className="notify-dot"></span>
+              <BellIcon />
+            </button>
+            {notificationsOpen && (
+              <div className="trade-notifications-popup" role="dialog" aria-label="Recent closed trade notifications">
+                <div className="trade-notifications-header">
+                  <strong>Recent closed trades</strong>
+                  <button type="button" onClick={() => setNotificationsOpen(false)} aria-label="Close notifications">×</button>
+                </div>
+                <div className="trade-notifications-list">
+                  {closedTrades.slice(0, 3).map((trade) => (
+                    <div key={trade.id} className="trade-notification-item">
+                      <span className={`trade-notification-icon ${trade.status === 'Lost' ? 'is-lost' : 'is-won'}`} aria-hidden="true">
+                        {trade.status === 'Lost' ? '!' : '✓'}
+                      </span>
+                      <div>
+                        <strong>{trade.symbol} trade {trade.status.toLowerCase()}</strong>
+                        <span>${Number(trade.stake).toFixed(2)} stake · {trade.closedAt}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="trading-deck-balance-block">
