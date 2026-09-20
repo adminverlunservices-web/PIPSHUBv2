@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { apiUrl } from './config';
+import { sampleBots } from './sampleBots';
 import './trading-deck.css';
 
 function SearchIcon() {
@@ -339,6 +340,7 @@ function TradingDeckPage() {
   const [activeTrades, setActiveTrades] = useState([]);
   const [positionsOpen, setPositionsOpen] = useState(false);
   const [positionsTab, setPositionsTab] = useState('open');
+  const [botsOpen, setBotsOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const socketRef = useRef(null);
   const closedTrades = [
@@ -415,6 +417,17 @@ function TradingDeckPage() {
 
   const stopTrade = (tradeId) => {
     setActiveTrades((current) => current.filter((trade) => trade.id !== tradeId));
+  };
+
+  const loadBot = (bot) => {
+    setLoadedBot(bot);
+    if (typeof bot.market === 'string' && marketMeta[bot.market]) setMarket(bot.market);
+    if (typeof bot.tradeType === 'string' && tradeTypeOptions[bot.tradeType]) {
+      setTradeType(bot.tradeType);
+      setTradeDirection(tradeTypeOptions[bot.tradeType].primaryValue);
+    }
+    localStorage.setItem('pipshub:selected-bot', JSON.stringify(bot));
+    setBotsOpen(false);
   };
 
   const openTrade = () => {
@@ -551,7 +564,7 @@ function TradingDeckPage() {
         </div>
         <a href="#/trading-deck" className="trading-deck-rail-button is-active">Trade</a>
         <button type="button" className="trading-deck-rail-button" onClick={() => setPositionsOpen((open) => !open)}>Positions</button>
-        <a href="#/bots" className="trading-deck-rail-button">Bots</a>
+        <button type="button" className="trading-deck-rail-button" onClick={() => setBotsOpen((open) => !open)} aria-expanded={botsOpen}>Bots</button>
       </aside>
 
       <div className="trading-deck-content">
@@ -645,6 +658,30 @@ function TradingDeckPage() {
                   <div className="positions-empty">No closed trades</div>
                 )
               )}
+            </div>
+          </div>
+        )}
+        {botsOpen && (
+          <div className="bots-popup" role="dialog" aria-label="Available trading bots">
+            <div className="bots-popup-header">
+              <div>
+                <strong>Available bots</strong>
+                <span>Choose a strategy to load</span>
+              </div>
+              <button type="button" className="bots-close-button" onClick={() => setBotsOpen(false)} aria-label="Close bots panel">×</button>
+            </div>
+            <div className="bots-list">
+              {sampleBots.map((bot) => (
+                <button type="button" key={bot.name} className="bot-picker-item" onClick={() => loadBot(bot)}>
+                  <span className="bot-picker-icon">{bot.name.charAt(0)}</span>
+                  <span className="bot-picker-copy">
+                    <strong>{bot.name}</strong>
+                    <span>{bot.description}</span>
+                    <small>{bot.market} · {bot.tradeType} · {bot.contract}</small>
+                  </span>
+                  <span className="bot-picker-arrow" aria-hidden="true">→</span>
+                </button>
+              ))}
             </div>
           </div>
         )}

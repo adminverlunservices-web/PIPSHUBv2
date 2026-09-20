@@ -226,6 +226,137 @@
   border-radius: 12px;
 }
 
+.bots-popup {
+  position: absolute;
+  top: 16px;
+  left: 18px;
+  z-index: 45;
+  width: min(440px, calc(100% - 32px));
+  overflow: hidden;
+  border: 1px solid rgba(190, 203, 214, 0.22);
+  border-radius: 18px;
+  background: rgba(7, 17, 26, 0.98);
+  box-shadow: 0 24px 44px rgba(4, 9, 16, 0.5);
+}
+
+.bots-popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 15px 16px 12px;
+  border-bottom: 1px solid rgba(150, 171, 196, 0.15);
+}
+
+.bots-popup-header div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bots-popup-header strong {
+  color: #edf5ff;
+  font-size: 0.9rem;
+}
+
+.bots-popup-header span {
+  color: #aabed8;
+  font-size: 0.7rem;
+}
+
+.bots-close-button {
+  width: 28px;
+  height: 28px;
+  border: 1px solid rgba(150, 171, 196, 0.24);
+  border-radius: 50%;
+  background: rgba(17, 31, 47, 0.9);
+  color: #edf5ff;
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.bots-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 430px;
+  padding: 12px;
+  overflow-y: auto;
+}
+
+.bot-picker-item {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 11px 10px;
+  border: 1px solid rgba(150, 171, 196, 0.16);
+  border-radius: 12px;
+  background: rgba(15, 25, 36, 0.9);
+  color: #edf5ff;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.bot-picker-item:hover,
+.bot-picker-item:focus-visible {
+  background: rgba(29, 58, 67, 0.98);
+  border-color: rgba(110, 214, 190, 0.55);
+  transform: translateY(-1px);
+}
+
+.bot-picker-item:focus-visible {
+  outline: 2px solid #d7c28a;
+  outline-offset: 2px;
+}
+
+.bot-picker-icon {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #d8c48d, #ad9357);
+  color: #152027;
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.bot-picker-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.bot-picker-copy strong {
+  overflow: hidden;
+  font-size: 0.78rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bot-picker-copy span,
+.bot-picker-copy small {
+  overflow: hidden;
+  color: #aabed8;
+  font-size: 0.66rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bot-picker-copy small {
+  color: #6ee4b4;
+}
+
+.bot-picker-arrow {
+  color: #d7c28a;
+  font-size: 1.1rem;
+}
+
 .trading-deck-side-rail {
   width: 220px;
   background: rgba(9, 17, 25, 0.92);
@@ -273,9 +404,13 @@
 
 .trading-deck-rail-button {
   width: 100%;
-  border: 1px solid rgba(152, 170, 191, 0.18);
-  background: rgba(17, 27, 36, 0.8);
-  color: #dfeaf8;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border: 1px solid rgba(190, 203, 214, 0.2);
+  background: linear-gradient(135deg, rgba(22, 32, 42, 0.96), rgba(11, 19, 27, 0.96));
+  color: #c9d5df;
   border-radius: 12px;
   min-height: 56px;
   padding: 8px 6px;
@@ -285,12 +420,26 @@
   letter-spacing: 0.05em;
   text-transform: uppercase;
   cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.trading-deck-rail-button:hover {
+  background: linear-gradient(135deg, rgba(29, 58, 67, 0.98), rgba(13, 31, 38, 0.98));
+  border-color: rgba(110, 214, 190, 0.58);
+  color: #f3fffb;
+  transform: translateY(-1px);
+}
+
+.trading-deck-rail-button:focus-visible {
+  outline: 2px solid #d7c28a;
+  outline-offset: 2px;
 }
 
 .trading-deck-rail-button.is-active {
-  background: rgba(52, 111, 214, 0.22);
-  border-color: rgba(121, 173, 255, 0.5);
-  color: #ffffff;
+  background: linear-gradient(135deg, #d8c48d, #ad9357);
+  border-color: #f0dda4;
+  color: #152027;
+  box-shadow: 0 8px 18px rgba(177, 145, 75, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.34);
 }
 
 .trading-deck-content {
@@ -2043,9 +2192,15 @@
     padding: 12px 14px;
   }
 
+  .trading-deck-rail-brand-wrap {
+    width: auto;
+    flex: 0 0 auto;
+    margin-bottom: 0;
+  }
+
   .trading-deck-rail-button {
     width: auto;
-    flex: 1 1 0;
+    flex: 1 1 120px;
     min-width: 72px;
     min-height: 44px;
   }
