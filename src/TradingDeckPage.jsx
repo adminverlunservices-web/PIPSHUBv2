@@ -557,9 +557,6 @@ function TradingDeckPage() {
           <div className="trading-deck-brand-mark" aria-label="Deriv logo">
             <span className="brand-dot">d</span>
           </div>
-
-          <span className="trading-deck-brand-name">deriv.</span>
-          <span className="trading-deck-trade-label">Trade</span>
         </div>
 
         <label className="trading-deck-search" aria-label="Search markets">
