@@ -348,7 +348,7 @@ function TradingDeckPage() {
   const [loadedBot, setLoadedBot] = useState(null);
   const [activeTradesMinimized, setActiveTradesMinimized] = useState(true);
   const [activeTrades, setActiveTrades] = useState([]);
-  const [smartwaRunning, setSmartwaRunning] = useState(false);
+  const [autoBotRunning, setAutoBotRunning] = useState(false);
   const [positionsOpen, setPositionsOpen] = useState(false);
   const [positionsTab, setPositionsTab] = useState('open');
   const [closedTrades, setClosedTrades] = useState([]);
@@ -358,8 +358,8 @@ function TradingDeckPage() {
   const socketRef = useRef(null);
   const takeProfitTriggeredRef = useRef(new Set());
   const stopTriggeredRef = useRef(new Set());
-  const smartwaRepeatScheduledRef = useRef(new Set());
-  const smartwaRunningRef = useRef(false);
+  const autoBotRepeatScheduledRef = useRef(new Set());
+  const autoBotRunningRef = useRef(false);
   const marketMeta = {
     R_10: { name: 'Volatility 10 Index', price: 18.42 },
     R_25: { name: 'Volatility 25 Index', price: 36.88 },
@@ -415,6 +415,7 @@ function TradingDeckPage() {
   const profitPercent = Number(((profit / stake) * 100).toFixed(1));
   const loadedBotScript = loadedBot?.script
     || (Array.isArray(loadedBot?.scripts) ? loadedBot.scripts.join('\n') : '');
+  const isAutoBot = Boolean(loadedBot && loadedBot.format !== 'xml');
 
   useEffect(() => {
     const timerId = window.setInterval(() => {
@@ -550,10 +551,8 @@ function TradingDeckPage() {
 
   const loadBot = (bot) => {
     setLoadedBot(bot);
-    if (bot.name !== 'SMARTWA') {
-      smartwaRunningRef.current = false;
-      setSmartwaRunning(false);
-    }
+    autoBotRunningRef.current = false;
+    setAutoBotRunning(false);
     if (typeof bot.market === 'string' && marketMeta[bot.market]) setMarket(bot.market);
     if (typeof bot.tradeType === 'string' && tradeTypeOptions[bot.tradeType]) {
       setTradeType(bot.tradeType);
@@ -563,27 +562,27 @@ function TradingDeckPage() {
     setBotsOpen(false);
   };
 
-  const startSmartwa = () => {
-    if (loadedBot?.name !== 'SMARTWA') return;
+  const startAutoBot = () => {
+    if (!isAutoBot) return;
     const profitLimit = Number(stopProfit);
     const lossLimit = Number(stopLoss);
     if (!Number.isFinite(profitLimit) || profitLimit <= 0 || !Number.isFinite(lossLimit) || lossLimit <= 0) {
-      setTradeStatus('Set both a profit limit and a loss limit before starting SMARTWA.');
+      setTradeStatus(`Set both a profit limit and a loss limit before starting ${loadedBot.name}.`);
       return;
     }
-    smartwaRunningRef.current = true;
-    setSmartwaRunning(true);
+    autoBotRunningRef.current = true;
+    setAutoBotRunning(true);
     openTrade();
   };
 
-  const stopSmartwa = () => {
-    smartwaRunningRef.current = false;
-    setSmartwaRunning(false);
-    setTradeStatus('SMARTWA stopped. The current contract will finish normally.');
+  const stopAutoBot = () => {
+    autoBotRunningRef.current = false;
+    setAutoBotRunning(false);
+    setTradeStatus(`${loadedBot?.name || 'Bot'} stopped. The current contract will finish normally.`);
   };
 
   const openTrade = () => {
-    if (loadedBot?.name === 'SMARTWA' && !smartwaRunningRef.current) return;
+    if (isAutoBot && !autoBotRunningRef.current) return;
 
     const amount = Number(stake);
     const contractDuration = Number(duration) || 1;
@@ -610,7 +609,7 @@ function TradingDeckPage() {
           throw new Error(data.error || data.ws_error || 'Live trading is unavailable on this deployment.');
         }
 
-        if (loadedBot?.name === 'SMARTWA' && !smartwaRunningRef.current) return;
+        if (isAutoBot && !autoBotRunningRef.current) return;
 
         const socket = new WebSocket(data.ws_url);
         socketRef.current = socket;
@@ -659,17 +658,17 @@ function TradingDeckPage() {
                 return nextTrades;
               });
               socket.close();
-              if (smartwaRunningRef.current && !smartwaRepeatScheduledRef.current.has(contractId)) {
-                smartwaRepeatScheduledRef.current.add(contractId);
+              if (autoBotRunningRef.current && !autoBotRepeatScheduledRef.current.has(contractId)) {
+                autoBotRepeatScheduledRef.current.add(contractId);
                 window.setTimeout(() => {
-                  if (smartwaRunningRef.current) openTrade();
+                  if (autoBotRunningRef.current) openTrade();
                 }, 250);
               }
             }
           }
 
           if (message.proposal) {
-            if (loadedBot?.name === 'SMARTWA' && !smartwaRunningRef.current) {
+            if (isAutoBot && !autoBotRunningRef.current) {
               socket.close();
               return;
             }
@@ -1239,14 +1238,14 @@ function TradingDeckPage() {
               </div>
             </div>
 
-            {loadedBot?.name === 'SMARTWA' ? (
+            {isAutoBot ? (
               <button
                 type="button"
-                className={`trade-submit-button ${smartwaRunning ? 'is-fall' : 'is-rise'}`}
-                onClick={smartwaRunning ? stopSmartwa : startSmartwa}
+                className={`trade-submit-button ${autoBotRunning ? 'is-fall' : 'is-rise'}`}
+                onClick={autoBotRunning ? stopAutoBot : startAutoBot}
               >
-                <span className="submit-bullet">{smartwaRunning ? '■' : '◔'}</span>
-                {smartwaRunning ? 'Stop SMARTWA' : 'Start SMARTWA'}
+                <span className="submit-bullet">{autoBotRunning ? '■' : '◔'}</span>
+                {autoBotRunning ? `Stop ${loadedBot.name}` : `Start ${loadedBot.name}`}
               </button>
             ) : (
             <button
