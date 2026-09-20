@@ -616,14 +616,30 @@
   font-weight: 700;
 }
 
+.trading-deck-layout {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  max-width: 1440px;
+  margin: 28px auto 0;
+  padding: 0 18px;
+}
+
+.trading-deck-main-column {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
 .trading-deck-controls {
   display: flex;
   align-items: center;
   gap: 18px;
-  padding: 26px 18px 0 18px;
   flex-wrap: wrap;
-  max-width: 1440px;
-  margin: 0 auto;
+  margin: 0;
+  padding: 0;
 }
 
 .selector-card {
@@ -683,17 +699,19 @@
 }
 
 .trading-deck-live-panel {
-  max-width: 1440px;
-  margin: 28px auto 0;
-  padding: 0 18px;
+  width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 .trading-card-wrap {
-  margin-top: 20px;
+  flex: 0 0 420px;
+  width: 420px;
+  margin: 0;
 }
 
 .trading-card-shell {
-  width: min(100%, 520px);
+  width: 100%;
   background: rgba(9, 17, 25, 0.9);
   border: 1px solid rgba(150, 173, 196, 0.25);
   border-radius: 24px;

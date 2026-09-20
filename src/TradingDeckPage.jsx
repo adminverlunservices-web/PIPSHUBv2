@@ -600,48 +600,52 @@ function TradingDeckPage() {
         </div>
       </header>
 
-      <div className="trading-deck-controls">
-        <label className="selector-card">
-          <span className="selector-label">Trade type</span>
-          <select
-            value={tradeType}
-            onChange={(event) => {
-              const nextType = event.target.value;
-              setTradeType(nextType);
-              const nextTradeType = tradeTypeOptions[nextType] || tradeTypeOptions['Higher / Lower'];
-              setTradeDirection(nextTradeType.primaryValue);
-            }}
-            className="selector-native"
-          >
-            <option>Higher / Lower</option>
-            <option>Rise / Fall</option>
-            <option>Touch / No Touch</option>
-            <option>Even / Odd</option>
-            <option>Accumulators</option>
-            <option>Digits</option>
-          </select>
-          <span className="selector-caret">⌄</span>
-        </label>
+      <div className="trading-deck-layout">
+        <div className="trading-deck-main-column">
+          <div className="trading-deck-controls">
+            <label className="selector-card">
+              <span className="selector-label">Trade type</span>
+              <select
+                value={tradeType}
+                onChange={(event) => {
+                  const nextType = event.target.value;
+                  setTradeType(nextType);
+                  const nextTradeType = tradeTypeOptions[nextType] || tradeTypeOptions['Higher / Lower'];
+                  setTradeDirection(nextTradeType.primaryValue);
+                }}
+                className="selector-native"
+              >
+                <option>Higher / Lower</option>
+                <option>Rise / Fall</option>
+                <option>Touch / No Touch</option>
+                <option>Even / Odd</option>
+                <option>Accumulators</option>
+                <option>Digits</option>
+              </select>
+              <span className="selector-caret">⌄</span>
+            </label>
 
-        <label className="selector-card active">
-          <span className="selector-label">Volatility</span>
-          <select value={market} onChange={(event) => setMarket(event.target.value)} className="selector-native">
-            <option value="R_10">Volatility 10 Index</option>
-            <option value="R_25">Volatility 25 Index</option>
-            <option value="R_50">Volatility 50 Index</option>
-            <option value="R_75">Volatility 75 Index</option>
-            <option value="R_100">Volatility 100 Index</option>
-            <option value="1HZ10V">Volatility 10 (1s) Index</option>
-            <option value="1HZ50V">Volatility 50 (1s) Index</option>
-            <option value="1HZ75V">Volatility 75 (1s) Index</option>
-            <option value="1HZ100V">Volatility 100 (1s) Index</option>
-          </select>
-          <span className="selector-caret">⌄</span>
-        </label>
-      </div>
+            <label className="selector-card active">
+              <span className="selector-label">Volatility</span>
+              <select value={market} onChange={(event) => setMarket(event.target.value)} className="selector-native">
+                <option value="R_10">Volatility 10 Index</option>
+                <option value="R_25">Volatility 25 Index</option>
+                <option value="R_50">Volatility 50 Index</option>
+                <option value="R_75">Volatility 75 Index</option>
+                <option value="R_100">Volatility 100 Index</option>
+                <option value="1HZ10V">Volatility 10 (1s) Index</option>
+                <option value="1HZ50V">Volatility 50 (1s) Index</option>
+                <option value="1HZ75V">Volatility 75 (1s) Index</option>
+                <option value="1HZ100V">Volatility 100 (1s) Index</option>
+              </select>
+              <span className="selector-caret">⌄</span>
+            </label>
+          </div>
 
-      <div className="trading-deck-live-panel">
-        <LiveFeedChart market={market} onMarketChange={setMarket} onQuoteChange={setLiveQuote} />
+          <div className="trading-deck-live-panel">
+            <LiveFeedChart market={market} onMarketChange={setMarket} onQuoteChange={setLiveQuote} />
+          </div>
+        </div>
 
         <div className="trading-card-wrap">
           <div className="trading-card-shell">
