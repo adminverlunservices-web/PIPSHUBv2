@@ -539,36 +539,6 @@ function TradingDeckPage() {
     };
   }, []);
 
-  const sideMenu = [
-    { label: 'Home', icon: '⌂', active: activeSidebarView === 'Home' },
-    { label: 'Positions', icon: '◫', active: activeSidebarView === 'Positions' },
-    { label: 'Reports', icon: '▣', active: activeSidebarView === 'Reports' },
-    { label: 'Help', icon: '◍', active: activeSidebarView === 'Help' },
-    { label: 'Language', icon: '◌', active: activeSidebarView === 'Language' },
-    { label: 'Theme', icon: '◐', active: activeSidebarView === 'Theme' },
-    { label: 'Log out', icon: '↵', active: activeSidebarView === 'Log out' },
-  ];
-
-  const sidebar = (
-    <aside className="trading-deck-sidebar" aria-label="Sidebar">
-      <div className="sidebar-brand" aria-label="Brand logo">DT</div>
-      <nav className="sidebar-nav" aria-label="Main navigation">
-        {sideMenu.map(({ label, icon, active }) => (
-          <button
-            key={label}
-            type="button"
-            className={`sidebar-item ${active ? 'is-active' : ''}`}
-            aria-label={label}
-            onClick={() => setActiveSidebarView(label)}
-          >
-            <span className="sidebar-icon" aria-hidden="true">{icon}</span>
-            <span className="sidebar-label">{label}</span>
-          </button>
-        ))}
-      </nav>
-    </aside>
-  );
-
   const positionsView = (
     <section className="positions-page">
       <div className="positions-header">
@@ -633,8 +603,6 @@ function TradingDeckPage() {
 
   return (
     <div className="trading-deck-page">
-      {sidebar}
-
       <div className="trading-deck-main">
         <header className="trading-deck-topbar">
           <div className="trading-deck-brand-wrap">
@@ -718,8 +686,6 @@ function TradingDeckPage() {
             <div className="debit-badge">JD</div>
           </div>
         </header>
-
-        {activeSidebarView === 'Positions' ? positionsView : null}
 
         <div className="trading-deck-controls">
         <label className="selector-card">
