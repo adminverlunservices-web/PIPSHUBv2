@@ -537,32 +537,6 @@ function TradingDeckPage() {
       <div className="trading-deck-content">
         <header className="trading-deck-topbar">
           <div className="trading-deck-brand-wrap">
-            <button
-              className={`trading-deck-menu ${menuOpen ? 'is-open' : ''}`}
-              type="button"
-              aria-label="Toggle menu"
-              onClick={() => setMenuOpen((open) => !open)}
-            >
-              <span></span>
-              <span></span>
-              <span></span>
-            </button>
-
-          {menuOpen && (
-            <nav className="trading-deck-nav-panel" aria-label="Main navigation">
-              {navItems.map(({ label, href, active }) => (
-                <a
-                  key={label}
-                  href={href}
-                  className={`trading-deck-nav-link ${active ? 'is-active' : ''}`}
-                  onClick={() => setMenuOpen(false)}
-                >
-                  {label}
-                </a>
-              ))}
-            </nav>
-          )}
-
           <div className="trading-deck-brand-mark" aria-label="Deriv logo">
             <span className="brand-dot">d</span>
           </div>
