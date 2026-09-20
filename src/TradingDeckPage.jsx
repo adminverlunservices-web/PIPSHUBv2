@@ -652,7 +652,7 @@ function TradingDeckPage() {
             <span className="brand-dot">P</span>
           </div>
 
-          <span className="trading-deck-brand-name">PIPSHUB</span>
+          <span className="trading-deck-brand-name">VERLUN| PipsHub</span>
           <span className="trading-deck-trade-label">Trade</span>
         </div>
 
