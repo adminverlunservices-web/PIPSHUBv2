@@ -340,6 +340,8 @@ function TradingDeckPage() {
   const [digit, setDigit] = useState('5');
   const [growthRate, setGrowthRate] = useState('2');
   const [takeProfit, setTakeProfit] = useState('20');
+  const [stopProfit, setStopProfit] = useState('');
+  const [stopLoss, setStopLoss] = useState('');
   const [liveQuote, setLiveQuote] = useState(null);
   const [tradeStatus, setTradeStatus] = useState('Ready');
   const [tradeSuccessMessage, setTradeSuccessMessage] = useState('');
@@ -354,6 +356,7 @@ function TradingDeckPage() {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const socketRef = useRef(null);
   const takeProfitTriggeredRef = useRef(new Set());
+  const stopTriggeredRef = useRef(new Set());
   const marketMeta = {
     R_10: { name: 'Volatility 10 Index', price: 18.42 },
     R_25: { name: 'Volatility 25 Index', price: 36.88 },
@@ -596,10 +599,23 @@ function TradingDeckPage() {
             const contractId = Number(contract.contract_id);
             const profit = Number(contract.profit || 0);
             const target = Number(takeProfit);
+            const profitStop = Number(stopProfit);
+            const lossStop = Number(stopLoss);
+            const reachedProfitStop = Number.isFinite(profitStop) && profitStop > 0 && profit >= profitStop;
+            const reachedLossStop = Number.isFinite(lossStop) && lossStop > 0 && profit <= -lossStop;
 
-            if (isAccumulatorMode && Number.isFinite(contractId) && profit >= target && !takeProfitTriggeredRef.current.has(contractId)) {
+            if (isAccumulatorMode && Number.isFinite(contractId) && profit >= target && !takeProfitTriggeredRef.current.has(contractId) && !stopTriggeredRef.current.has(contractId)) {
               takeProfitTriggeredRef.current.add(contractId);
               setTradeStatus(`Take profit reached. Closing contract ${contractId}...`);
+              socket.send(JSON.stringify({
+                sell: contractId,
+                price: Number(contract.bid_price || 0),
+              }));
+            }
+
+            if (Number.isFinite(contractId) && (reachedProfitStop || reachedLossStop) && !stopTriggeredRef.current.has(contractId) && !takeProfitTriggeredRef.current.has(contractId)) {
+              stopTriggeredRef.current.add(contractId);
+              setTradeStatus(`${reachedProfitStop ? 'Profit' : 'Loss'} stop reached. Closing contract ${contractId}...`);
               socket.send(JSON.stringify({
                 sell: contractId,
                 price: Number(contract.bid_price || 0),
@@ -640,11 +656,7 @@ function TradingDeckPage() {
               },
               ...current,
             ]);
-            if (isAccumulatorMode) {
-              socket.send(JSON.stringify({ proposal_open_contract: 1, contract_id: contractId, subscribe: 1 }));
-            } else {
-              socket.close();
-            }
+            socket.send(JSON.stringify({ proposal_open_contract: 1, contract_id: contractId, subscribe: 1 }));
           }
         });
 
@@ -820,6 +832,7 @@ function TradingDeckPage() {
                   <div className="positions-empty">No closed trades</div>
                 )
               )}
+
             </div>
           </div>
         )}
@@ -1071,6 +1084,7 @@ function TradingDeckPage() {
                         step="1"
                         value={duration}
                         onChange={(event) => setDuration(event.target.value)}
+                        disabled
                         className="stake-input"
                         aria-label="Duration"
                       />
@@ -1107,6 +1121,38 @@ function TradingDeckPage() {
                   )}
                 </>
               )}
+
+              <label className="field-box">
+                <span className="field-label">Stop at (Profit)</span>
+                <div className="field-value amount-value">
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={stopProfit}
+                    onChange={(event) => setStopProfit(event.target.value)}
+                    className="stake-input"
+                    aria-label="Stop at profit"
+                    placeholder="0.00"
+                  />
+                </div>
+              </label>
+
+              <label className="field-box">
+                <span className="field-label">Stop at (Loss)</span>
+                <div className="field-value amount-value">
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={stopLoss}
+                    onChange={(event) => setStopLoss(event.target.value)}
+                    className="stake-input"
+                    aria-label="Stop at loss"
+                    placeholder="0.00"
+                  />
+                </div>
+              </label>
             </div>
 
             <div className="stake-controls">
