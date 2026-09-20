@@ -4,11 +4,13 @@
   align-items: stretch;
   width: 100%;
   min-height: 100vh;
+  max-width: 100vw;
   background: #071a2c;
   color: #edf5ff;
   font-family: 'Segoe UI', sans-serif;
   padding: 0;
   box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .trading-deck-side-rail {
@@ -1696,16 +1698,19 @@
   }
 
   .trading-deck-layout {
+    display: flex;
     flex-direction: column;
     padding: 0 14px;
   }
 
   .trading-deck-main-column {
     width: 100%;
+    max-width: 100%;
   }
 
   .trading-card-wrap {
     width: 100%;
+    max-width: 100%;
     flex-basis: auto;
   }
 
@@ -1766,27 +1771,33 @@
   .trading-deck-layout {
     display: flex !important;
     flex-direction: column !important;
+    gap: 16px !important;
   }
 
   .trading-deck-main-column {
     order: 1 !important;
     width: 100% !important;
+    max-width: 100% !important;
   }
 
   .trading-card-wrap {
     order: 2 !important;
     width: 100% !important;
+    max-width: 100% !important;
     flex: 1 1 auto !important;
   }
 
   .trading-deck-controls {
+    display: flex;
     flex-direction: column;
     align-items: stretch;
+    width: 100%;
   }
 
   .selector-card {
     width: 100%;
     min-width: 0;
+    flex: 1 1 auto;
   }
 
   .trade-grid,
