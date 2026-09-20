@@ -360,9 +360,12 @@ function TradingDeckPage() {
     R_75: { name: 'Volatility 75 Index', price: 86.42 },
     R_100: { name: 'Volatility 100 Index', price: 119.74 },
     '1HZ10V': { name: 'Volatility 10 (1s) Index', price: 28.91 },
+    '1HZ25V': { name: 'Volatility 25 (1s) Index', price: 44.27 },
     '1HZ50V': { name: 'Volatility 50 (1s) Index', price: 63.14 },
     '1HZ75V': { name: 'Volatility 75 (1s) Index', price: 82.36 },
     '1HZ100V': { name: 'Volatility 100 (1s) Index', price: 117.82 },
+    RDBEAR: { name: 'Range Break Bear Index', price: 96.24 },
+    RDBULL: { name: 'Range Break Bull Index', price: 103.76 },
   };
   const tradeTypeOptions = {
     'Higher / Lower': { primary: 'Higher', secondary: 'Lower', primaryValue: 'rise', secondaryValue: 'fall' },
@@ -372,7 +375,16 @@ function TradingDeckPage() {
     'Accumulators': { primary: 'Up', secondary: 'Down', primaryValue: 'up', secondaryValue: 'down' },
     Digits: { primary: 'Over', secondary: 'Under', primaryValue: 'over', secondaryValue: 'under' },
   };
+  const syntheticMarkets = {
+    'Higher / Lower': ['R_10', 'R_25', 'R_50', 'R_75', 'R_100', 'RDBEAR', 'RDBULL'],
+    'Rise / Fall': ['R_10', 'R_25', 'R_50', 'R_75', 'R_100', '1HZ10V', '1HZ25V', '1HZ50V', '1HZ75V', '1HZ100V', 'RDBEAR', 'RDBULL'],
+    'Touch / No Touch': ['R_10', 'R_25', 'R_50', 'R_75', 'R_100', 'RDBEAR', 'RDBULL'],
+    'Even / Odd': ['1HZ10V', '1HZ25V', '1HZ50V', '1HZ75V', '1HZ100V'],
+    Accumulators: ['R_10', 'R_25', 'R_50', 'R_75', 'R_100', 'RDBEAR', 'RDBULL'],
+    Digits: ['1HZ10V', '1HZ25V', '1HZ50V', '1HZ75V', '1HZ100V'],
+  };
   const activeTradeType = tradeTypeOptions[tradeType] || tradeTypeOptions['Higher / Lower'];
+  const availableMarkets = syntheticMarkets[tradeType] || syntheticMarkets['Higher / Lower'];
   const currentMarket = marketMeta[market] || marketMeta.R_100;
   const currentPrice = liveQuote ?? currentMarket.price;
   const directionLabel = tradeDirection === activeTradeType.secondaryValue ? activeTradeType.secondary : activeTradeType.primary;
@@ -897,6 +909,8 @@ function TradingDeckPage() {
                   const nextTradeType = tradeTypeOptions[nextType] || tradeTypeOptions['Higher / Lower'];
                   setTradeDirection(nextTradeType.primaryValue);
                   setDurationUnit(nextType === 'Even / Odd' ? 't' : 'm');
+                  const nextMarkets = syntheticMarkets[nextType] || syntheticMarkets['Higher / Lower'];
+                  if (!nextMarkets.includes(market)) setMarket(nextMarkets[0]);
                 }}
                 className="selector-native"
               >
@@ -914,15 +928,7 @@ function TradingDeckPage() {
             <label className="selector-card active">
               <span className="selector-label">Synthetics</span>
               <select value={market} onChange={(event) => setMarket(event.target.value)} className="selector-native">
-                <option value="R_10">Volatility 10 Index</option>
-                <option value="R_25">Volatility 25 Index</option>
-                <option value="R_50">Volatility 50 Index</option>
-                <option value="R_75">Volatility 75 Index</option>
-                <option value="R_100">Volatility 100 Index</option>
-                <option value="1HZ10V">Volatility 10 (1s) Index</option>
-                <option value="1HZ50V">Volatility 50 (1s) Index</option>
-                <option value="1HZ75V">Volatility 75 (1s) Index</option>
-                <option value="1HZ100V">Volatility 100 (1s) Index</option>
+                {availableMarkets.map((symbol) => <option key={symbol} value={symbol}>{marketMeta[symbol].name}</option>)}
               </select>
               <span className="selector-value">{currentMarket.name}</span>
               <span className="selector-caret">⌄</span>
