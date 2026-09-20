@@ -540,7 +540,7 @@ function TradingDeckPage() {
   }, []);
 
   const sideMenu = [
-    { label: 'Home', icon: '⌂' },
+    { label: 'Home', icon: '⌂', active: activeSidebarView === 'Home' || activeSidebarView === 'Positions' },
     { label: 'Positions', icon: '◫', active: activeSidebarView === 'Positions' },
     { label: 'Reports', icon: '▣', active: activeSidebarView === 'Reports' },
     { label: 'Help', icon: '◍', active: activeSidebarView === 'Help' },
