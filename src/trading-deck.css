@@ -277,17 +277,6 @@
   font-size: 0.76rem;
 }
 
-.trading-deck-sidebar,
-.trading-deck-topbar,
-.trading-deck-brand-wrap,
-.trading-deck-menu,
-.trading-deck-nav-panel,
-.trading-deck-search,
-.trading-deck-tools,
-.trading-deck-balance-block {
-  display: none !important;
-}
-
 .trading-deck-main {
   flex: 1;
   width: 100%;
