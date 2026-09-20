@@ -12,6 +12,6 @@ export default async function handler(req, res) {
     const accessToken = String(tokens.access_token || tokens.token || '').replace(/^Bearer\s+/i, '');
     if (!response.ok || !accessToken) throw new Error('Deriv authentication failed.');
     writeSession(res, { accessToken, connectedAt: Date.now() });
-    return res.redirect(302, '/#/manual');
+    return res.redirect(302, '/#/trading-deck');
   } catch (error) { return json(res, 502, { error: error.message }); }
 }
