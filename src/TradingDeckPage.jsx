@@ -562,6 +562,7 @@ function TradingDeckPage() {
           <div className="trading-deck-rail-brand">P</div>
           <span className="trading-deck-rail-brand-name">VERLUN| PipsHub</span>
         </div>
+        <a href="#/" className="trading-deck-rail-button">Dashboard</a>
         <a href="#/trading-deck" className="trading-deck-rail-button is-active">Trade</a>
         <button type="button" className="trading-deck-rail-button" onClick={() => setPositionsOpen((open) => !open)}>Positions</button>
         <button type="button" className="trading-deck-rail-button" onClick={() => setBotsOpen((open) => !open)} aria-expanded={botsOpen}>Bots</button>
