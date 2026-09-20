@@ -3,6 +3,20 @@ import TradingDeckPage from './TradingDeckPage';
 import { API_BASE_URL, apiUrl } from './config';
 import { sampleBots } from './sampleBots';
 
+const folderBotFiles = import.meta.glob('../bots/bots/*.xml', { query: '?raw', import: 'default', eager: true });
+const folderBots = Object.entries(folderBotFiles).map(([filePath, script]) => {
+  const fileName = filePath.split('/').pop()?.replace(/\.xml$/i, '').trim() || 'XML bot';
+  return {
+    name: fileName,
+    description: 'XML bot found in the bots folder.',
+    market: 'Custom',
+    tradeType: 'XML strategy',
+    contract: 'XML strategy',
+    script,
+    format: 'xml',
+  };
+});
+
 const nav = [
   ['dashboard', 'Dashboard', '/'],
   ['trading-deck', 'Trading Deck', '/trading-deck'],
@@ -386,6 +400,14 @@ function Bots({ path }) {
             <h3>{bot.name}</h3>
             <p>{bot.description}</p>
             <div className="bot-meta"><span>{bot.market}</span><span>{bot.tradeType}</span><button type="button" onClick={() => loadBot(bot)}>Load →</button></div>
+          </article>
+        ))}
+        {folderBots.map((bot) => (
+          <article className="bot-card imported" key={`folder-${bot.name}`}>
+            <div className="bot-top"><span className="bot-icon">XML</span><span className="badge">Folder bot</span></div>
+            <h3>{bot.name}</h3>
+            <p>{bot.description}</p>
+            <div className="bot-meta"><span>{bot.market}</span><span>{bot.contract}</span><button type="button" onClick={() => loadBot(bot)}>Use →</button></div>
           </article>
         ))}
         {importedBots.map((bot, index) => (
