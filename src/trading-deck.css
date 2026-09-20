@@ -227,7 +227,7 @@
 }
 
 .trading-deck-side-rail {
-  width: 92px;
+  width: 220px;
   background: rgba(9, 17, 25, 0.92);
   border-right: 1px solid rgba(165, 183, 203, 0.18);
   display: flex;
@@ -248,6 +248,27 @@
   font-weight: 800;
   font-size: 1.1rem;
   margin-bottom: 8px;
+}
+
+.trading-deck-rail-brand-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.trading-deck-rail-brand-wrap .trading-deck-rail-brand {
+  flex: 0 0 38px;
+  margin-bottom: 0;
+}
+
+.trading-deck-rail-brand-name {
+  color: #edf5ff;
+  font-size: 0.9rem;
+  font-weight: 800;
+  line-height: 1.1;
+  white-space: nowrap;
 }
 
 .trading-deck-rail-button {
