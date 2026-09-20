@@ -1775,18 +1775,19 @@
   }
 
   .trading-deck-layout {
-    display: flex;
-    flex-direction: column;
+    display: flex !important;
+    flex-direction: column !important;
   }
 
   .trading-deck-main-column {
-    order: 1;
-    width: 100%;
+    order: 1 !important;
+    width: 100% !important;
   }
 
   .trading-card-wrap {
-    order: 2;
-    width: 100%;
+    order: 2 !important;
+    width: 100% !important;
+    flex: 1 1 auto !important;
   }
 
   .trading-deck-controls {
