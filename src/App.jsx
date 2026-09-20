@@ -5,7 +5,7 @@ import { sampleBots } from './sampleBots';
 
 const nav = [
   ['dashboard', 'Dashboard', '/'],
-  ['trading-deck', 'VERLUN| PIPSHIB V3', '/trading-deck'],
+  ['trading-deck', 'Trading Deck', '/trading-deck'],
   ['account', 'Account Setup', '/account'],
   ['contracts', 'Contracts', '/contracts'],
   ['rise-fall', 'Rise / Fall', '/rise-fall'],
@@ -21,6 +21,7 @@ const nav = [
 ];
 
 const routeNames = Object.fromEntries(nav.map(([key, label, path]) => [path, [key, label]]));
+routeNames['/trading-deck'] = ['trading-deck', 'VERLUN| PIPSHIB V3'];
 
 function useRoute() {
   const [path, setPath] = useState(() => window.location.hash.slice(1) || '/');
