@@ -334,6 +334,7 @@ function TradingDeckPage() {
   const [liveQuote, setLiveQuote] = useState(null);
   const [tradeStatus, setTradeStatus] = useState('Ready');
   const [loadedBot, setLoadedBot] = useState(null);
+  const [showHistory, setShowHistory] = useState(true);
   const [activeTradesMinimized, setActiveTradesMinimized] = useState(false);
   const [activeTrades, setActiveTrades] = useState([]);
   const socketRef = useRef(null);
@@ -365,11 +366,24 @@ function TradingDeckPage() {
   const tradeContractType = ['fall', 'down', 'odd', 'noTouch', 'under'].includes(tradeDirection) ? 'PUT' : 'CALL';
   const navItems = [
     { label: 'Dashboard', href: '#/' },
-    { label: 'Trading Deck', href: '#/trading-deck', active: true },
+    { label: 'Trading Deck', href: '#/trading-deck', active: !showHistory },
+    { label: 'History', href: '#/trading-deck', active: showHistory },
     { label: 'Account Setup', href: '#/account' },
     { label: 'Contracts', href: '#/contracts' },
     { label: 'Manual Trading', href: '#/manual' },
     { label: 'Bot Builder', href: '#/builder' },
+  ];
+
+  const tradeHistory = [
+    { id: 'TR-1048', market: 'R_100', side: 'Rise', stake: 25, status: 'Won', payout: 47.84, time: '09:42 AM' },
+    { id: 'TR-1041', market: 'R_75', side: 'Fall', stake: 18, status: 'Lost', payout: 0, time: 'Yesterday' },
+    { id: 'TR-1035', market: '1HZ10V', side: 'Rise', stake: 12, status: 'Won', payout: 23.26, time: '2 days ago' },
+  ];
+
+  const contractHistory = [
+    { id: 'CN-2049', type: 'CALL', market: 'R_100', profit: '+$14.20', status: 'Settled', time: '09:42 AM' },
+    { id: 'CN-2044', type: 'PUT', market: 'R_50', profit: '-$6.10', status: 'Closed', time: 'Yesterday' },
+    { id: 'CN-2037', type: 'CALL', market: '1HZ10V', profit: '+$9.80', status: 'Settled', time: '2 days ago' },
   ];
 
   const payout = Number((stake * 1.92).toFixed(2));
@@ -546,7 +560,17 @@ function TradingDeckPage() {
                   key={label}
                   href={href}
                   className={`trading-deck-nav-link ${active ? 'is-active' : ''}`}
-                  onClick={() => setMenuOpen(false)}
+                  onClick={(event) => {
+                    setMenuOpen(false);
+                    if (label === 'History') {
+                      event.preventDefault();
+                      setShowHistory(true);
+                      return;
+                    }
+                    if (label === 'Trading Deck') {
+                      setShowHistory(false);
+                    }
+                  }}
                 >
                   {label}
                 </a>
@@ -918,6 +942,64 @@ function TradingDeckPage() {
             )}
           </div>
         </div>
+      )}
+
+      {showHistory && (
+        <section className="history-panel" aria-live="polite">
+          <div className="history-panel-header">
+            <div>
+              <span className="history-kicker">Activity history</span>
+              <h3>Trades & contracts</h3>
+            </div>
+            <span className="history-badge">{tradeHistory.length + contractHistory.length} records</span>
+          </div>
+
+          <div className="history-grid">
+            <article className="history-card">
+              <div className="history-card-header">
+                <span className="history-card-label">Recent trades</span>
+                <strong>{tradeHistory.length}</strong>
+              </div>
+              {tradeHistory.map((trade) => (
+                <div className="history-row" key={trade.id}>
+                  <div>
+                    <span className="history-row-title">{trade.id}</span>
+                    <small>{trade.market} · {trade.side}</small>
+                  </div>
+                  <div className="history-row-meta">
+                    <span>{trade.time}</span>
+                    <strong>${trade.stake.toFixed(2)}</strong>
+                  </div>
+                  <div className={`history-status ${trade.status === 'Won' ? 'is-win' : 'is-loss'}`}>
+                    {trade.status}
+                  </div>
+                </div>
+              ))}
+            </article>
+
+            <article className="history-card">
+              <div className="history-card-header">
+                <span className="history-card-label">Recent contracts</span>
+                <strong>{contractHistory.length}</strong>
+              </div>
+              {contractHistory.map((contract) => (
+                <div className="history-row" key={contract.id}>
+                  <div>
+                    <span className="history-row-title">{contract.id}</span>
+                    <small>{contract.market} · {contract.type}</small>
+                  </div>
+                  <div className="history-row-meta">
+                    <span>{contract.time}</span>
+                    <strong>{contract.profit}</strong>
+                  </div>
+                  <div className={`history-status ${contract.status === 'Settled' ? 'is-win' : 'is-loss'}`}>
+                    {contract.status}
+                  </div>
+                </div>
+              ))}
+            </article>
+          </div>
+        </section>
       )}
     </div>
   );
