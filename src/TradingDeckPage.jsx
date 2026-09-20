@@ -933,6 +933,7 @@ function TradingDeckPage() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

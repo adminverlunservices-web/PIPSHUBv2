@@ -1715,6 +1715,8 @@
     width: 100%;
     max-width: 100%;
     order: 1 !important;
+    display: flex;
+    flex-direction: column;
   }
 
   .trading-card-wrap {
@@ -1722,6 +1724,8 @@
     max-width: 100%;
     flex-basis: auto;
     order: 2 !important;
+    display: flex;
+    flex-direction: column;
   }
 
   .trading-deck-topbar {
@@ -1822,6 +1826,8 @@
     width: 100% !important;
     max-width: 100% !important;
     gap: 12px;
+    display: flex;
+    flex-direction: column;
   }
 
   .trading-card-wrap {
@@ -1829,6 +1835,8 @@
     width: 100% !important;
     max-width: 100% !important;
     flex: 1 1 auto !important;
+    display: flex;
+    flex-direction: column;
   }
 
   .trading-deck-controls {
