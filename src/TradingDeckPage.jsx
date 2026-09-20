@@ -604,53 +604,6 @@ function TradingDeckPage() {
   return (
     <div className="trading-deck-page">
       <div className="trading-deck-main">
-        <header className="trading-deck-topbar">
-          <div className="trading-deck-brand-wrap">
-            <div className="trading-deck-brand-mark" aria-label="Brand logo">
-              <span className="brand-dot">V</span>
-            </div>
-
-            <span className="trading-deck-brand-name">VERLUN| Trading Deck</span>
-          </div>
-
-          <label className="trading-deck-search" aria-label="Search markets">
-            <span className="search-icon"><SearchIcon /></span>
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder="Search markets"
-              aria-label="Search markets"
-            />
-            <span className="search-shortcut">⌘ K</span>
-          </label>
-
-          <div className="trading-deck-tools">
-            <button type="button" className="tool-pill tool-pill-ghost" aria-label="Filter">
-              <FilterIcon />
-            </button>
-            <button type="button" className="tool-pill tool-pill-ghost" aria-label="Notifications">
-              <BellIcon />
-            </button>
-            <button type="button" className="tool-pill tool-pill-notify" aria-label="Alerts">
-              <span className="notify-dot"></span>
-              <BellIcon />
-            </button>
-          </div>
-
-          <div className="trading-deck-balance-block">
-            <div className="balance-copy">
-              <span className="balance-label">DEMO BALANCE</span>
-              <strong>{balance === '--' ? '--' : `$${Number(balance).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currency}`}</strong>
-            </div>
-            <button type="button" className="deposit-button is-locked" disabled aria-label="Deposit disabled">
-              <WalletIcon />
-              <span>Deposit</span>
-            </button>
-            <div className="debit-badge">JD</div>
-          </div>
-        </header>
-
         <div className="trading-deck-controls">
         <label className="selector-card">
           <span className="selector-label">Trade type</span>
