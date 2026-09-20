@@ -1485,6 +1485,11 @@
   -moz-appearance: textfield;
 }
 
+.stake-input:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
 .field-caret {
   position: absolute;
   right: 12px;
@@ -1497,6 +1502,13 @@
 
 .amount-value {
   justify-content: center;
+}
+
+.field-suffix {
+  margin-left: 4px;
+  color: #a6bed9;
+  font-size: 0.82rem;
+  pointer-events: none;
 }
 
 .stake-controls {

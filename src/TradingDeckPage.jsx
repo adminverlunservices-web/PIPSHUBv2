@@ -39,7 +39,7 @@ function WalletIcon() {
   );
 }
 
-function LiveFeedChart({ market = 'R_100', onMarketChange, onQuoteChange }) {
+function LiveFeedChart({ market = 'R_100', onMarketChange, onQuoteChange, showAccumulatorGuides = false }) {
   const canvasRef = useRef(null);
   const [tick, setTick] = useState('Waiting for tick');
   const [viewType, setViewType] = useState('line');
@@ -171,14 +171,16 @@ function LiveFeedChart({ market = 'R_100', onMarketChange, onQuoteChange }) {
         drawLine();
       }
 
-      const upperGuideY = guideY(latestPrice + guideOffset);
-      const lowerGuideY = guideY(latestPrice - guideOffset);
-      context.save();
-      context.fillStyle = 'rgba(29, 129, 198, 0.14)';
-      context.fillRect(guideStart, upperGuideY, guideEnd - guideStart, lowerGuideY - upperGuideY);
-      context.restore();
-      drawGuide(latestPrice + guideOffset, `+${guideOffset.toFixed(5)}`);
-      drawGuide(latestPrice - guideOffset, `-${guideOffset.toFixed(5)}`);
+      if (showAccumulatorGuides) {
+        const upperGuideY = guideY(latestPrice + guideOffset);
+        const lowerGuideY = guideY(latestPrice - guideOffset);
+        context.save();
+        context.fillStyle = 'rgba(29, 129, 198, 0.14)';
+        context.fillRect(guideStart, upperGuideY, guideEnd - guideStart, lowerGuideY - upperGuideY);
+        context.restore();
+        drawGuide(latestPrice + guideOffset, `+${guideOffset.toFixed(5)}`);
+        drawGuide(latestPrice - guideOffset, `-${guideOffset.toFixed(5)}`);
+      }
 
       const latest = points[points.length - 1];
       context.save();
@@ -294,7 +296,7 @@ function LiveFeedChart({ market = 'R_100', onMarketChange, onQuoteChange }) {
       socket?.close();
       window.removeEventListener('resize', draw);
     };
-  }, [market, viewType]);
+  }, [market, viewType, showAccumulatorGuides]);
 
   return (
     <div className="trading-deck-chart">
@@ -324,15 +326,19 @@ function TradingDeckPage() {
   const [balance, setBalance] = useState('--');
   const [currency, setCurrency] = useState('USD');
   const [accountType, setAccountType] = useState('demo');
+  const [accountSwitching, setAccountSwitching] = useState(false);
   const [tradeType, setTradeType] = useState('Higher / Lower');
   const [market, setMarket] = useState('R_100');
   const [searchQuery, setSearchQuery] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
   const [tradeDirection, setTradeDirection] = useState('rise');
   const [duration, setDuration] = useState('1');
+  const [durationUnit, setDurationUnit] = useState('m');
   const [stake, setStake] = useState(10);
+  const [barrier, setBarrier] = useState('0');
   const [digit, setDigit] = useState('5');
-  const [multiplier, setMultiplier] = useState('1');
+  const [growthRate, setGrowthRate] = useState('2');
+  const [takeProfit, setTakeProfit] = useState('20');
   const [liveQuote, setLiveQuote] = useState(null);
   const [tradeStatus, setTradeStatus] = useState('Ready');
   const [tradeSuccessMessage, setTradeSuccessMessage] = useState('');
@@ -346,6 +352,7 @@ function TradingDeckPage() {
   const [botsOpen, setBotsOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const socketRef = useRef(null);
+  const takeProfitTriggeredRef = useRef(new Set());
   const marketMeta = {
     R_10: { name: 'Volatility 10 Index', price: 18.42 },
     R_25: { name: 'Volatility 25 Index', price: 36.88 },
@@ -358,7 +365,7 @@ function TradingDeckPage() {
     '1HZ100V': { name: 'Volatility 100 (1s) Index', price: 117.82 },
   };
   const tradeTypeOptions = {
-    'Higher / Lower': { primary: 'Rise', secondary: 'Fall', primaryValue: 'rise', secondaryValue: 'fall' },
+    'Higher / Lower': { primary: 'Higher', secondary: 'Lower', primaryValue: 'rise', secondaryValue: 'fall' },
     'Rise / Fall': { primary: 'Rise', secondary: 'Fall', primaryValue: 'rise', secondaryValue: 'fall' },
     'Touch / No Touch': { primary: 'Touch', secondary: 'No Touch', primaryValue: 'touch', secondaryValue: 'noTouch' },
     'Even / Odd': { primary: 'Even', secondary: 'Odd', primaryValue: 'even', secondaryValue: 'odd' },
@@ -383,7 +390,9 @@ function TradingDeckPage() {
 
   const marketMovement = currentMarket.price > 0 ? currentPrice / currentMarket.price : 1;
   const payout = Number((Number(stake) * 1.92 * marketMovement).toFixed(2));
-  const profit = Number((payout - stake).toFixed(2));
+  const accumulatorPayout = Number((Number(stake) * (1 + Number(growthRate) / 100) * marketMovement).toFixed(2));
+  const displayedPayout = isAccumulatorMode ? accumulatorPayout : payout;
+  const profit = Number((displayedPayout - stake).toFixed(2));
   const profitPercent = Number(((profit / stake) * 100).toFixed(1));
   const loadedBotScript = loadedBot?.script
     || (Array.isArray(loadedBot?.scripts) ? loadedBot.scripts.join('\n') : '');
@@ -480,6 +489,37 @@ function TradingDeckPage() {
     });
   };
 
+  const switchAccount = () => {
+    if (accountSwitching) return;
+
+    setAccountSwitching(true);
+    fetch(apiUrl('api/deriv-accounts.js'), { credentials: 'include' })
+      .then(async (response) => {
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Unable to load accounts.');
+        const target = data.accounts?.find((account) => account.account_type !== accountType && account.status === 'active');
+        if (!target) throw new Error(`No ${accountType === 'real' ? 'demo' : 'real'} account is available.`);
+
+        const body = new URLSearchParams({ account_id: target.account_id });
+        const switchResponse = await fetch(apiUrl('api/deriv-accounts.js'), {
+          method: 'POST',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body,
+        });
+        const switched = await switchResponse.json();
+        if (!switchResponse.ok) throw new Error(switched.error || 'Unable to switch account.');
+        return target;
+      })
+      .then((target) => {
+        setAccountType(target.account_type === 'real' ? 'real' : 'demo');
+        setBalance(Number(target.balance || 0).toFixed(2));
+        setCurrency(target.currency || 'USD');
+      })
+      .catch((error) => setTradeStatus(error.message))
+      .finally(() => setAccountSwitching(false));
+  };
+
   const loadBot = (bot) => {
     setLoadedBot(bot);
     if (typeof bot.market === 'string' && marketMeta[bot.market]) setMarket(bot.market);
@@ -529,6 +569,31 @@ function TradingDeckPage() {
             return;
           }
 
+          if (message.proposal_open_contract) {
+            const contract = message.proposal_open_contract;
+            const contractId = Number(contract.contract_id);
+            const profit = Number(contract.profit || 0);
+            const target = Number(takeProfit);
+
+            if (isAccumulatorMode && Number.isFinite(contractId) && profit >= target && !takeProfitTriggeredRef.current.has(contractId)) {
+              takeProfitTriggeredRef.current.add(contractId);
+              setTradeStatus(`Take profit reached. Closing contract ${contractId}...`);
+              socket.send(JSON.stringify({
+                sell: contractId,
+                price: Number(contract.bid_price || 0),
+              }));
+            }
+
+            if (Number(contract.is_sold) === 1 || Number(contract.is_expired) === 1 || contract.status !== 'open') {
+              setActiveTrades((current) => {
+                const nextTrades = current.filter((trade) => trade.id !== contractId);
+                if (nextTrades.length === 0) setActiveTradesMinimized(true);
+                return nextTrades;
+              });
+              socket.close();
+            }
+          }
+
           if (message.proposal) {
             socket.send(JSON.stringify({
               buy: message.proposal.id,
@@ -537,21 +602,27 @@ function TradingDeckPage() {
           }
 
           if (message.buy) {
-            setTradeStatus(`Contract opened. ID: ${message.buy.contract_id}`);
-            setTradeSuccessMessage(`Trade placed successfully · Contract ${message.buy.contract_id}`);
+            const contractId = Number(message.buy.contract_id);
+            setTradeStatus(`Contract opened. ID: ${contractId}`);
+            setTradeSuccessMessage(`Trade placed successfully · Contract ${contractId}`);
             setActiveTradesMinimized(false);
             setActiveTrades((current) => [
               {
-                id: Date.now(),
+                id: contractId,
                 symbol: market,
                 direction: directionLabel,
                 status: tradeDirection === activeTradeType.secondaryValue ? 'Losing' : 'Winning',
                 stake: amount,
                 price: Number(currentPrice || liveQuote || currentMarket.price),
+                takeProfit: isAccumulatorMode ? Number(takeProfit) : null,
               },
               ...current,
             ]);
-            socket.close();
+            if (isAccumulatorMode) {
+              socket.send(JSON.stringify({ proposal_open_contract: 1, contract_id: contractId, subscribe: 1 }));
+            } else {
+              socket.close();
+            }
           }
         });
 
@@ -563,7 +634,7 @@ function TradingDeckPage() {
             contract_type: tradeContractType,
             currency: 'USD',
             duration: contractDuration,
-            duration_unit: 'm',
+            duration_unit: durationUnit,
             underlying_symbol: market,
           }));
         });
@@ -774,9 +845,9 @@ function TradingDeckPage() {
             <span className="balance-label">DEMO BALANCE</span>
             <strong>{balance === '--' ? '--' : `$${Number(balance).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currency}`}</strong>
           </div>
-          <button type="button" className="deposit-button is-locked" disabled aria-label="Deposit disabled">
+          <button type="button" className="deposit-button" onClick={switchAccount} disabled={accountSwitching} aria-label={`Switch to ${accountType === 'real' ? 'Demo' : 'Real'} Account`}>
             <WalletIcon />
-            <span>Deposit</span>
+            <span>{accountSwitching ? 'Switching...' : `Switch to ${accountType === 'real' ? 'Demo' : 'Real'} Account`}</span>
           </button>
           <div className="balance-actions">
             <button type="button" className="tool-pill tool-pill-ghost" aria-label="Filter">
@@ -825,6 +896,7 @@ function TradingDeckPage() {
                   setTradeType(nextType);
                   const nextTradeType = tradeTypeOptions[nextType] || tradeTypeOptions['Higher / Lower'];
                   setTradeDirection(nextTradeType.primaryValue);
+                  setDurationUnit(nextType === 'Even / Odd' ? 't' : 'm');
                 }}
                 className="selector-native"
               >
@@ -840,7 +912,7 @@ function TradingDeckPage() {
             </label>
 
             <label className="selector-card active">
-              <span className="selector-label">Volatility</span>
+              <span className="selector-label">Synthetics</span>
               <select value={market} onChange={(event) => setMarket(event.target.value)} className="selector-native">
                 <option value="R_10">Volatility 10 Index</option>
                 <option value="R_25">Volatility 25 Index</option>
@@ -858,7 +930,7 @@ function TradingDeckPage() {
           </div>
 
           <div className="trading-deck-live-panel">
-            <LiveFeedChart market={market} onMarketChange={setMarket} onQuoteChange={setLiveQuote} />
+            <LiveFeedChart market={market} onMarketChange={setMarket} onQuoteChange={setLiveQuote} showAccumulatorGuides={isAccumulatorMode} />
           </div>
         </div>
 
@@ -883,28 +955,7 @@ function TradingDeckPage() {
               </span>
             </div>
 
-            {!isAccumulatorMode && !isDigitsMode ? (
-              <div className="trade-chooser">
-                <button
-                  type="button"
-                  className={`trade-option ${tradeDirection === activeTradeType.primaryValue ? 'selected' : ''}`}
-                  data-direction={activeTradeType.primaryValue}
-                  onClick={() => setTradeDirection(activeTradeType.primaryValue)}
-                >
-                  <span className="option-arrow up">↗</span>
-                  {activeTradeType.primary}
-                </button>
-                <button
-                  type="button"
-                  className={`trade-option ${tradeDirection === activeTradeType.secondaryValue ? 'selected' : ''}`}
-                  data-direction={activeTradeType.secondaryValue}
-                  onClick={() => setTradeDirection(activeTradeType.secondaryValue)}
-                >
-                  <span className="option-arrow down">↘</span>
-                  {activeTradeType.secondary}
-                </button>
-              </div>
-            ) : (
+            {!isAccumulatorMode && (
               <div className="trade-chooser">
                 <button
                   type="button"
@@ -960,28 +1011,34 @@ function TradingDeckPage() {
               ) : isAccumulatorMode ? (
                 <>
                   <label className="field-box">
-                    <span className="field-label">Duration</span>
-                    <div className="field-value">
-                      <select value={duration} onChange={(event) => setDuration(event.target.value)} className="field-select">
-                        <option value="5">5 minutes</option>
-                        <option value="10">10 minutes</option>
-                        <option value="15">15 minutes</option>
-                        <option value="30">30 minutes</option>
-                      </select>
-                      <span className="field-caret">⌄</span>
+                    <span className="field-label">Growth rate</span>
+                    <div className="field-value amount-value">
+                      <input
+                        type="number"
+                        min="0.1"
+                        step="0.1"
+                        value={growthRate}
+                        onChange={(event) => setGrowthRate(event.target.value)}
+                        className="stake-input"
+                        aria-label="Growth rate percentage"
+                      />
+                      <span className="field-suffix">%</span>
                     </div>
                   </label>
 
                   <label className="field-box">
-                    <span className="field-label">Multiplier</span>
-                    <div className="field-value">
-                      <select value={multiplier} onChange={(event) => setMultiplier(event.target.value)} className="field-select">
-                        <option value="1">x1</option>
-                        <option value="2">x2</option>
-                        <option value="5">x5</option>
-                        <option value="10">x10</option>
-                      </select>
-                      <span className="field-caret">⌄</span>
+                    <span className="field-label">Take profit</span>
+                    <div className="field-value amount-value">
+                      <input
+                        type="number"
+                        min="0.35"
+                        step="0.01"
+                        value={takeProfit}
+                        onChange={(event) => setTakeProfit(event.target.value)}
+                        className="stake-input"
+                        aria-label="Take profit amount"
+                      />
+                      <span className="field-suffix">$</span>
                     </div>
                   </label>
                 </>
@@ -989,31 +1046,47 @@ function TradingDeckPage() {
                 <>
                   <label className="field-box">
                     <span className="field-label">Duration</span>
-                    <div className="field-value">
-                      <select value={duration} onChange={(event) => setDuration(event.target.value)} className="field-select">
-                        <option value="1">1 minute</option>
-                        <option value="2">2 minutes</option>
-                        <option value="5">5 minutes</option>
-                        <option value="10">10 minutes</option>
-                      </select>
-                      <span className="field-caret">⌄</span>
-                    </div>
-                  </label>
-
-                  <label className="field-box">
-                    <span className="field-label">Stake</span>
                     <div className="field-value amount-value">
                       <input
                         type="number"
                         min="1"
                         step="1"
-                        value={stake}
-                        onChange={(event) => setStake(Math.max(1, Number(event.target.value) || 1))}
+                        value={duration}
+                        onChange={(event) => setDuration(event.target.value)}
                         className="stake-input"
-                        aria-label="Stake amount"
+                        aria-label="Duration"
                       />
                     </div>
                   </label>
+
+                  {tradeType === 'Even / Odd' ? (
+                    <label className="field-box">
+                      <span className="field-label">Duration type</span>
+                      <div className="field-value">
+                        <select value={durationUnit} onChange={(event) => setDurationUnit(event.target.value)} className="field-select">
+                          <option value="t">Ticks</option>
+                          <option value="s">Seconds</option>
+                          <option value="m">Minutes</option>
+                        </select>
+                        <span className="field-caret">⌄</span>
+                      </div>
+                    </label>
+                  ) : (
+                    <label className="field-box">
+                      <span className="field-label">Barrier</span>
+                      <div className="field-value amount-value">
+                        <input
+                          type="number"
+                          step="0.01"
+                          value={barrier}
+                          onChange={(event) => setBarrier(event.target.value)}
+                          disabled={tradeType === 'Rise / Fall'}
+                          className="stake-input"
+                          aria-label="Barrier value"
+                        />
+                      </div>
+                    </label>
+                  )}
                 </>
               )}
             </div>
@@ -1053,8 +1126,8 @@ function TradingDeckPage() {
 
             <div className="summary-panel">
               <div className="summary-row">
-                <span>Potential payout</span>
-                <strong>${payout.toFixed(2)}</strong>
+                <span>{isAccumulatorMode ? 'Estimated return' : 'Potential payout'}</span>
+                <strong>${displayedPayout.toFixed(2)}</strong>
               </div>
               <div className="summary-row payout-row">
                 <span>Profit</span>
@@ -1068,7 +1141,7 @@ function TradingDeckPage() {
               onClick={openTrade}
             >
               <span className="submit-bullet">◔</span>
-              Trade {directionLabel}
+              {isAccumulatorMode ? 'Buy' : `Trade ${directionLabel}`}
             </button>
             <p className="trade-status" aria-live="polite">{tradeStatus}</p>
             {loadedBotScript && (
