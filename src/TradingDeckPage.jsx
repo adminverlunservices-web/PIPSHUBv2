@@ -324,6 +324,8 @@ function TradingDeckPage() {
   const [currency, setCurrency] = useState('USD');
   const [tradeType, setTradeType] = useState('Higher / Lower');
   const [market, setMarket] = useState('R_100');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [menuOpen, setMenuOpen] = useState(false);
   const [tradeDirection, setTradeDirection] = useState('rise');
   const [duration, setDuration] = useState('1');
   const [stake, setStake] = useState(10);
@@ -361,17 +363,13 @@ function TradingDeckPage() {
   const isAccumulatorMode = tradeType === 'Accumulators';
   const isDigitsMode = tradeType === 'Digits';
   const tradeContractType = ['fall', 'down', 'odd', 'noTouch', 'under'].includes(tradeDirection) ? 'PUT' : 'CALL';
-
-  const tradeHistory = [
-    { id: 'TR-1048', market: 'R_100', side: 'Rise', stake: 25, status: 'Won', payout: 47.84, time: '09:42 AM' },
-    { id: 'TR-1041', market: 'R_75', side: 'Fall', stake: 18, status: 'Lost', payout: 0, time: 'Yesterday' },
-    { id: 'TR-1035', market: '1HZ10V', side: 'Rise', stake: 12, status: 'Won', payout: 23.26, time: '2 days ago' },
-  ];
-
-  const contractHistory = [
-    { id: 'CN-2049', type: 'CALL', market: 'R_100', profit: '+$14.20', status: 'Settled', time: '09:42 AM' },
-    { id: 'CN-2044', type: 'PUT', market: 'R_50', profit: '-$6.10', status: 'Closed', time: 'Yesterday' },
-    { id: 'CN-2037', type: 'CALL', market: '1HZ10V', profit: '+$9.80', status: 'Settled', time: '2 days ago' },
+  const navItems = [
+    { label: 'Dashboard', href: '#/' },
+    { label: 'Trading Deck', href: '#/trading-deck', active: true },
+    { label: 'Account Setup', href: '#/account' },
+    { label: 'Contracts', href: '#/contracts' },
+    { label: 'Manual Trading', href: '#/manual' },
+    { label: 'Bot Builder', href: '#/builder' },
   ];
 
   const payout = Number((stake * 1.92).toFixed(2));
@@ -528,69 +526,400 @@ function TradingDeckPage() {
 
   return (
     <div className="trading-deck-page">
-      <aside className="trading-deck-sidebar">
-        <div className="sidebar-brand">P</div>
-        <nav className="sidebar-nav" aria-label="Pipshub navigation">
-          {['Trade', 'History', 'Positions', 'Bots'].map((item, index) => (
-            <button
-              key={item}
-              type="button"
-              className={`sidebar-item ${index === 0 ? 'is-active' : ''}`}
-            >
-              <span className="sidebar-icon">{index === 0 ? '◈' : index === 1 ? '◫' : index === 2 ? '▣' : '✦'}</span>
-              <span className="sidebar-label">{item}</span>
-            </button>
-          ))}
-        </nav>
-      </aside>
+      <header className="trading-deck-topbar">
+        <div className="trading-deck-brand-wrap">
+          <button
+            className={`trading-deck-menu ${menuOpen ? 'is-open' : ''}`}
+            type="button"
+            aria-label="Toggle menu"
+            onClick={() => setMenuOpen((open) => !open)}
+          >
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
 
-      <div className="trading-deck-main">
-        <div className="trading-deck-panel">
-          <LiveFeedChart market={market} onMarketChange={setMarket} onQuoteChange={setLiveQuote} />
+          {menuOpen && (
+            <nav className="trading-deck-nav-panel" aria-label="Main navigation">
+              {navItems.map(({ label, href, active }) => (
+                <a
+                  key={label}
+                  href={href}
+                  className={`trading-deck-nav-link ${active ? 'is-active' : ''}`}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  {label}
+                </a>
+              ))}
+            </nav>
+          )}
+
+          <div className="trading-deck-brand-mark" aria-label="Deriv logo">
+            <span className="brand-dot">d</span>
+          </div>
+
+          <span className="trading-deck-brand-name">deriv.</span>
+          <span className="trading-deck-trade-label">Trade</span>
         </div>
 
-        <div className="trading-card-shell">
-          <div className="trading-card-header">
-            <div>
-              <span className="trading-card-kicker">Trade</span>
-              <strong>{market}</strong>
+        <label className="trading-deck-search" aria-label="Search markets">
+          <span className="search-icon"><SearchIcon /></span>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            placeholder="Search markets"
+            aria-label="Search markets"
+          />
+          <span className="search-shortcut">⌘ K</span>
+        </label>
+
+        <div className="trading-deck-tools">
+          <button type="button" className="tool-pill tool-pill-ghost" aria-label="Filter">
+            <FilterIcon />
+          </button>
+          <button type="button" className="tool-pill tool-pill-ghost" aria-label="Notifications">
+            <BellIcon />
+          </button>
+          <button type="button" className="tool-pill tool-pill-notify" aria-label="Alerts">
+            <span className="notify-dot"></span>
+            <BellIcon />
+          </button>
+        </div>
+
+        <div className="trading-deck-balance-block">
+          <div className="balance-copy">
+            <span className="balance-label">DEMO BALANCE</span>
+            <strong>{balance === '--' ? '--' : `$${Number(balance).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currency}`}</strong>
+          </div>
+          <button type="button" className="deposit-button is-locked" disabled aria-label="Deposit disabled">
+            <WalletIcon />
+            <span>Deposit</span>
+          </button>
+          <div className="debit-badge">JD</div>
+        </div>
+      </header>
+
+      <div className="trading-deck-controls">
+        <label className="selector-card">
+          <span className="selector-label">Trade type</span>
+          <select
+            value={tradeType}
+            onChange={(event) => {
+              const nextType = event.target.value;
+              setTradeType(nextType);
+              const nextTradeType = tradeTypeOptions[nextType] || tradeTypeOptions['Higher / Lower'];
+              setTradeDirection(nextTradeType.primaryValue);
+            }}
+            className="selector-native"
+          >
+            <option>Higher / Lower</option>
+            <option>Rise / Fall</option>
+            <option>Touch / No Touch</option>
+            <option>Even / Odd</option>
+            <option>Accumulators</option>
+            <option>Digits</option>
+          </select>
+          <span className="selector-caret">⌄</span>
+        </label>
+
+        <label className="selector-card active">
+          <span className="selector-label">Volatility</span>
+          <select value={market} onChange={(event) => setMarket(event.target.value)} className="selector-native">
+            <option value="R_10">Volatility 10 Index</option>
+            <option value="R_25">Volatility 25 Index</option>
+            <option value="R_50">Volatility 50 Index</option>
+            <option value="R_75">Volatility 75 Index</option>
+            <option value="R_100">Volatility 100 Index</option>
+            <option value="1HZ10V">Volatility 10 (1s) Index</option>
+            <option value="1HZ50V">Volatility 50 (1s) Index</option>
+            <option value="1HZ75V">Volatility 75 (1s) Index</option>
+            <option value="1HZ100V">Volatility 100 (1s) Index</option>
+          </select>
+          <span className="selector-caret">⌄</span>
+        </label>
+      </div>
+
+      <div className="trading-deck-live-panel">
+        <LiveFeedChart market={market} onMarketChange={setMarket} onQuoteChange={setLiveQuote} />
+
+        <div className="trading-card-wrap">
+          <div className="trading-card-shell">
+            <div className="trading-card-header">
+              <div>
+                <span className="trading-card-kicker">Trade</span>
+                <h2>{currentMarket.name}</h2>
+                {loadedBot && <span className="loaded-bot-label">Bot loaded: {loadedBot.name}</span>}
+              </div>
+              <button type="button" className="demo-account-button">Demo account</button>
             </div>
-            <div className="quote-pill">{liveQuote ?? currentMarket.price}</div>
-          </div>
 
-          <div className="trade-direction-row">
-            {['Rise', 'Fall'].map((option) => (
+            <div className="trading-card-market-row">
+              <div className="price-stat">
+                <span>Current price</span>
+                <strong>{currentPrice.toFixed(2)}</strong>
+              </div>
+              <span className={`market-trend ${tradeDirection === activeTradeType.secondaryValue ? 'negative' : 'positive'}`}>
+                {tradeDirection === activeTradeType.secondaryValue ? '-2.45%' : '+2.45%'}
+              </span>
+            </div>
+
+            {!isAccumulatorMode && !isDigitsMode ? (
+              <div className="trade-chooser">
+                <button
+                  type="button"
+                  className={`trade-option ${tradeDirection === activeTradeType.primaryValue ? 'selected' : ''}`}
+                  data-direction={activeTradeType.primaryValue}
+                  onClick={() => setTradeDirection(activeTradeType.primaryValue)}
+                >
+                  <span className="option-arrow up">↗</span>
+                  {activeTradeType.primary}
+                </button>
+                <button
+                  type="button"
+                  className={`trade-option ${tradeDirection === activeTradeType.secondaryValue ? 'selected' : ''}`}
+                  data-direction={activeTradeType.secondaryValue}
+                  onClick={() => setTradeDirection(activeTradeType.secondaryValue)}
+                >
+                  <span className="option-arrow down">↘</span>
+                  {activeTradeType.secondary}
+                </button>
+              </div>
+            ) : (
+              <div className="trade-chooser">
+                <button
+                  type="button"
+                  className={`trade-option ${tradeDirection === activeTradeType.primaryValue ? 'selected' : ''}`}
+                  data-direction={activeTradeType.primaryValue}
+                  onClick={() => setTradeDirection(activeTradeType.primaryValue)}
+                >
+                  <span className="option-arrow up">{isDigitsMode ? '◉' : '↗'}</span>
+                  {activeTradeType.primary}
+                </button>
+                <button
+                  type="button"
+                  className={`trade-option ${tradeDirection === activeTradeType.secondaryValue ? 'selected' : ''}`}
+                  data-direction={activeTradeType.secondaryValue}
+                  onClick={() => setTradeDirection(activeTradeType.secondaryValue)}
+                >
+                  <span className="option-arrow down">{isDigitsMode ? '◌' : '↘'}</span>
+                  {activeTradeType.secondary}
+                </button>
+              </div>
+            )}
+
+            <div className="trade-grid">
+              {isDigitsMode ? (
+                <>
+                  <label className="field-box">
+                    <span className="field-label">Digit</span>
+                    <div className="field-value">
+                      <select value={digit} onChange={(event) => setDigit(event.target.value)} className="field-select">
+                        {Array.from({ length: 10 }, (_, index) => (
+                          <option key={index} value={String(index)}>{index}</option>
+                        ))}
+                      </select>
+                      <span className="field-caret">⌄</span>
+                    </div>
+                  </label>
+
+                  <label className="field-box">
+                    <span className="field-label">Stake</span>
+                    <div className="field-value amount-value">
+                      <input
+                        type="number"
+                        min="1"
+                        step="1"
+                        value={stake}
+                        onChange={(event) => setStake(Math.max(1, Number(event.target.value) || 1))}
+                        className="stake-input"
+                        aria-label="Stake amount"
+                      />
+                    </div>
+                  </label>
+                </>
+              ) : isAccumulatorMode ? (
+                <>
+                  <label className="field-box">
+                    <span className="field-label">Duration</span>
+                    <div className="field-value">
+                      <select value={duration} onChange={(event) => setDuration(event.target.value)} className="field-select">
+                        <option value="5">5 minutes</option>
+                        <option value="10">10 minutes</option>
+                        <option value="15">15 minutes</option>
+                        <option value="30">30 minutes</option>
+                      </select>
+                      <span className="field-caret">⌄</span>
+                    </div>
+                  </label>
+
+                  <label className="field-box">
+                    <span className="field-label">Multiplier</span>
+                    <div className="field-value">
+                      <select value={multiplier} onChange={(event) => setMultiplier(event.target.value)} className="field-select">
+                        <option value="1">x1</option>
+                        <option value="2">x2</option>
+                        <option value="5">x5</option>
+                        <option value="10">x10</option>
+                      </select>
+                      <span className="field-caret">⌄</span>
+                    </div>
+                  </label>
+                </>
+              ) : (
+                <>
+                  <label className="field-box">
+                    <span className="field-label">Duration</span>
+                    <div className="field-value">
+                      <select value={duration} onChange={(event) => setDuration(event.target.value)} className="field-select">
+                        <option value="1">1 minute</option>
+                        <option value="2">2 minutes</option>
+                        <option value="5">5 minutes</option>
+                        <option value="10">10 minutes</option>
+                      </select>
+                      <span className="field-caret">⌄</span>
+                    </div>
+                  </label>
+
+                  <label className="field-box">
+                    <span className="field-label">Stake</span>
+                    <div className="field-value amount-value">
+                      <input
+                        type="number"
+                        min="1"
+                        step="1"
+                        value={stake}
+                        onChange={(event) => setStake(Math.max(1, Number(event.target.value) || 1))}
+                        className="stake-input"
+                        aria-label="Stake amount"
+                      />
+                    </div>
+                  </label>
+                </>
+              )}
+            </div>
+
+            <div className="stake-controls">
               <button
-                key={option}
                 type="button"
-                className={directionLabel === option ? 'is-selected' : ''}
-                onClick={() => setTradeDirection(option === 'Rise' ? 'rise' : 'fall')}
+                className="step-button"
+                aria-label="Decrease stake"
+                onClick={() => setStake((value) => Math.max(1, value - 1))}
               >
-                {option}
+                −
               </button>
-            ))}
+              <div className="stake-display">$ {stake.toFixed(2)}</div>
+              <button
+                type="button"
+                className="step-button"
+                aria-label="Increase stake"
+                onClick={() => setStake((value) => value + 1)}
+              >
+                +
+              </button>
+            </div>
+
+            <div className="quick-stakes">
+              {[10, 50, 100].map((amount) => (
+                <button
+                  key={amount}
+                  type="button"
+                  className={stake === amount ? 'is-selected' : ''}
+                  onClick={() => setStake(amount)}
+                >
+                  ${amount}
+                </button>
+              ))}
+            </div>
+
+            <div className="summary-panel">
+              <div className="summary-row">
+                <span>Potential payout</span>
+                <strong>${payout.toFixed(2)}</strong>
+              </div>
+              <div className="summary-row payout-row">
+                <span>Profit</span>
+                <strong>${profit.toFixed(2)} ({profitPercent}%)</strong>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              className={`trade-submit-button ${tradeDirection === activeTradeType.secondaryValue ? 'is-fall' : 'is-rise'}`}
+              onClick={openTrade}
+            >
+              <span className="submit-bullet">◔</span>
+              Trade {directionLabel}
+            </button>
+            <p className="trade-status" aria-live="polite">{tradeStatus}</p>
+            {loadedBotScript && (
+              <details className="loaded-bot-script">
+                <summary>Loaded bot script</summary>
+                <pre>{loadedBotScript}</pre>
+              </details>
+            )}
           </div>
-
-          <div className="trade-form-grid">
-            <label>
-              <span>Stake</span>
-              <input type="number" min="0.35" step="0.01" value={stake} onChange={(event) => setStake(Number(event.target.value) || 0)} />
-            </label>
-
-            <label>
-              <span>Duration</span>
-              <input type="number" min="1" step="1" value={duration} onChange={(event) => setDuration(event.target.value)} />
-            </label>
-          </div>
-
-          <div className="trade-actions">
-            <button type="button" className="trade-action trade-action-rise" onClick={openTrade}>Rise</button>
-            <button type="button" className="trade-action trade-action-fall" onClick={openTrade}>Fall</button>
-          </div>
-
-          <div className="trade-status">{tradeStatus}</div>
         </div>
       </div>
+
+      {activeTradesMinimized ? (
+        <button
+          type="button"
+          className="active-trades-activity-button"
+          onClick={() => setActiveTradesMinimized(false)}
+          aria-label={`Show active trades${activeTrades.length ? ` (${activeTrades.length})` : ''}`}
+        >
+          <span className="activity-icon" aria-hidden="true">≋</span>
+          <span>Activity</span>
+          <strong>{activeTrades.length}</strong>
+        </button>
+      ) : (
+        <div className="active-trades-bar" aria-live="polite">
+          <div className="active-trades-header">
+            <span>Active trades</span>
+            <div className="active-trades-header-actions">
+              <strong>{activeTrades.length}</strong>
+              <button
+                type="button"
+                className="active-trades-minimize"
+                onClick={() => setActiveTradesMinimized(true)}
+                aria-label="Minimize active trades"
+                title="Minimize active trades"
+              >
+                −
+              </button>
+            </div>
+          </div>
+
+          <div className="active-trades-list">
+            {activeTrades.length > 0 ? (
+              activeTrades.map((trade) => (
+                <div key={trade.id} className="active-trade-item">
+                  <div className="active-trade-main">
+                    <span className="active-trade-symbol">{trade.symbol}</span>
+                    <span className={`active-trade-direction ${trade.direction.toLowerCase() === 'fall' || trade.direction.toLowerCase() === 'down' || trade.direction.toLowerCase() === 'odd' || trade.direction.toLowerCase() === 'under' ? 'is-fall' : 'is-rise'}`}>
+                      {trade.direction}
+                    </span>
+                  </div>
+                  <div className="active-trade-meta">
+                    <span>Stake</span>
+                    <strong>${Number(trade.stake).toFixed(2)}</strong>
+                  </div>
+                  <div className="active-trade-meta">
+                    <span>Price</span>
+                    <strong>{Number(trade.price).toFixed(2)}</strong>
+                  </div>
+                  <button type="button" className="stop-trade-button" onClick={() => stopTrade(trade.id)}>
+                    Stop
+                  </button>
+                </div>
+              ))
+            ) : (
+              <div className="active-trades-empty">No Active trades</div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
