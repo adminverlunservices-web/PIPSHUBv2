@@ -602,7 +602,6 @@ function TradingDeckPage() {
                 <h2>{currentMarket.name}</h2>
                 {loadedBot && <span className="loaded-bot-label">Bot loaded: {loadedBot.name}</span>}
               </div>
-              <button type="button" className="demo-account-button">Demo account</button>
             </div>
 
             <div className="trading-card-market-row">
@@ -610,9 +609,6 @@ function TradingDeckPage() {
                 <span>Current price</span>
                 <strong>{currentPrice.toFixed(2)}</strong>
               </div>
-              <span className={`market-trend ${tradeDirection === activeTradeType.secondaryValue ? 'negative' : 'positive'}`}>
-                {tradeDirection === activeTradeType.secondaryValue ? '-2.45%' : '+2.45%'}
-              </span>
             </div>
 
             {!isAccumulatorMode && !isDigitsMode ? (
@@ -783,17 +779,6 @@ function TradingDeckPage() {
               ))}
             </div>
 
-            <div className="summary-panel">
-              <div className="summary-row">
-                <span>Potential payout</span>
-                <strong>${payout.toFixed(2)}</strong>
-              </div>
-              <div className="summary-row payout-row">
-                <span>Profit</span>
-                <strong>${profit.toFixed(2)} ({profitPercent}%)</strong>
-              </div>
-            </div>
-
             <button
               type="button"
               className={`trade-submit-button ${tradeDirection === activeTradeType.secondaryValue ? 'is-fall' : 'is-rise'}`}
@@ -803,12 +788,6 @@ function TradingDeckPage() {
               Trade {directionLabel}
             </button>
             <p className="trade-status" aria-live="polite">{tradeStatus}</p>
-            {loadedBotScript && (
-              <details className="loaded-bot-script">
-                <summary>Loaded bot script</summary>
-                <pre>{loadedBotScript}</pre>
-              </details>
-            )}
           </div>
         </div>
       </div>
