@@ -705,6 +705,7 @@ function TradingDeckPage() {
             const contractId = Number(message.buy.contract_id);
             setTradeStatus(`Contract opened. ID: ${contractId}`);
             setTradeSuccessMessage(`Trade placed successfully · Contract ${contractId}`);
+            if (smart) setSmartTradingOpen(false);
             setActiveTradesMinimized(false);
             setActiveTrades((current) => [
               {
