@@ -948,7 +948,7 @@ function TradingDeckPage() {
 
         <div className="trading-deck-balance-block">
           <div className="balance-copy">
-            <span className="balance-label">DEMO BALANCE</span>
+            <span className="balance-label">{accountType === 'real' ? 'REAL' : 'DEMO'} BALANCE</span>
             <strong>{balance === '--' ? '--' : `$${Number(balance).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currency}`}</strong>
           </div>
           <button type="button" className="deposit-button" onClick={switchAccount} disabled={accountSwitching} aria-label={`Switch to ${accountType === 'real' ? 'Demo' : 'Real'} Account`}>
