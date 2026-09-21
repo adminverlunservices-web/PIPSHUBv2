@@ -64,3 +64,11 @@
 @keyframes matrix-scroll-right{0%{transform:translateX(-20%);opacity:.25}15%,75%{opacity:.9}100%{transform:translateX(0);opacity:.25}}
 .bot-meta button{border:0;background:none;color:var(--blue);font:inherit;font-weight:600;cursor:pointer;padding:0}.bot-meta button:hover{text-decoration:underline}
 .shell{max-width:1920px}
+.access-page{display:grid;place-items:center;min-height:100vh;padding:24px;background:var(--paper);color:var(--ink)}
+.access-card{width:min(100%,520px);padding:32px;border:1px solid var(--line);background:var(--panel);box-shadow:var(--shadow)}
+.access-card h1{margin:8px 0 24px;font-size:clamp(1.6rem,4vw,2.5rem);line-height:1.1}
+.access-sad-face{margin:-10px 0 22px;font-size:2.4rem;line-height:1;text-align:center}
+.access-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.access-actions .primary-button{background:var(--green);color:#f2fff9}
+.access-actions .dashboard-action{background:var(--red);color:#fff}
+.access-state{display:grid;place-items:center;min-height:100vh;background:var(--paper);color:var(--muted);font:12px 'DM Mono',monospace}

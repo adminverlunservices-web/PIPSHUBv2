@@ -87,7 +87,7 @@ function Layout({ route, title, children }) {
       <aside className={`sidebar ${menuOpen ? 'open' : ''}`}>
         <Link className="brand" href="/"><span>VERLUN</span><b>|</b><small> PIPSHIB V3</small></Link>
         <p className="eyebrow">VERLUN| PIPSHIB V3</p>
-        <nav>{nav.map(([key, label, href]) => <Link key={key} className={`nav-link ${route === key ? 'is-active' : ''}`} href={href} onClick={() => setMenuOpen(false)}><span className="nav-dot" />{label}</Link>)}</nav>
+        <nav>{nav.filter(([key]) => key !== 'trading-deck' || connected).map(([key, label, href]) => <Link key={key} className={`nav-link ${route === key ? 'is-active' : ''}`} href={href} onClick={() => setMenuOpen(false)}><span className="nav-dot" />{label}</Link>)}</nav>
         <div className="sidebar-foot"><span className="status-dot" /><span>Deriv link ready</span><a href="https://t.me/derivdominator" target="_blank" rel="noreferrer">Community ↗</a></div>
       </aside>
       <main className="shell">
@@ -99,6 +99,41 @@ function Layout({ route, title, children }) {
         {children}
       </main>
     </>
+  );
+}
+
+function TradingDeckGate() {
+  const [status, setStatus] = useState('checking');
+
+  useEffect(() => {
+    let active = true;
+    fetch(apiUrl('api/deriv-session.js'), { credentials: 'include' })
+      .then((response) => response.json().then((data) => ({ ok: response.ok, data })))
+      .then(({ ok, data }) => {
+        if (active) setStatus(ok && data.connected ? 'connected' : 'denied');
+      })
+      .catch(() => {
+        if (active) setStatus('denied');
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  if (status === 'checking') return <div className="access-state" role="status">Checking access...</div>;
+  if (status === 'connected') return <TradingDeckPage />;
+  return (
+    <main className="access-page">
+      <section className="access-card" role="alert">
+        <p className="kicker">Trading Deck</p>
+        <h1>Please Login first to Continue.</h1>
+        <div className="access-sad-face" role="img" aria-label="Login required">😞</div>
+        <div className="access-actions">
+          <a className="primary-button" href={`${API_BASE_URL}/api/deriv-login.js`}>Connect Deriv <span>→</span></a>
+          <a className="primary-button dashboard-action" href="#/">Dashboard</a>
+        </div>
+      </section>
+    </main>
   );
 }
 
@@ -633,7 +668,7 @@ function App() {
   const [route, title] = routeNames[path];
 
   if (path === '/trading-deck') {
-    return <TradingDeckPage />;
+    return <TradingDeckGate />;
   }
 
   let content = <Dashboard />;
