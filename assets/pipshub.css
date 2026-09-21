@@ -18,8 +18,20 @@
 .analysis-processing .kicker{margin-bottom:9px}
 .analysis-processing-state{display:flex;align-items:center;gap:8px;margin:0;color:var(--muted);font:11px 'DM Mono',monospace}
 .analysis-processing-state i{width:7px;height:7px;border-radius:50%;background:var(--red);animation:analysis-pulse 1s ease-in-out infinite}
+.analysis-code-stream{position:relative;display:flex;flex-direction:column;gap:4px;width:100%;margin-top:12px;padding:9px 10px;overflow:hidden;background:#101820;font:10px/1.35 'DM Mono',monospace;letter-spacing:.12em;opacity:.95}
+.analysis-code-label{position:absolute;top:50%;left:50%;z-index:1;display:flex;align-items:center;gap:8px;padding:7px 12px;transform:translate(-50%,-50%);background:rgba(16,24,32,.9);color:#f7f8fa;font:600 12px 'Space Grotesk',sans-serif;letter-spacing:.04em;white-space:nowrap}
+.analysis-code-label i{width:7px;height:7px;border-radius:50%;background:#55c89e;animation:analysis-pulse 1s ease-in-out infinite}
+.analysis-code-stream span{display:flex;justify-content:flex-start;width:max-content;min-width:125%;gap:12px;white-space:nowrap;animation:matrix-scroll-left 1.15s linear infinite}
+.analysis-code-stream span:nth-child(2n){animation-name:matrix-scroll-right;animation-duration:.9s;animation-delay:-.18s;opacity:.78}
+.analysis-code-stream span:nth-child(3n){animation-duration:1.45s;animation-delay:-.34s;opacity:.58}
+.matrix-digit{font-weight:500}
+.digit-0,.digit-5{color:#79d8ae}.digit-1,.digit-6{color:#72b8ff}.digit-2,.digit-7{color:#f3c969}.digit-3,.digit-8{color:#f28c83}.digit-4,.digit-9{color:#c4a7ff}
 .analysis-processing-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px}
+.analysis-processing-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .analysis-processing-grid span{padding:9px 10px;background:#f5f8f5;color:var(--muted);font:10px 'DM Mono',monospace;text-transform:uppercase}
 .analysis-processing-grid strong{display:block;margin-top:5px;color:var(--ink);font:600 14px 'Space Grotesk',sans-serif;text-transform:none}
+.analysis-grid table{display:none}
 @keyframes analysis-pulse{50%{opacity:.3}}
+@keyframes matrix-scroll-left{0%{transform:translateX(0);opacity:.25}15%,75%{opacity:.95}100%{transform:translateX(-20%);opacity:.25}}
+@keyframes matrix-scroll-right{0%{transform:translateX(-20%);opacity:.25}15%,75%{opacity:.9}100%{transform:translateX(0);opacity:.25}}
 .bot-meta button{border:0;background:none;color:var(--blue);font:inherit;font-weight:600;cursor:pointer;padding:0}.bot-meta button:hover{text-decoration:underline}

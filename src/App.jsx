@@ -17,6 +17,8 @@ const folderBots = Object.entries(folderBotFiles).map(([filePath, script]) => {
   };
 });
 
+const createMatrixLine = () => Array.from({ length: 76 }, () => String(Math.floor(Math.random() * 10)));
+
 const nav = [
   ['dashboard', 'Dashboard', '/'],
   ['trading-deck', 'Trading Deck', '/trading-deck'],
@@ -107,9 +109,17 @@ function Hero({ kicker, heading, lede, action, selectedMarket, onMarketChange })
   const [analysisResult, setAnalysisResult] = useState(null);
   const [digitPrices, setDigitPrices] = useState([]);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [matrixCode, setMatrixCode] = useState(() => Array.from({ length: 6 }, createMatrixLine));
   const analysisTimerRef = useRef(null);
 
   useEffect(() => () => clearTimeout(analysisTimerRef.current), []);
+  useEffect(() => {
+    if (!isProcessing) return undefined;
+    const updateMatrix = () => setMatrixCode(Array.from({ length: 6 }, createMatrixLine));
+    updateMatrix();
+    const interval = window.setInterval(updateMatrix, 140);
+    return () => window.clearInterval(interval);
+  }, [isProcessing]);
 
   useEffect(() => {
     if (!isMarketPage) return undefined;
@@ -159,6 +169,7 @@ function Hero({ kicker, heading, lede, action, selectedMarket, onMarketChange })
     clearTimeout(analysisTimerRef.current);
     setAnalysisResult(null);
     setIsProcessing(true);
+    window.dispatchEvent(new CustomEvent('market-analysis', { detail: { market: selectedSynthetic, processing: true } }));
     analysisTimerRef.current = setTimeout(() => {
       setIsProcessing(false);
       setAnalysisResult(result);
@@ -174,11 +185,11 @@ function Hero({ kicker, heading, lede, action, selectedMarket, onMarketChange })
         <label style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}><span className="kicker">Markets</span>{syntheticSelector}</label>
         <label style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}><span className="kicker">Synthetics</span>{marketSelector}</label>
       </div>
-      <div className="analysis-action-row"><button type="button" className="primary-button" onClick={analyzeMarket} disabled={!canAnalyze || isProcessing}>{isProcessing ? 'Processing...' : 'Analyze market'} <span>→</span></button></div>
+      <div className="analysis-action-row"><button type="button" className="primary-button" onClick={analyzeMarket} disabled={!canAnalyze || isProcessing}>{isProcessing ? 'Analyzing...' : 'Analyze market'} <span>→</span></button></div>
     </div>
-    {(isProcessing || analysisResult) && <div className="analysis-processing" role="status" aria-live="polite">
-      <p className="kicker">Analysis matrix</p>
-      {isProcessing ? <p className="analysis-processing-state"><i /> Processing live ticks for {selectedSynthetic}...</p> : <div className="analysis-processing-grid"><span>Market<strong>{analysisResult.market}</strong></span><span>Odd<strong>{analysisResult.odd}%</strong></span><span>Even<strong>{analysisResult.even}%</strong></span></div>}
+    {isProcessing && <div className="analysis-processing" role="status" aria-live="polite">
+      <div className="analysis-code-stream" aria-label="Analyzing"><strong className="analysis-code-label"><i /> Analyzing...</strong>{matrixCode.map((line, lineIndex) => <span key={lineIndex}>{line.map((digit, digitIndex) => <b className={`matrix-digit digit-${digit}`} key={`${lineIndex}-${digitIndex}`}>{digit}</b>)}</span>)}</div>
+      return <><div className="panel-heading"><div><p className="kicker">{kicker}</p><h3>{heading === 'Live conditions' ? 'Analysis Report' : heading}</h3></div>{action}</div>{kicker === 'Market matrix' && marketAnalysis && <div role="status" style={{ marginBottom: '16px', padding: '10px 12px', border: '1px solid var(--line)', background: 'var(--paper)' }}><strong>Winning chances · {marketAnalysis.market}</strong><div style={{ display: 'flex', gap: '18px' }}><span>ODD: <b>{marketAnalysis.odd}%</b></span><span>EVEN: <b>{marketAnalysis.even}%</b></span></div></div>}</>;
     </div>}
   </>;
   return isMarketPage ? marketView : <section className="hero-row compact"><div><p className="kicker">{kicker === 'Market intelligence' ? 'Live Analysis' : kicker}</p><h2>{heading === 'Read the market.' ? 'Live Analysis' : heading}</h2><p className="lede">{lede}</p></div>{action}</section>;
@@ -187,7 +198,7 @@ function Hero({ kicker, heading, lede, action, selectedMarket, onMarketChange })
 function PanelHeading({ kicker, heading, action }) {
   const [marketAnalysis, setMarketAnalysis] = useState(null);
   useEffect(() => {
-    const handleAnalysis = (event) => setMarketAnalysis(event.detail);
+    const handleAnalysis = (event) => setMarketAnalysis(event.detail.processing ? null : event.detail);
     window.addEventListener('market-analysis', handleAnalysis);
     return () => window.removeEventListener('market-analysis', handleAnalysis);
   }, []);
