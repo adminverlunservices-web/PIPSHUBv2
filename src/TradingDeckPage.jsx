@@ -1214,7 +1214,7 @@ function TradingDeckPage() {
                         step="1"
                         value={duration}
                         onChange={(event) => setDuration(event.target.value)}
-                        disabled
+                        disabled={!smartTradingOpen}
                         className="stake-input"
                         aria-label="Duration"
                       />
