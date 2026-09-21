@@ -87,7 +87,7 @@ function Layout({ route, title, children }) {
       <aside className={`sidebar ${menuOpen ? 'open' : ''}`}>
         <Link className="brand" href="/"><span>VERLUN</span><b>|</b><small> PIPSHIB V3</small></Link>
         <p className="eyebrow">VERLUN| PIPSHIB V3</p>
-        <nav>{nav.filter(([key]) => key !== 'trading-deck' || connected).map(([key, label, href]) => <Link key={key} className={`nav-link ${route === key ? 'is-active' : ''}`} href={href} onClick={() => setMenuOpen(false)}><span className="nav-dot" />{label}</Link>)}</nav>
+        <nav>{nav.filter(([key]) => key !== 'smart').map(([key, label, href]) => <Link key={key} className={`nav-link ${route === key ? 'is-active' : ''}`} href={href} onClick={() => setMenuOpen(false)}><span className="nav-dot" />{label}</Link>)}</nav>
         <div className="sidebar-foot"><span className="status-dot" /><span>Deriv link ready</span><a href="https://t.me/derivdominator" target="_blank" rel="noreferrer">Community ↗</a></div>
       </aside>
       <main className="shell">
