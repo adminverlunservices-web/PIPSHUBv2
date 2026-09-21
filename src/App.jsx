@@ -251,6 +251,7 @@ function Hero({ kicker, heading, lede, action, selectedMarket, onMarketChange })
             <span>{analysisResult ? analysisResult.primaryLabel : 'Analyzing'}<strong>{analysisResult ? `${analysisResult.primaryValue}%` : '--'}</strong></span>
             <span>{analysisResult ? analysisResult.secondaryLabel : 'Status'}<strong>{analysisResult ? `${analysisResult.secondaryValue}%` : 'Live'}</strong></span>
           </div>
+          <Link className="result-action primary-button" href="/trading-deck">Open Trading Deck <span>→</span></Link>
         </div>
       </div>
     )}

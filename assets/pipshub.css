@@ -37,6 +37,7 @@
 .analysis-result-grid span:nth-child(3){border-left-color:var(--red)}
 .analysis-result-grid span:nth-child(4){border-left-color:#d69b2d}
 .analysis-result-grid strong{display:block;margin-top:3px;color:var(--ink);font:600 14px 'Space Grotesk',sans-serif;text-transform:none}
+.result-action{width:100%;margin-top:10px;justify-content:space-between}
 .analysis-result-wrap{display:flex;justify-content:flex-end;width:min(100%,850px);max-width:100%;min-width:0;margin-top:12px;margin-left:0}
 .new-result-container{margin:0;padding:12px;border:1px solid var(--line);background:var(--panel);width:100%;max-width:100%;min-width:0;display:block;box-shadow:var(--shadow);align-self:stretch}
 .analysis-result-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;padding-bottom:9px;border-bottom:1px solid var(--line)}
