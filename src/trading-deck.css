@@ -1098,7 +1098,7 @@
   max-width: 460px;
 }
 
-@media (max-width: 1200px) and (min-width: 961px) {
+@media (max-width: 1200px) and (min-width: 901px) {
   .trading-deck-topbar {
     flex-wrap: wrap;
     min-height: 124px;
