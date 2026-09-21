@@ -375,6 +375,7 @@ function TradingDeckPage() {
     RDBULL: { name: 'Range Break Bull Index', price: 103.76 },
   };
   const tradeTypeOptions = {
+    'Derived Markets': { primary: 'Higher', secondary: 'Lower', primaryValue: 'rise', secondaryValue: 'fall' },
     'Higher / Lower': { primary: 'Higher', secondary: 'Lower', primaryValue: 'rise', secondaryValue: 'fall' },
     'Rise / Fall': { primary: 'Rise', secondary: 'Fall', primaryValue: 'rise', secondaryValue: 'fall' },
     'Touch / No Touch': { primary: 'Touch', secondary: 'No Touch', primaryValue: 'touch', secondaryValue: 'noTouch' },
@@ -384,6 +385,7 @@ function TradingDeckPage() {
     'Matches & Differs': { primary: 'Matches', secondary: 'Differs', primaryValue: 'matches', secondaryValue: 'differs' },
   };
   const syntheticMarkets = {
+    'Derived Markets': ['R_10', 'R_25', 'R_50', 'R_75', 'R_100', '1HZ10V', '1HZ25V', '1HZ50V', '1HZ75V', '1HZ100V', 'RDBEAR', 'RDBULL'],
     'Higher / Lower': ['R_10', 'R_25', 'R_50', 'R_75', 'R_100', 'RDBEAR', 'RDBULL'],
     'Rise / Fall': ['R_10', 'R_25', 'R_50', 'R_75', 'R_100', '1HZ10V', '1HZ25V', '1HZ50V', '1HZ75V', '1HZ100V', 'RDBEAR', 'RDBULL'],
     'Touch / No Touch': ['R_10', 'R_25', 'R_50', 'R_75', 'R_100', 'RDBEAR', 'RDBULL'],
@@ -979,6 +981,7 @@ function TradingDeckPage() {
                 }}
                 className="selector-native"
               >
+                <option>Derived Markets</option>
                 <option>Higher / Lower</option>
                 <option>Rise / Fall</option>
                 <option>Touch / No Touch</option>

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { cloneElement, useEffect, useRef, useState } from 'react';
 import TradingDeckPage from './TradingDeckPage';
 import { API_BASE_URL, apiUrl } from './config';
 import { sampleBots } from './sampleBots';
@@ -101,7 +101,13 @@ function Layout({ route, title, children }) {
 }
 
 function Hero({ kicker, heading, lede, action }) {
-  return <section className="hero-row compact"><div><p className="kicker">{kicker}</p><h2>{heading}</h2><p className="lede">{lede}</p></div>{action}</section>;
+  const isMarketPage = action?.props?.className === 'market-select';
+  const syntheticSelector = isMarketPage
+    ? cloneElement(action, {}, ...action.props.children.filter((option) => !String(option.props?.children || '').startsWith('Volatility') && !['1HZ indices', 'Range Break Bear Index (RDBEAR)', 'Range Break Bull Index (RDBULL)'].includes(String(option.props?.children || ''))).map((option) => String(option.props?.children || '') === 'All synthetic markets' ? <option key="derived-markets">Derived Markets</option> : option), <option key="higher-lower">Higher / Lower</option>, <option key="rise-fall">Rise / Fall</option>, <option key="touch-no-touch">Touch / No Touch</option>, <option key="even-odd">Even / Odd</option>, <option key="accumulators">Accumulators</option>, <option key="digits">Digits</option>, <option key="matches-differs">Matches &amp; Differs</option>)
+    : action;
+  const syntheticOptions = ['All synthetics', '1HZ indices', 'Range Break Bear Index (RDBEAR)', 'Range Break Bull Index (RDBULL)', 'Volatility 10 Index', 'Volatility 25 Index', 'Volatility 50 Index', 'Volatility 75 Index', 'Volatility 100 Index', 'Volatility 10 (1s) Index', 'Volatility 25 (1s) Index', 'Volatility 50 (1s) Index', 'Volatility 75 (1s) Index', 'Volatility 100 (1s) Index'];
+  const marketSelector = <select className="market-select synthetics-select" aria-label="Synthetics">{syntheticOptions.map((option) => <option key={option}>{option}</option>)}</select>;
+  return <section className="hero-row compact"><div><p className="kicker">{kicker}</p><h2>{heading}</h2><p className="lede">{lede}</p></div>{isMarketPage ? <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}><label style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}><span className="kicker">Markets</span>{syntheticSelector}</label><label style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}><span className="kicker">Synthetics</span>{marketSelector}</label></div> : action}</section>;
 }
 
 function PanelHeading({ kicker, heading, action }) {
