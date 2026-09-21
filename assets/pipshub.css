@@ -8,7 +8,7 @@
 .hero-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.import-bots-button{display:inline-flex;align-items:center;cursor:pointer}.import-bots-button input{display:none}.import-status{margin:0 0 16px;color:var(--muted);font-size:.86rem}.bot-card.imported{border-color:rgba(35,119,201,.35);box-shadow:0 10px 24px rgba(35,119,201,.08)}
 .loaded-bot-label{display:block;margin-top:5px;color:#1599e8;font-size:.72rem;font-weight:600}.loaded-bot-script{margin-top:12px;border-top:1px solid rgba(150,171,196,.18);padding-top:10px;color:#b8c8dd;font-size:.75rem}.loaded-bot-script summary{cursor:pointer;color:#8fbfff;font-weight:700}.loaded-bot-script pre{max-height:150px;margin:8px 0 0;overflow:auto;white-space:pre-wrap;color:#dfeaf8;font:11px/1.5 'DM Mono',monospace}
 .bot-card.sample{border-color:rgba(22,138,105,.3);box-shadow:0 10px 24px rgba(22,138,105,.06)}
-.market-analysis-controls{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;align-items:end;gap:10px;width:100%;margin:0 0 30px}
+.market-analysis-controls{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;align-items:end;gap:10px;width:min(100%,850px);margin:0 0 30px}
 .market-analysis-controls .market-controls{display:contents!important}
 .market-analysis-controls .market-controls label{min-width:0}
 .market-analysis-controls .market-controls .market-select{width:100%;min-width:0}
@@ -33,7 +33,15 @@
 .analysis-result-grid{display:grid;grid-template-columns:1.4fr 1.4fr 1fr 1fr;gap:10px}
 .analysis-result-grid span{padding:9px 10px;background:#f5f8f5;color:var(--muted);font:10px 'DM Mono',monospace;text-transform:uppercase}
 .analysis-result-grid strong{display:block;margin-top:5px;color:var(--ink);font:600 14px 'Space Grotesk',sans-serif;text-transform:none}
-.analysis-grid table{display:none}
+.analysis-grid table{display:table;width:100%;border-collapse:collapse;table-layout:fixed}
+.analysis-grid tbody tr{display:table-row}
+.analysis-grid th,.analysis-grid td{padding:12px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+.analysis-grid th{font:500 10px 'DM Mono',monospace;text-transform:uppercase;letter-spacing:.14em;color:var(--muted)}
+.analysis-grid td{font-size:14px;color:var(--ink)}
+.analysis-grid .bar{display:block;width:100%;height:8px;overflow:hidden;border-radius:999px;background:#edf2ef}
+.analysis-grid .bar i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#7bc9ab,#2e7d7b)}
+@media(max-width:900px){.market-analysis-controls{grid-template-columns:1fr 1fr;width:100%}.market-analysis-controls .analysis-action-row .primary-button{grid-column:1/-1;width:100%;justify-content:space-between}.analysis-result-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.market-analysis-controls{grid-template-columns:1fr}.market-analysis-controls .analysis-action-row .primary-button{grid-column:auto}.analysis-result-grid{grid-template-columns:1fr}}
 @keyframes analysis-pulse{50%{opacity:.3}}
 @keyframes matrix-scroll-left{0%{transform:translateX(0);opacity:.25}15%,75%{opacity:.95}100%{transform:translateX(-20%);opacity:.25}}
 @keyframes matrix-scroll-right{0%{transform:translateX(-20%);opacity:.25}15%,75%{opacity:.9}100%{transform:translateX(0);opacity:.25}}

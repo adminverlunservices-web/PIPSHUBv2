@@ -124,10 +124,20 @@ function Hero({ kicker, heading, lede, action, selectedMarket, onMarketChange })
   useEffect(() => {
     if (!isMarketPage) return undefined;
     const rows = () => document.querySelectorAll('.analysis-grid tbody tr');
-    rows().forEach((row) => { row.style.display = 'none'; });
+    const showAllRows = () => rows().forEach((row) => { row.style.display = ''; });
     const handleAnalysis = (event) => {
-      rows().forEach((row) => { row.style.display = row.firstElementChild?.textContent === event.detail.market ? '' : 'none'; });
+      const detail = event.detail || {};
+      if (detail.processing) {
+        rows().forEach((row) => { row.style.display = 'none'; });
+        return;
+      }
+      if (!detail.market) {
+        showAllRows();
+        return;
+      }
+      rows().forEach((row) => { row.style.display = row.firstElementChild?.textContent === detail.market ? '' : 'none'; });
     };
+    showAllRows();
     window.addEventListener('market-analysis', handleAnalysis);
     return () => window.removeEventListener('market-analysis', handleAnalysis);
   }, [isMarketPage]);
