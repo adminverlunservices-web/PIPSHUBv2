@@ -105,6 +105,7 @@ function Hero({ kicker, heading, lede, action, selectedMarket, onMarketChange })
   const [selectedMarketType, setSelectedMarketType] = useState('Derived Markets');
   const [selectedSynthetic, setSelectedSynthetic] = useState('');
   const [analysisResult, setAnalysisResult] = useState(null);
+  const [digitPrices, setDigitPrices] = useState([]);
 
   useEffect(() => {
     if (!isMarketPage) return undefined;
@@ -122,8 +123,37 @@ function Hero({ kicker, heading, lede, action, selectedMarket, onMarketChange })
   const syntheticOptions = ['All synthetics', '1HZ indices', 'Range Break Bear Index (RDBEAR)', 'Range Break Bull Index (RDBULL)', 'Volatility 10 Index', 'Volatility 25 Index', 'Volatility 50 Index', 'Volatility 75 Index', 'Volatility 100 Index', 'Volatility 10 (1s) Index', 'Volatility 25 (1s) Index', 'Volatility 50 (1s) Index', 'Volatility 75 (1s) Index', 'Volatility 100 (1s) Index'];
   const marketValues = { '1HZ indices': '1HZ10V', 'Range Break Bear Index (RDBEAR)': 'RDBEAR', 'Range Break Bull Index (RDBULL)': 'RDBULL', 'Volatility 10 Index': 'R_10', 'Volatility 25 Index': 'R_25', 'Volatility 50 Index': 'R_50', 'Volatility 75 Index': 'R_75', 'Volatility 100 Index': 'R_100', 'Volatility 10 (1s) Index': '1HZ10V', 'Volatility 25 (1s) Index': '1HZ25V', 'Volatility 50 (1s) Index': '1HZ50V', 'Volatility 75 (1s) Index': '1HZ75V', 'Volatility 100 (1s) Index': '1HZ100V' };
   const marketSelector = <select className="market-select synthetics-select" aria-label="Synthetics" value={selectedMarket || undefined} onChange={(event) => { const selected = event.target.value; setSelectedSynthetic(selected); setAnalysisResult(null); onMarketChange?.(selected); document.querySelectorAll('.analysis-grid tbody tr').forEach((row) => { row.style.display = 'none'; }); }}>{syntheticOptions.map((option) => <option key={option} value={marketValues[option] || ''}>{option}</option>)}</select>;
-  const canAnalyze = selectedMarketType === 'Even / Odd' && /^R_|^1HZ/.test(selectedSynthetic);
-  const analyzeMarket = () => { const result = { odd: 62, even: 38, market: selectedSynthetic }; setAnalysisResult(result); window.dispatchEvent(new CustomEvent('market-analysis', { detail: result })); };
+  const canAnalyze = selectedMarketType !== 'Derived Markets' && /^R_|^1HZ/.test(selectedSynthetic);
+  useEffect(() => {
+    setDigitPrices([]);
+    if (!canAnalyze) return undefined;
+    let socket;
+    let closed = false;
+    const appendPrices = (values) => setDigitPrices((current) => [...current, ...values.map(Number).filter(Number.isFinite)].slice(-100));
+    try {
+      socket = new WebSocket('wss://api.derivws.com/trading/v1/options/ws/public');
+      socket.addEventListener('open', () => socket.send(JSON.stringify({ ticks_history: selectedSynthetic, end: 'latest', count: 100, style: 'ticks' })));
+      socket.addEventListener('message', (event) => {
+        const message = JSON.parse(event.data);
+        if (message.history?.prices) {
+          appendPrices(message.history.prices);
+          socket.send(JSON.stringify({ ticks: selectedSynthetic, subscribe: 1 }));
+        }
+        if (message.tick?.quote !== undefined) appendPrices([message.tick.quote]);
+      });
+    } catch {
+      return undefined;
+    }
+    return () => { closed = true; if (closed) socket?.close(); };
+  }, [canAnalyze, selectedSynthetic]);
+  const analyzeMarket = () => {
+    const digits = digitPrices.map((price) => Number(price).toFixed(2).slice(-1)).map(Number);
+    const odd = digits.filter((digit) => digit % 2 === 1).length;
+    const total = digits.length || 1;
+    const result = { odd: Math.round(odd / total * 100), even: Math.round((total - odd) / total * 100), market: selectedSynthetic };
+    setAnalysisResult(result);
+    window.dispatchEvent(new CustomEvent('market-analysis', { detail: result }));
+  };
   return <section className="hero-row compact"><div><p className="kicker">{kicker === 'Market intelligence' ? 'Live Analysis' : kicker}</p><h2>{heading === 'Read the market.' ? 'Live Analysis' : heading}</h2><p className="lede">{lede}</p></div>{isMarketPage ? <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'flex-end' }}><label style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}><span className="kicker">Markets</span>{syntheticSelector}</label><label style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}><span className="kicker">Synthetics</span>{marketSelector}</label>{canAnalyze && <button type="button" className="primary-button" onClick={analyzeMarket}>Analyze market <span>→</span></button>}</div> : action}</section>;
 }
 
