@@ -1251,25 +1251,39 @@
   position: relative;
   display: flex;
   align-items: center;
-  gap: 16px;
-  min-width: 300px;
-  min-height: 52px;
-  border-radius: 16px;
-  padding: 0 14px 0 18px;
-  background: rgba(11, 20, 29, 0.7);
-  border: 1px solid rgba(150, 173, 196, 0.3);
+  gap: 12px;
+  width: min(100%, 320px);
+  min-width: 220px;
+  max-width: 320px;
+  min-height: 48px;
+  border-radius: 10px;
+  padding: 0 13px 0 15px;
+  background: rgba(9, 18, 27, 0.84);
+  border: 1px solid rgba(150, 173, 196, 0.22);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.14), inset 0 1px 0 rgba(255, 255, 255, 0.035);
   color: #edf4ff;
   cursor: pointer;
+  transition: border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
 }
 
 .selector-card.active {
-  border-color: rgba(130, 176, 246, 0.64);
+  background: rgba(12, 24, 36, 0.94);
+  border-color: rgba(130, 176, 246, 0.58);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18), inset 2px 0 0 #78aef5;
+}
+
+.selector-card:hover {
+  background: rgba(13, 26, 39, 0.94);
+  border-color: rgba(153, 187, 230, 0.46);
 }
 
 .selector-label {
-  font-size: 0.72rem;
-  letter-spacing: 0.02em;
-  color: #9bb3ce;
+  flex: 0 0 auto;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #829bb6;
   white-space: nowrap;
 }
 

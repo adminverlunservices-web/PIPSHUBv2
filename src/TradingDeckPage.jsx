@@ -402,6 +402,58 @@ function TradingDeckPage() {
   };
   const activeTradeType = tradeTypeOptions[tradeType] || tradeTypeOptions['Higher / Lower'];
   const availableMarkets = syntheticMarkets[tradeType] || syntheticMarkets['Higher / Lower'];
+  const filteredMarkets = availableMarkets.filter((symbol) => {
+    const label = marketMeta[symbol]?.name || symbol;
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return true;
+    return label.toLowerCase().includes(query) || symbol.toLowerCase().includes(query);
+  });
+
+  useEffect(() => {
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return;
+
+    const tradeTypeMatches = Object.keys(tradeTypeOptions)
+      .filter((option) => option.toLowerCase().includes(query))
+      .sort((a, b) => {
+        const aStarts = a.toLowerCase().startsWith(query) ? 0 : 1;
+        const bStarts = b.toLowerCase().startsWith(query) ? 0 : 1;
+        if (aStarts !== bStarts) return aStarts - bStarts;
+        return a.length - b.length;
+      });
+
+    if (tradeTypeMatches.length > 0) {
+      const bestMatch = tradeTypeMatches[0];
+      if (bestMatch !== tradeType) {
+        setTradeType(bestMatch);
+        const nextTradeType = tradeTypeOptions[bestMatch] || tradeTypeOptions['Higher / Lower'];
+        setTradeDirection(nextTradeType.primaryValue);
+        setDurationUnit(bestMatch === 'Even / Odd' ? 't' : 'm');
+        const nextMarkets = syntheticMarkets[bestMatch] || syntheticMarkets['Higher / Lower'];
+        if (!nextMarkets.includes(market)) setMarket(nextMarkets[0]);
+      }
+      return;
+    }
+
+    const marketMatches = availableMarkets
+      .filter((symbol) => {
+        const label = marketMeta[symbol]?.name || symbol;
+        return label.toLowerCase().includes(query) || symbol.toLowerCase().includes(query);
+      })
+      .sort((a, b) => {
+        const aName = (marketMeta[a]?.name || a).toLowerCase();
+        const bName = (marketMeta[b]?.name || b).toLowerCase();
+        const aStarts = aName.startsWith(query) ? 0 : 1;
+        const bStarts = bName.startsWith(query) ? 0 : 1;
+        if (aStarts !== bStarts) return aStarts - bStarts;
+        return aName.length - bName.length;
+      });
+
+    if (marketMatches.length > 0 && marketMatches[0] !== market) {
+      setMarket(marketMatches[0]);
+    }
+  }, [searchQuery, tradeType, availableMarkets, market]);
+
   const currentMarket = marketMeta[market] || marketMeta.R_100;
   const currentPrice = liveQuote ?? currentMarket.price;
   const directionLabel = tradeDirection === activeTradeType.secondaryValue ? activeTradeType.secondary : activeTradeType.primary;
@@ -1059,6 +1111,7 @@ function TradingDeckPage() {
                   setDurationUnit(nextType === 'Even / Odd' ? 't' : 'm');
                   const nextMarkets = syntheticMarkets[nextType] || syntheticMarkets['Higher / Lower'];
                   if (!nextMarkets.includes(market)) setMarket(nextMarkets[0]);
+                  setSearchQuery('');
                 }}
                 className="selector-native"
               >
@@ -1077,8 +1130,16 @@ function TradingDeckPage() {
 
             <label className="selector-card active">
               <span className="selector-label">Synthetics</span>
-              <select value={market} onChange={(event) => setMarket(event.target.value)} className="selector-native">
-                {availableMarkets.map((symbol) => <option key={symbol} value={symbol}>{marketMeta[symbol].name}</option>)}
+              <select
+                value={filteredMarkets.includes(market) ? market : (filteredMarkets[0] || '')}
+                onChange={(event) => setMarket(event.target.value)}
+                className="selector-native"
+              >
+                {filteredMarkets.length > 0 ? (
+                  filteredMarkets.map((symbol) => <option key={symbol} value={symbol}>{marketMeta[symbol].name}</option>)
+                ) : (
+                  <option value="">No market matches</option>
+                )}
               </select>
               <span className="selector-value">{currentMarket.name}</span>
               <span className="selector-caret">⌄</span>
