@@ -134,7 +134,7 @@ function PanelHeading({ kicker, heading, action }) {
     window.addEventListener('market-analysis', handleAnalysis);
     return () => window.removeEventListener('market-analysis', handleAnalysis);
   }, []);
-  return <><div className="panel-heading"><div><p className="kicker">{kicker}</p><h3>{heading}</h3></div>{action}</div>{kicker === 'Market matrix' && marketAnalysis && <div role="status" style={{ marginBottom: '16px', padding: '10px 12px', border: '1px solid var(--line)', background: 'var(--paper)' }}><strong>Winning chances · {marketAnalysis.market}</strong><div style={{ display: 'flex', gap: '18px', marginTop: '6px' }}><span>ODD: <b>{marketAnalysis.odd}%</b></span><span>EVEN: <b>{marketAnalysis.even}%</b></span></div></div>}</>;
+  return <><div className="panel-heading"><div><p className="kicker">{kicker}</p><h3>{heading === 'Live conditions' ? 'Analysis Report' : heading}</h3></div>{action}</div>{kicker === 'Market matrix' && marketAnalysis && <div role="status" style={{ marginBottom: '16px', padding: '10px 12px', border: '1px solid var(--line)', background: 'var(--paper)' }}><strong>Winning chances · {marketAnalysis.market}</strong><div style={{ display: 'flex', gap: '18px', marginTop: '6px' }}><span>ODD: <b>{marketAnalysis.odd}%</b></span><span>EVEN: <b>{marketAnalysis.even}%</b></span></div></div>}</>;
 }
 
 function LiveFeedChart({ market = 'R_100', onMarketChange }) {
