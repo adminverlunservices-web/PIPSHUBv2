@@ -590,14 +590,28 @@ function TradingDeckPage() {
     setTradeStatus(`${loadedBot?.name || 'Bot'} stopped. The current contract will finish normally.`);
   };
 
-  const openTrade = () => {
+  const openTrade = ({ smart = false } = {}) => {
     if (isAutoBot && !autoBotRunningRef.current) return;
 
-    const amount = Number(stake);
-    const contractDuration = Number(duration) || 1;
+    const selectedStake = Number(stake);
+    const selectedDuration = Number(duration);
+    const selectedDurationUnit = durationUnit;
+    const selectedProfitStop = stopProfit;
+    const selectedLossStop = stopLoss;
+    const selectedMaxStake = Number(maxStake);
+    const amount = selectedStake;
+    const contractDuration = selectedDuration;
 
-    if (!Number.isFinite(amount) || amount < 0.35) {
+    if (!Number.isFinite(amount) || amount < 0.35 || (smart && Number.isFinite(selectedMaxStake) && selectedMaxStake > 0 && amount > selectedMaxStake)) {
+      if (smart && Number.isFinite(selectedMaxStake) && selectedMaxStake > 0 && amount > selectedMaxStake) {
+        setTradeStatus('Initial stake cannot exceed the Smart Trading max. stake.');
+        return;
+      }
       setTradeStatus('Enter a valid stake of at least $0.35.');
+      return;
+    }
+    if (!Number.isFinite(contractDuration) || contractDuration < 1) {
+      setTradeStatus('Enter a valid duration of at least 1.');
       return;
     }
 
@@ -637,8 +651,8 @@ function TradingDeckPage() {
             const contractId = Number(contract.contract_id);
             const profit = Number(contract.profit || 0);
             const target = Number(takeProfit);
-            const profitStop = Number(stopProfit);
-            const lossStop = Number(stopLoss);
+            const profitStop = Number(selectedProfitStop);
+            const lossStop = Number(selectedLossStop);
             const reachedProfitStop = Number.isFinite(profitStop) && profitStop > 0 && profit >= profitStop;
             const reachedLossStop = Number.isFinite(lossStop) && lossStop > 0 && profit <= -lossStop;
 
@@ -716,8 +730,9 @@ function TradingDeckPage() {
             contract_type: tradeContractType,
             currency: 'USD',
             duration: contractDuration,
-            duration_unit: durationUnit,
+            duration_unit: selectedDurationUnit,
             underlying_symbol: market,
+            ...(smart && allowEquals ? { allow_equals: 1 } : {}),
           }));
         });
 
@@ -1342,7 +1357,7 @@ function TradingDeckPage() {
             <button
               type="button"
               className={`trade-submit-button ${tradeDirection === activeTradeType.secondaryValue ? 'is-fall' : 'is-rise'}`}
-              onClick={openTrade}
+              onClick={() => openTrade({ smart: smartTradingOpen })}
             >
               <span className="submit-bullet">◔</span>
               {isAccumulatorMode ? 'Buy' : `Trade ${directionLabel}`}
