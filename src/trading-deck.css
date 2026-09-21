@@ -2087,6 +2087,97 @@
   border-radius: 12px;
 }
 
+.history-trades-section {
+  margin-top: 16px;
+  border-top: 1px solid rgba(160, 178, 200, 0.18);
+  padding-top: 14px;
+}
+
+.history-trades-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+  color: #dfeaf7;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.history-trades-header strong {
+  color: #edf5ff;
+}
+
+.history-trade-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1.8fr) auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid rgba(160, 178, 200, 0.12);
+  background: rgba(13, 27, 41, 0.7);
+  border-radius: 12px;
+  margin-bottom: 8px;
+}
+
+.history-trade-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.history-trade-symbol {
+  color: #edf5ff;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.history-trade-direction,
+.history-trade-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 0.66rem;
+  font-weight: 700;
+}
+
+.history-trade-direction {
+  background: rgba(94, 194, 142, 0.12);
+  color: #75e7b1;
+}
+
+.history-trade-direction.is-fall {
+  background: rgba(216, 82, 82, 0.12);
+  color: #f2a1a1;
+}
+
+.history-trade-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: #aabed8;
+  font-size: 0.68rem;
+}
+
+.history-trade-meta strong {
+  color: #edf5ff;
+  font-size: 0.78rem;
+}
+
+.history-trade-status.is-winning {
+  background: rgba(94, 194, 142, 0.12);
+  color: #75e7b1;
+}
+
+.history-trade-status.is-losing {
+  background: rgba(216, 82, 82, 0.12);
+  color: #f2a1a1;
+}
+
 .history-panel {
   margin-top: 20px;
   padding: 18px 20px 20px;

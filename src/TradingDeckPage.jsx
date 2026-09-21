@@ -406,6 +406,11 @@ function TradingDeckPage() {
   const currentPrice = liveQuote ?? currentMarket.price;
   const directionLabel = tradeDirection === activeTradeType.secondaryValue ? activeTradeType.secondary : activeTradeType.primary;
   const isAccumulatorMode = tradeType === 'Accumulators';
+  const recentHistoryTrades = closedTrades.slice(0, 4);
+  const resolveDirectionClass = (direction) => {
+    const normalized = String(direction || '').toLowerCase();
+    return ['fall', 'down', 'odd', 'under', 'differs', 'put'].includes(normalized) ? 'is-fall' : 'is-rise';
+  };
   const isDigitsMode = tradeType === 'Digits' || tradeType === 'Matches & Differs';
   const tradeContractType = ['fall', 'down', 'odd', 'noTouch', 'under', 'differs'].includes(tradeDirection) ? 'PUT' : 'CALL';
   const navItems = [
@@ -461,11 +466,12 @@ function TradingDeckPage() {
   }, [tradeSuccessMessage]);
 
   useEffect(() => {
-    if (!positionsOpen || positionsTab !== 'closed') return undefined;
-
     let socket;
     let active = true;
-    setClosedTradesLoading(true);
+
+    if (!positionsOpen || positionsTab !== 'closed') {
+      setClosedTradesLoading(true);
+    }
 
     fetch(apiUrl('api/deriv-session.js'), { credentials: 'include' })
       .then(async (response) => {
@@ -1412,7 +1418,7 @@ function TradingDeckPage() {
                 <div key={trade.id} className="active-trade-item">
                   <div className="active-trade-main">
                     <span className="active-trade-symbol">{trade.symbol}</span>
-                    <span className={`active-trade-direction ${trade.direction.toLowerCase() === 'fall' || trade.direction.toLowerCase() === 'down' || trade.direction.toLowerCase() === 'odd' || trade.direction.toLowerCase() === 'under' ? 'is-fall' : 'is-rise'}`}>
+                    <span className={`active-trade-direction ${resolveDirectionClass(trade.direction)}`}>
                       {trade.direction}
                     </span>
                     <span className={`active-trade-status ${trade.status === 'Losing' ? 'is-losing' : 'is-winning'}`}>
@@ -1434,6 +1440,39 @@ function TradingDeckPage() {
               ))
             ) : (
               <div className="active-trades-empty">No Active trades</div>
+            )}
+
+            {recentHistoryTrades.length > 0 && (
+              <div className="history-trades-section">
+                <div className="history-trades-header">
+                  <span>History</span>
+                  <strong>{recentHistoryTrades.length}</strong>
+                </div>
+
+                {recentHistoryTrades.map((trade) => (
+                  <div key={`${trade.id}-history`} className="history-trade-item">
+                    <div className="history-trade-main">
+                      <span className="history-trade-symbol">{trade.symbol}</span>
+                      <span className={`history-trade-direction ${resolveDirectionClass(trade.direction)}`}>
+                        {trade.direction}
+                      </span>
+                      <span className={`history-trade-status ${trade.status === 'Lost' ? 'is-losing' : 'is-winning'}`}>
+                        {trade.status}
+                      </span>
+                    </div>
+                    <div className="history-trade-meta">
+                      <span>Stake</span>
+                      <strong>${Number(trade.stake).toFixed(2)}</strong>
+                    </div>
+                    <div className="history-trade-meta">
+                      <span>Profit</span>
+                      <strong className={trade.status === 'Lost' ? 'is-loss-value' : 'is-profit-value'}>
+                        {trade.profit >= 0 ? '+' : '-'}${Math.abs(Number(trade.profit)).toFixed(2)}
+                      </strong>
+                    </div>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
         </div>
