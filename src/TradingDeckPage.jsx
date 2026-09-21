@@ -431,6 +431,35 @@ function TradingDeckPage() {
     || (Array.isArray(loadedBot?.scripts) ? loadedBot.scripts.join('\n') : '');
   const isAutoBot = Boolean(loadedBot && loadedBot.format !== 'xml');
 
+  const refreshAccountBalance = async () => {
+    try {
+      const response = await fetch(apiUrl('api/deriv-session.js'), { credentials: 'include' });
+      const text = await response.text();
+      let payload = {};
+
+      try {
+        payload = text ? JSON.parse(text) : {};
+      } catch {
+        setBalance('--');
+        setCurrency('USD');
+        return;
+      }
+
+      if (payload && typeof payload.balance === 'number') {
+        setBalance(`${payload.balance.toFixed(2)}`);
+        setCurrency(payload.currency || 'USD');
+        setAccountType(String(payload.account_type || '').toLowerCase() === 'real' ? 'real' : 'demo');
+      } else {
+        setBalance('--');
+        setCurrency('USD');
+      }
+    } catch {
+      setBalance('--');
+      setCurrency('USD');
+      setAccountType('demo');
+    }
+  };
+
   useEffect(() => {
     const timerId = window.setInterval(() => {
       setLocalTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }));
@@ -559,6 +588,7 @@ function TradingDeckPage() {
         setAccountType(String(target.account_type || '').toLowerCase() === 'real' ? 'real' : 'demo');
         setBalance(Number(target.balance || 0).toFixed(2));
         setCurrency(target.currency || 'USD');
+        return refreshAccountBalance();
       })
       .catch((error) => setTradeStatus(error.message))
       .finally(() => setAccountSwitching(false));
@@ -686,6 +716,7 @@ function TradingDeckPage() {
                 if (nextTrades.length === 0) setActiveTradesMinimized(true);
                 return nextTrades;
               });
+              refreshAccountBalance();
               socket.close();
               if (autoBotRunningRef.current && !autoBotRepeatScheduledRef.current.has(contractId)) {
                 autoBotRepeatScheduledRef.current.add(contractId);
@@ -725,6 +756,7 @@ function TradingDeckPage() {
               },
               ...current,
             ]);
+            refreshAccountBalance();
             socket.send(JSON.stringify({ proposal_open_contract: 1, contract_id: contractId, subscribe: 1 }));
           }
         });
@@ -755,8 +787,9 @@ function TradingDeckPage() {
   useEffect(() => {
     let active = true;
 
-    fetch(apiUrl('api/deriv-session.js'), { credentials: 'include' })
-      .then(async (response) => {
+    const syncBalance = async () => {
+      try {
+        const response = await fetch(apiUrl('api/deriv-session.js'), { credentials: 'include' });
         const text = await response.text();
         let payload = {};
 
@@ -780,14 +813,16 @@ function TradingDeckPage() {
           setBalance('--');
           setCurrency('USD');
         }
-      })
-      .catch(() => {
+      } catch {
         if (active) {
           setBalance('--');
           setCurrency('USD');
           setAccountType('demo');
         }
-      });
+      }
+    };
+
+    syncBalance();
 
     return () => {
       active = false;
