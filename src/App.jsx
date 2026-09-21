@@ -436,7 +436,6 @@ function App() {
   if (path === '/account') content = <AccountSetup />;
   if (path === '/contracts') content = <Contracts />;
   if (path === '/builder') content = <Builder />;
-  if (path === '/manual') content = <ManualTrading />;
   if (path === '/markets') content = <Markets />;
   if (path === '/bots' || path === '/speed') content = <Bots path={path} />;
   if (simplePages[path]) content = <SimplePage path={path} />;
