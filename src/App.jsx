@@ -106,6 +106,10 @@ function Hero({ kicker, heading, lede, action, selectedMarket, onMarketChange })
   const [selectedSynthetic, setSelectedSynthetic] = useState('');
   const [analysisResult, setAnalysisResult] = useState(null);
   const [digitPrices, setDigitPrices] = useState([]);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const analysisTimerRef = useRef(null);
+
+  useEffect(() => () => clearTimeout(analysisTimerRef.current), []);
 
   useEffect(() => {
     if (!isMarketPage) return undefined;
@@ -118,12 +122,12 @@ function Hero({ kicker, heading, lede, action, selectedMarket, onMarketChange })
     return () => window.removeEventListener('market-analysis', handleAnalysis);
   }, [isMarketPage]);
   const syntheticSelector = isMarketPage
-    ? cloneElement(action, { onChange: (event) => { setSelectedMarketType(event.target.value); setAnalysisResult(null); document.querySelectorAll('.analysis-grid tbody tr').forEach((row) => { row.style.display = 'none'; }); } }, ...action.props.children.filter((option) => !String(option.props?.children || '').startsWith('Volatility') && !['1HZ indices', 'Range Break Bear Index (RDBEAR)', 'Range Break Bull Index (RDBULL)'].includes(String(option.props?.children || ''))).map((option) => String(option.props?.children || '') === 'All synthetic markets' ? <option key="derived-markets">Derived Markets</option> : option), <option key="higher-lower">Higher / Lower</option>, <option key="rise-fall">Rise / Fall</option>, <option key="touch-no-touch">Touch / No Touch</option>, <option key="even-odd">Even / Odd</option>, <option key="accumulators">Accumulators</option>, <option key="digits">Digits</option>, <option key="matches-differs">Matches &amp; Differs</option>)
+    ? cloneElement(action, { onChange: (event) => { clearTimeout(analysisTimerRef.current); setSelectedMarketType(event.target.value); setAnalysisResult(null); setIsProcessing(false); document.querySelectorAll('.analysis-grid tbody tr').forEach((row) => { row.style.display = 'none'; }); } }, ...action.props.children.filter((option) => !String(option.props?.children || '').startsWith('Volatility') && !['1HZ indices', 'Range Break Bear Index (RDBEAR)', 'Range Break Bull Index (RDBULL)'].includes(String(option.props?.children || ''))).map((option) => String(option.props?.children || '') === 'All synthetic markets' ? <option key="derived-markets">Derived Markets</option> : option), <option key="higher-lower">Higher / Lower</option>, <option key="rise-fall">Rise / Fall</option>, <option key="touch-no-touch">Touch / No Touch</option>, <option key="even-odd">Even / Odd</option>, <option key="accumulators">Accumulators</option>, <option key="digits">Digits</option>, <option key="matches-differs">Matches &amp; Differs</option>)
     : action;
   const syntheticOptions = ['All synthetics', '1HZ indices', 'Range Break Bear Index (RDBEAR)', 'Range Break Bull Index (RDBULL)', 'Volatility 10 Index', 'Volatility 25 Index', 'Volatility 50 Index', 'Volatility 75 Index', 'Volatility 100 Index', 'Volatility 10 (1s) Index', 'Volatility 25 (1s) Index', 'Volatility 50 (1s) Index', 'Volatility 75 (1s) Index', 'Volatility 100 (1s) Index'];
   const marketValues = { '1HZ indices': '1HZ10V', 'Range Break Bear Index (RDBEAR)': 'RDBEAR', 'Range Break Bull Index (RDBULL)': 'RDBULL', 'Volatility 10 Index': 'R_10', 'Volatility 25 Index': 'R_25', 'Volatility 50 Index': 'R_50', 'Volatility 75 Index': 'R_75', 'Volatility 100 Index': 'R_100', 'Volatility 10 (1s) Index': '1HZ10V', 'Volatility 25 (1s) Index': '1HZ25V', 'Volatility 50 (1s) Index': '1HZ50V', 'Volatility 75 (1s) Index': '1HZ75V', 'Volatility 100 (1s) Index': '1HZ100V' };
-  const marketSelector = <select className="market-select synthetics-select" aria-label="Synthetics" value={selectedMarket || undefined} onChange={(event) => { const selected = event.target.value; setSelectedSynthetic(selected); setAnalysisResult(null); onMarketChange?.(selected); document.querySelectorAll('.analysis-grid tbody tr').forEach((row) => { row.style.display = 'none'; }); }}>{syntheticOptions.map((option) => <option key={option} value={marketValues[option] || ''}>{option}</option>)}</select>;
-  const canAnalyze = selectedMarketType !== 'Derived Markets' && /^R_|^1HZ/.test(selectedSynthetic);
+  const marketSelector = <select className="market-select synthetics-select" aria-label="Synthetics" value={selectedMarket || undefined} onChange={(event) => { const selected = event.target.value; clearTimeout(analysisTimerRef.current); setSelectedSynthetic(selected); setAnalysisResult(null); setIsProcessing(false); onMarketChange?.(selected); document.querySelectorAll('.analysis-grid tbody tr').forEach((row) => { row.style.display = 'none'; }); }}>{syntheticOptions.map((option) => <option key={option} value={marketValues[option] || ''}>{option}</option>)}</select>;
+  const canAnalyze = /^R_|^1HZ/.test(selectedSynthetic);
   useEffect(() => {
     setDigitPrices([]);
     if (!canAnalyze) return undefined;
@@ -147,14 +151,37 @@ function Hero({ kicker, heading, lede, action, selectedMarket, onMarketChange })
     return () => { closed = true; if (closed) socket?.close(); };
   }, [canAnalyze, selectedSynthetic]);
   const analyzeMarket = () => {
+    if (!canAnalyze) return;
     const digits = digitPrices.map((price) => Number(price).toFixed(2).slice(-1)).map(Number);
     const odd = digits.filter((digit) => digit % 2 === 1).length;
     const total = digits.length || 1;
     const result = { odd: Math.round(odd / total * 100), even: Math.round((total - odd) / total * 100), market: selectedSynthetic };
-    setAnalysisResult(result);
-    window.dispatchEvent(new CustomEvent('market-analysis', { detail: result }));
+    clearTimeout(analysisTimerRef.current);
+    setAnalysisResult(null);
+    setIsProcessing(true);
+    analysisTimerRef.current = setTimeout(() => {
+      setIsProcessing(false);
+      setAnalysisResult(result);
+      window.dispatchEvent(new CustomEvent('market-analysis', { detail: result }));
+    }, 5000);
   };
-  return isMarketPage ? <><section className="hero-row compact"><div><p className="kicker">{kicker === 'Market intelligence' ? 'Live Analysis' : kicker}</p><h2>{heading === 'Read the market.' ? 'Live Analysis' : heading}</h2><p className="lede">{lede}</p></div></section><div className="market-analysis-controls"><div className="market-controls"><label style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}><span className="kicker">Markets</span>{syntheticSelector}</label><label style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}><span className="kicker">Synthetics</span>{marketSelector}</label></div><div className="analysis-action-row"><button type="button" className="primary-button" onClick={analyzeMarket} disabled={!canAnalyze}>Analyze market <span>→</span></button></div></div></> : <section className="hero-row compact"><div><p className="kicker">{kicker === 'Market intelligence' ? 'Live Analysis' : kicker}</p><h2>{heading === 'Read the market.' ? 'Live Analysis' : heading}</h2><p className="lede">{lede}</p></div>{action}</section>;
+  const marketView = <>
+    <section className="hero-row compact">
+      <div><p className="kicker">{kicker === 'Market intelligence' ? 'Live Analysis' : kicker}</p><h2>{heading === 'Read the market.' ? 'Live Analysis' : heading}</h2><p className="lede">{lede}</p></div>
+    </section>
+    <div className="market-analysis-controls">
+      <div className="market-controls">
+        <label style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}><span className="kicker">Markets</span>{syntheticSelector}</label>
+        <label style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}><span className="kicker">Synthetics</span>{marketSelector}</label>
+      </div>
+      <div className="analysis-action-row"><button type="button" className="primary-button" onClick={analyzeMarket} disabled={!canAnalyze || isProcessing}>{isProcessing ? 'Processing...' : 'Analyze market'} <span>→</span></button></div>
+    </div>
+    {(isProcessing || analysisResult) && <div className="analysis-processing" role="status" aria-live="polite">
+      <p className="kicker">Analysis matrix</p>
+      {isProcessing ? <p className="analysis-processing-state"><i /> Processing live ticks for {selectedSynthetic}...</p> : <div className="analysis-processing-grid"><span>Market<strong>{analysisResult.market}</strong></span><span>Odd<strong>{analysisResult.odd}%</strong></span><span>Even<strong>{analysisResult.even}%</strong></span></div>}
+    </div>}
+  </>;
+  return isMarketPage ? marketView : <section className="hero-row compact"><div><p className="kicker">{kicker === 'Market intelligence' ? 'Live Analysis' : kicker}</p><h2>{heading === 'Read the market.' ? 'Live Analysis' : heading}</h2><p className="lede">{lede}</p></div>{action}</section>;
 }
 
 function PanelHeading({ kicker, heading, action }) {

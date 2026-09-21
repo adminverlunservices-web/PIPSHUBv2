@@ -14,4 +14,12 @@
 .market-analysis-controls .market-controls .market-select{width:100%;min-width:0}
 .analysis-action-row{display:contents}
 .analysis-action-row .primary-button{width:auto;justify-content:space-between;white-space:nowrap}
+.analysis-processing{width:100%;margin:0 0 30px;padding:14px 16px;border:1px solid var(--line);background:var(--panel);box-shadow:var(--shadow)}
+.analysis-processing .kicker{margin-bottom:9px}
+.analysis-processing-state{display:flex;align-items:center;gap:8px;margin:0;color:var(--muted);font:11px 'DM Mono',monospace}
+.analysis-processing-state i{width:7px;height:7px;border-radius:50%;background:var(--red);animation:analysis-pulse 1s ease-in-out infinite}
+.analysis-processing-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px}
+.analysis-processing-grid span{padding:9px 10px;background:#f5f8f5;color:var(--muted);font:10px 'DM Mono',monospace;text-transform:uppercase}
+.analysis-processing-grid strong{display:block;margin-top:5px;color:var(--ink);font:600 14px 'Space Grotesk',sans-serif;text-transform:none}
+@keyframes analysis-pulse{50%{opacity:.3}}
 .bot-meta button{border:0;background:none;color:var(--blue);font:inherit;font-weight:600;cursor:pointer;padding:0}.bot-meta button:hover{text-decoration:underline}
