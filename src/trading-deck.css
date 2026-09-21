@@ -1337,6 +1337,49 @@
   margin: 0;
 }
 
+.trading-card-wrap.is-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 80;
+  width: min(420px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  overflow: auto;
+  transform: translate(-50%, -50%);
+}
+
+.trading-card-wrap.is-popup .trading-card-shell {
+  width: 100%;
+  max-width: none;
+}
+
+.trading-panel-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  border: 0;
+  background: rgba(3, 10, 17, 0.72);
+  cursor: pointer;
+}
+
+.trading-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.trading-panel-close {
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgba(190, 203, 214, 0.28);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #edf5ff;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
 .trading-card-shell {
   width: 100%;
   background: rgba(9, 17, 25, 0.9);

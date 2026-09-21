@@ -354,6 +354,7 @@ function TradingDeckPage() {
   const [closedTrades, setClosedTrades] = useState([]);
   const [closedTradesLoading, setClosedTradesLoading] = useState(false);
   const [botsOpen, setBotsOpen] = useState(false);
+  const [smartTradingOpen, setSmartTradingOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const socketRef = useRef(null);
   const takeProfitTriggeredRef = useRef(new Set());
@@ -775,6 +776,11 @@ function TradingDeckPage() {
         </div>
         <a href="#/" className="trading-deck-rail-button">Dashboard</a>
         <a href="#/trading-deck" className="trading-deck-rail-button is-active">Trade</a>
+        <a
+          href="#/smart"
+          className="trading-deck-rail-button"
+          onClick={(event) => { event.preventDefault(); setSmartTradingOpen(true); }}
+        >Smart Trading</a>
         <button type="button" className="trading-deck-rail-button" onClick={() => setPositionsOpen((open) => !open)}>Positions</button>
         <button type="button" className="trading-deck-rail-button" onClick={() => setBotsOpen((open) => !open)} aria-expanded={botsOpen}>Bots</button>
       </aside>
@@ -1009,7 +1015,8 @@ function TradingDeckPage() {
           </div>
         </div>
 
-        <div className="trading-card-wrap">
+        {smartTradingOpen && <button type="button" className="trading-panel-overlay" onClick={() => setSmartTradingOpen(false)} aria-label="Close trading panel" />}
+        <div className={`trading-card-wrap ${smartTradingOpen ? 'is-popup' : ''}`}>
           <div className="trading-card-shell">
             <div className="trading-card-header">
               <div>
@@ -1017,7 +1024,10 @@ function TradingDeckPage() {
                 <h2>{currentMarket.name}</h2>
                 {loadedBot && <span className="loaded-bot-label">Bot loaded: {loadedBot.name}</span>}
               </div>
-              <button type="button" className="demo-account-button">Demo account</button>
+              <div className="trading-card-actions">
+                <button type="button" className="demo-account-button">Demo account</button>
+                {smartTradingOpen && <button type="button" className="trading-panel-close" onClick={() => setSmartTradingOpen(false)} aria-label="Close trading panel">×</button>}
+              </div>
             </div>
 
             <div className="trading-card-market-row">
