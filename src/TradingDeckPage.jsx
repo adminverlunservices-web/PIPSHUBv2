@@ -686,11 +686,24 @@ function TradingDeckPage() {
             const contract = message.proposal_open_contract;
             const contractId = Number(contract.contract_id);
             const profit = Number(contract.profit || 0);
+            const currentBid = Number(contract.bid_price || contract.current_spot || 0);
             const target = Number(takeProfit);
             const profitStop = Number(selectedProfitStop);
             const lossStop = Number(selectedLossStop);
             const reachedProfitStop = Number.isFinite(profitStop) && profitStop > 0 && profit >= profitStop;
             const reachedLossStop = Number.isFinite(lossStop) && lossStop > 0 && profit <= -lossStop;
+
+            if (Number.isFinite(contractId) && currentBid > 0) {
+              setActiveTrades((current) => current.map((trade) => {
+                if (trade.id !== contractId) return trade;
+                return {
+                  ...trade,
+                  status: profit >= 0 ? 'Winning' : 'Losing',
+                  price: currentBid,
+                  profit,
+                };
+              }));
+            }
 
             if (isAccumulatorMode && Number.isFinite(contractId) && profit >= target && !takeProfitTriggeredRef.current.has(contractId) && !stopTriggeredRef.current.has(contractId)) {
               takeProfitTriggeredRef.current.add(contractId);
@@ -749,7 +762,7 @@ function TradingDeckPage() {
                 id: contractId,
                 symbol: market,
                 direction: directionLabel,
-                status: tradeDirection === activeTradeType.secondaryValue ? 'Losing' : 'Winning',
+                status: 'Open',
                 stake: amount,
                 price: Number(currentPrice || liveQuote || currentMarket.price),
                 takeProfit: isAccumulatorMode ? Number(takeProfit) : null,
