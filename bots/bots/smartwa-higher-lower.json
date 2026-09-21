@@ -1,0 +1,9 @@
+{
+  "name": "SMARTWA Higher Lower",
+  "description": "SMARTWA repeat strategy for Higher / Lower contracts with profit and loss limits.",
+  "market": "R_100",
+  "tradeType": "Higher / Lower",
+  "contract": "Higher / Lower - Auto repeat",
+  "autoTrade": true,
+  "script": "START SMARTWA HIGHER LOWER\n  SET PROFIT LIMIT\n  SET LOSS LIMIT\n  SET CONTRACT Higher OR Lower\n  REPEAT CONTRACT\n  UNTIL STOPPED\nEND"
+}

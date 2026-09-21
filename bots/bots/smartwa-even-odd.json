@@ -1,0 +1,9 @@
+{
+  "name": "SMARTWA Even Odd",
+  "description": "SMARTWA repeat strategy for Even / Odd contracts with profit and loss limits.",
+  "market": "1HZ10V",
+  "tradeType": "Even / Odd",
+  "contract": "Even / Odd - Auto repeat",
+  "autoTrade": true,
+  "script": "START SMARTWA EVEN ODD\n  SET PROFIT LIMIT\n  SET LOSS LIMIT\n  SET CONTRACT Even OR Odd\n  REPEAT CONTRACT\n  UNTIL STOPPED\nEND"
+}

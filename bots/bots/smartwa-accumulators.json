@@ -1,0 +1,9 @@
+{
+  "name": "SMARTWA Accumulators",
+  "description": "SMARTWA repeat strategy for Accumulators with bounded growth and risk limits.",
+  "market": "R_50",
+  "tradeType": "Accumulators",
+  "contract": "Accumulator growth - Auto repeat",
+  "autoTrade": true,
+  "script": "START SMARTWA ACCUMULATORS\n  SET PROFIT LIMIT\n  SET LOSS LIMIT\n  SET GROWTH TARGET\n  REPEAT CONTRACT\n  UNTIL STOPPED\nEND"
+}

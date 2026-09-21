@@ -1,0 +1,9 @@
+{
+  "name": "SMARTWA Digits",
+  "description": "SMARTWA repeat strategy for Digits contracts with profit and loss limits.",
+  "market": "1HZ10V",
+  "tradeType": "Digits",
+  "contract": "Digits Over / Under - Auto repeat",
+  "autoTrade": true,
+  "script": "START SMARTWA DIGITS\n  SET PROFIT LIMIT\n  SET LOSS LIMIT\n  SET CONTRACT Over OR Under\n  REPEAT CONTRACT\n  UNTIL STOPPED\nEND"
+}

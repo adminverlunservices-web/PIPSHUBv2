@@ -1,0 +1,9 @@
+{
+  "name": "SMARTWA Matches Differs",
+  "description": "SMARTWA repeat strategy for Matches & Differs contracts with profit and loss limits.",
+  "market": "1HZ10V",
+  "tradeType": "Matches & Differs",
+  "contract": "Matches / Differs - Auto repeat",
+  "autoTrade": true,
+  "script": "START SMARTWA MATCHES DIFFERS\n  SET PROFIT LIMIT\n  SET LOSS LIMIT\n  SET CONTRACT Matches OR Differs\n  REPEAT CONTRACT\n  UNTIL STOPPED\nEND"
+}

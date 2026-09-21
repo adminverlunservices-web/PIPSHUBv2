@@ -1,0 +1,9 @@
+{
+  "name": "SMARTWA Touch No Touch",
+  "description": "SMARTWA repeat strategy for Touch / No Touch contracts with controlled limits.",
+  "market": "R_100",
+  "tradeType": "Touch / No Touch",
+  "contract": "Touch / No Touch - Auto repeat",
+  "autoTrade": true,
+  "script": "START SMARTWA TOUCH NO TOUCH\n  SET PROFIT LIMIT\n  SET LOSS LIMIT\n  SET CONTRACT Touch OR No Touch\n  REPEAT CONTRACT\n  UNTIL STOPPED\nEND"
+}

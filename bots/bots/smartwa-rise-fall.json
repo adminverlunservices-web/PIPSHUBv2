@@ -1,0 +1,9 @@
+{
+  "name": "SMARTWA Rise Fall",
+  "description": "SMARTWA repeat strategy for Rise / Fall contracts with profit and loss limits.",
+  "market": "R_100",
+  "tradeType": "Rise / Fall",
+  "contract": "Rise / Fall - Auto repeat",
+  "autoTrade": true,
+  "script": "START SMARTWA RISE FALL\n  SET PROFIT LIMIT\n  SET LOSS LIMIT\n  SET CONTRACT Rise OR Fall\n  REPEAT CONTRACT\n  UNTIL STOPPED\nEND"
+}
