@@ -1099,6 +1099,27 @@
 }
 
 @media (max-width: 1200px) and (min-width: 901px) {
+  .trading-deck-layout {
+    flex-direction: column;
+    gap: 18px;
+    padding: 0 18px;
+  }
+
+  .trading-deck-main-column,
+  .trading-card-wrap {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .trading-card-wrap {
+    flex-basis: auto;
+    flex: 1 1 auto;
+  }
+
+  .trading-card-shell {
+    max-width: none;
+  }
+
   .trading-deck-topbar {
     flex-wrap: wrap;
     min-height: 124px;
