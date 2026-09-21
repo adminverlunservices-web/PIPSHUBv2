@@ -336,6 +336,11 @@ function TradingDeckPage() {
   const [duration, setDuration] = useState('1');
   const [durationUnit, setDurationUnit] = useState('m');
   const [stake, setStake] = useState(10);
+  const [allowEquals, setAllowEquals] = useState(false);
+  const [martingaleEnabled, setMartingaleEnabled] = useState(false);
+  const [dalembertEnabled, setDalembertEnabled] = useState(false);
+  const [stakeMultiplier, setStakeMultiplier] = useState('2');
+  const [maxStake, setMaxStake] = useState('');
   const [barrier, setBarrier] = useState('0');
   const [digit, setDigit] = useState('5');
   const [growthRate, setGrowthRate] = useState('2');
@@ -1039,6 +1044,77 @@ function TradingDeckPage() {
                 {tradeDirection === activeTradeType.secondaryValue ? '-2.45%' : '+2.45%'}
               </span>
             </div>
+
+            {smartTradingOpen && (
+              <section className="smart-trading-parameters" aria-label="Smart trading parameters">
+                <div className="smart-parameter-section">
+                  <p className="smart-parameter-heading">Trade parameters</p>
+                  <div className="smart-parameter-grid">
+                    <label className="smart-parameter-field">
+                      <span>Duration term</span>
+                      <select value={durationUnit} onChange={(event) => setDurationUnit(event.target.value)}>
+                        <option value="t">Ticks</option>
+                        <option value="s">Seconds</option>
+                        <option value="m">Minutes</option>
+                      </select>
+                    </label>
+                    <label className="smart-parameter-field">
+                      <span>Initial stake</span>
+                      <input type="number" min="0.35" step="0.01" value={stake} onChange={(event) => setStake(Math.max(0.35, Number(event.target.value) || 0.35))} />
+                    </label>
+                    <label className="smart-parameter-toggle">
+                      <span>Allow equals</span>
+                      <select value={allowEquals ? 'yes' : 'no'} onChange={(event) => setAllowEquals(event.target.value === 'yes')}>
+                        <option value="no">No</option>
+                        <option value="yes">Yes</option>
+                      </select>
+                    </label>
+                  </div>
+                </div>
+
+                <div className="smart-parameter-section">
+                  <p className="smart-parameter-heading">Strategy parameters</p>
+                  <div className="smart-strategy-options">
+                    <label className={`smart-strategy-option ${martingaleEnabled ? 'is-selected' : ''}`}>
+                      <input type="checkbox" checked={martingaleEnabled} onChange={(event) => setMartingaleEnabled(event.target.checked)} />
+                      <span>Martingale</span>
+                    </label>
+                    <label className={`smart-strategy-option ${dalembertEnabled ? 'is-selected' : ''}`}>
+                      <input type="checkbox" checked={dalembertEnabled} onChange={(event) => setDalembertEnabled(event.target.checked)} />
+                      <span>D'Alembert</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div className="smart-parameter-section">
+                  <p className="smart-parameter-heading">Strategy</p>
+                  <div className="smart-parameter-grid">
+                    <label className="smart-parameter-field">
+                      <span>Stake multiplier</span>
+                      <input type="number" min="1" step="0.1" value={stakeMultiplier} onChange={(event) => setStakeMultiplier(event.target.value)} />
+                    </label>
+                    <label className="smart-parameter-field">
+                      <span>Max. stake</span>
+                      <input type="number" min="0.35" step="0.01" value={maxStake} placeholder="-" onChange={(event) => setMaxStake(event.target.value)} />
+                    </label>
+                  </div>
+                </div>
+
+                <div className="smart-parameter-section">
+                  <p className="smart-parameter-heading">Risk management</p>
+                  <div className="smart-parameter-grid">
+                    <label className="smart-parameter-field">
+                      <span>Profit threshold</span>
+                      <input type="number" min="0" step="0.01" value={stopProfit} placeholder="-" onChange={(event) => setStopProfit(event.target.value)} />
+                    </label>
+                    <label className="smart-parameter-field">
+                      <span>Loss threshold</span>
+                      <input type="number" min="0" step="0.01" value={stopLoss} placeholder="-" onChange={(event) => setStopLoss(event.target.value)} />
+                    </label>
+                  </div>
+                </div>
+              </section>
+            )}
 
             {!isAccumulatorMode && (
               <div className="trade-chooser">
