@@ -764,14 +764,14 @@
 }
 
 .trading-deck-brand-wrap {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+  position: static;
+  transform: none;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  min-width: 0;
+  min-width: 94px;
+  flex: 0 0 auto;
   white-space: nowrap;
 }
 
