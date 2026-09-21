@@ -189,7 +189,6 @@ function Hero({ kicker, heading, lede, action, selectedMarket, onMarketChange })
     </div>
     {isProcessing && <div className="analysis-processing" role="status" aria-live="polite">
       <div className="analysis-code-stream" aria-label="Analyzing"><strong className="analysis-code-label"><i /> Analyzing...</strong>{matrixCode.map((line, lineIndex) => <span key={lineIndex}>{line.map((digit, digitIndex) => <b className={`matrix-digit digit-${digit}`} key={`${lineIndex}-${digitIndex}`}>{digit}</b>)}</span>)}</div>
-        return <><div className="panel-heading"><div><p className="kicker">{kicker}</p><h3>{heading === 'Live conditions' ? 'Analysis Report' : heading}</h3></div>{action}</div>{kicker === 'Market matrix' && marketAnalysis && <div role="status" style={{ marginBottom: '16px', padding: '10px 12px', border: '1px solid var(--line)', background: 'var(--paper)' }}><div style={{ display: 'flex', gap: '18px' }}><span>ODD: <b>{marketAnalysis.odd}%</b></span><span>EVEN: <b>{marketAnalysis.even}%</b></span></div></div>}</>;
     </div>}
   </>;
   return isMarketPage ? marketView : <section className="hero-row compact"><div><p className="kicker">{kicker === 'Market intelligence' ? 'Live Analysis' : kicker}</p><h2>{heading === 'Read the market.' ? 'Live Analysis' : heading}</h2><p className="lede">{lede}</p></div>{action}</section>;
