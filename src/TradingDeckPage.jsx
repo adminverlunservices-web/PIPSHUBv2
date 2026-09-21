@@ -963,7 +963,7 @@ function TradingDeckPage() {
         <div className="trading-deck-main-column">
           <div className="trading-deck-controls">
             <label className="selector-card">
-              <span className="selector-label">Trade type</span>
+              <span className="selector-label">Markets</span>
               <select
                 value={tradeType}
                 onChange={(event) => {
