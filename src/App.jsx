@@ -132,15 +132,16 @@ function Hero({ kicker, heading, lede, action, selectedMarket, onMarketChange })
     return () => window.removeEventListener('market-analysis', handleAnalysis);
   }, [isMarketPage]);
   const syntheticSelector = isMarketPage
-    ? cloneElement(action, { onChange: (event) => { clearTimeout(analysisTimerRef.current); setSelectedMarketType(event.target.value); setAnalysisResult(null); setIsProcessing(false); document.querySelectorAll('.analysis-grid tbody tr').forEach((row) => { row.style.display = 'none'; }); } }, ...action.props.children.filter((option) => !String(option.props?.children || '').startsWith('Volatility') && !['1HZ indices', 'Range Break Bear Index (RDBEAR)', 'Range Break Bull Index (RDBULL)'].includes(String(option.props?.children || ''))).map((option) => String(option.props?.children || '') === 'All synthetic markets' ? <option key="derived-markets">Derived Markets</option> : option), <option key="higher-lower">Higher / Lower</option>, <option key="rise-fall">Rise / Fall</option>, <option key="touch-no-touch">Touch / No Touch</option>, <option key="even-odd">Even / Odd</option>, <option key="accumulators">Accumulators</option>, <option key="digits">Digits</option>, <option key="matches-differs">Matches &amp; Differs</option>)
+    ? cloneElement(action, { onChange: (event) => { clearTimeout(analysisTimerRef.current); setSelectedMarketType(event.target.value); setAnalysisResult(null); setIsProcessing(false); window.dispatchEvent(new CustomEvent('market-analysis', { detail: { processing: true } })); document.querySelectorAll('.analysis-grid tbody tr').forEach((row) => { row.style.display = 'none'; }); } }, ...action.props.children.filter((option) => !String(option.props?.children || '').startsWith('Volatility') && !['1HZ indices', 'Range Break Bear Index (RDBEAR)', 'Range Break Bull Index (RDBULL)'].includes(String(option.props?.children || ''))).map((option) => String(option.props?.children || '') === 'All synthetic markets' ? <option key="derived-markets">Derived Markets</option> : option), <option key="higher-lower">Higher / Lower</option>, <option key="rise-fall">Rise / Fall</option>, <option key="touch-no-touch">Touch / No Touch</option>, <option key="even-odd">Even / Odd</option>, <option key="accumulators">Accumulators</option>, <option key="digits">Digits</option>, <option key="matches-differs">Matches &amp; Differs</option>)
     : action;
   const syntheticOptions = ['All synthetics', '1HZ indices', 'Range Break Bear Index (RDBEAR)', 'Range Break Bull Index (RDBULL)', 'Volatility 10 Index', 'Volatility 25 Index', 'Volatility 50 Index', 'Volatility 75 Index', 'Volatility 100 Index', 'Volatility 10 (1s) Index', 'Volatility 25 (1s) Index', 'Volatility 50 (1s) Index', 'Volatility 75 (1s) Index', 'Volatility 100 (1s) Index'];
   const marketValues = { '1HZ indices': '1HZ10V', 'Range Break Bear Index (RDBEAR)': 'RDBEAR', 'Range Break Bull Index (RDBULL)': 'RDBULL', 'Volatility 10 Index': 'R_10', 'Volatility 25 Index': 'R_25', 'Volatility 50 Index': 'R_50', 'Volatility 75 Index': 'R_75', 'Volatility 100 Index': 'R_100', 'Volatility 10 (1s) Index': '1HZ10V', 'Volatility 25 (1s) Index': '1HZ25V', 'Volatility 50 (1s) Index': '1HZ50V', 'Volatility 75 (1s) Index': '1HZ75V', 'Volatility 100 (1s) Index': '1HZ100V' };
-  const marketSelector = <select className="market-select synthetics-select" aria-label="Synthetics" value={selectedMarket || undefined} onChange={(event) => { const selected = event.target.value; clearTimeout(analysisTimerRef.current); setSelectedSynthetic(selected); setAnalysisResult(null); setIsProcessing(false); onMarketChange?.(selected); document.querySelectorAll('.analysis-grid tbody tr').forEach((row) => { row.style.display = 'none'; }); }}>{syntheticOptions.map((option) => <option key={option} value={marketValues[option] || ''}>{option}</option>)}</select>;
-  const canAnalyze = /^R_|^1HZ/.test(selectedSynthetic);
+  const marketSelector = <select className="market-select synthetics-select" aria-label="Synthetics" value={selectedMarket || undefined} onChange={(event) => { const selected = event.target.value; clearTimeout(analysisTimerRef.current); setSelectedSynthetic(selected); setAnalysisResult(null); setIsProcessing(false); window.dispatchEvent(new CustomEvent('market-analysis', { detail: { processing: true } })); onMarketChange?.(selected); document.querySelectorAll('.analysis-grid tbody tr').forEach((row) => { row.style.display = 'none'; }); }}>{syntheticOptions.map((option) => <option key={option} value={marketValues[option] || ''}>{option}</option>)}</select>;
+  const marketSupported = /^R_|^1HZ/.test(selectedSynthetic);
+  const canAnalyze = marketSupported && digitPrices.length >= 2;
   useEffect(() => {
     setDigitPrices([]);
-    if (!canAnalyze) return undefined;
+    if (!marketSupported) return undefined;
     let socket;
     let closed = false;
     const appendPrices = (values) => setDigitPrices((current) => [...current, ...values.map(Number).filter(Number.isFinite)].slice(-100));
@@ -151,7 +152,7 @@ function Hero({ kicker, heading, lede, action, selectedMarket, onMarketChange })
         const message = JSON.parse(event.data);
         if (message.history?.prices) {
           appendPrices(message.history.prices);
-          socket.send(JSON.stringify({ ticks: selectedSynthetic, subscribe: 1 }));
+              if (!closed) socket.send(JSON.stringify({ ticks: selectedSynthetic, subscribe: 1 }));
         }
         if (message.tick?.quote !== undefined) appendPrices([message.tick.quote]);
       });
@@ -159,13 +160,50 @@ function Hero({ kicker, heading, lede, action, selectedMarket, onMarketChange })
       return undefined;
     }
     return () => { closed = true; if (closed) socket?.close(); };
-  }, [canAnalyze, selectedSynthetic]);
+  }, [marketSupported, selectedSynthetic]);
   const analyzeMarket = () => {
-    if (!canAnalyze) return;
+    if (!canAnalyze || digitPrices.length < 2) return;
     const digits = digitPrices.map((price) => Number(price).toFixed(2).slice(-1)).map(Number);
-    const odd = digits.filter((digit) => digit % 2 === 1).length;
     const total = digits.length || 1;
-    const result = { odd: Math.round(odd / total * 100), even: Math.round((total - odd) / total * 100), market: selectedSynthetic };
+    let primaryLabel = 'Odd';
+    let secondaryLabel = 'Even';
+    let primaryValue;
+    let secondaryValue;
+    const lastDigits = digits;
+    if (selectedMarketType === 'Rise / Fall' || selectedMarketType === 'Accumulators') {
+      const rises = digitPrices.slice(1).filter((price, index) => price > digitPrices[index]).length;
+      const comparisons = Math.max(digitPrices.length - 1, 1);
+      primaryLabel = selectedMarketType === 'Accumulators' ? 'Growth' : 'Rise';
+      secondaryLabel = selectedMarketType === 'Accumulators' ? 'Pullback' : 'Fall';
+      primaryValue = Math.round(rises / comparisons * 100);
+      secondaryValue = Math.round((comparisons - rises) / comparisons * 100);
+    } else if (selectedMarketType === 'Higher / Lower' || selectedMarketType === 'Digits') {
+      const higher = lastDigits.filter((digit) => digit > 5).length;
+      primaryLabel = selectedMarketType === 'Digits' ? 'Over 5' : 'Higher';
+      secondaryLabel = selectedMarketType === 'Digits' ? 'Under 5' : 'Lower';
+      primaryValue = Math.round(higher / total * 100);
+      secondaryValue = Math.round((total - higher) / total * 100);
+    } else if (selectedMarketType === 'Matches & Differs') {
+      const matches = lastDigits.slice(1).filter((digit, index) => digit === lastDigits[index]).length;
+      const comparisons = Math.max(lastDigits.length - 1, 1);
+      primaryLabel = 'Matches';
+      secondaryLabel = 'Differs';
+      primaryValue = Math.round(matches / comparisons * 100);
+      secondaryValue = Math.round((comparisons - matches) / comparisons * 100);
+    } else if (selectedMarketType === 'Touch / No Touch') {
+      const openingPrice = digitPrices[0];
+      const touchRange = Math.max(Math.abs(openingPrice) * 0.0005, 0.01);
+      const touched = digitPrices.slice(1).some((price) => Math.abs(price - openingPrice) <= touchRange);
+      primaryLabel = 'Touch';
+      secondaryLabel = 'No Touch';
+      primaryValue = touched ? 100 : 0;
+      secondaryValue = touched ? 0 : 100;
+    } else {
+      const odd = digits.filter((digit) => digit % 2 === 1).length;
+      primaryValue = Math.round(odd / total * 100);
+      secondaryValue = Math.round((total - odd) / total * 100);
+    }
+    const result = { primaryLabel, secondaryLabel, primaryValue, secondaryValue, marketType: selectedMarketType, market: selectedSynthetic };
     clearTimeout(analysisTimerRef.current);
     setAnalysisResult(null);
     setIsProcessing(true);
@@ -201,7 +239,7 @@ function PanelHeading({ kicker, heading, action }) {
     window.addEventListener('market-analysis', handleAnalysis);
     return () => window.removeEventListener('market-analysis', handleAnalysis);
   }, []);
-  return <><div className="panel-heading"><div><p className="kicker">{kicker}</p><h3>{heading === 'Live conditions' ? 'Analysis Report' : heading}</h3></div>{action}</div>{kicker === 'Market matrix' && marketAnalysis && <div role="status" style={{ marginBottom: '16px', padding: '10px 12px', border: '1px solid var(--line)', background: 'var(--paper)' }}><div style={{ display: 'flex', gap: '18px', marginTop: '6px' }}><span>ODD: <b>{marketAnalysis.odd}%</b></span><span>EVEN: <b>{marketAnalysis.even}%</b></span></div></div>}</>;
+  return <><div className="panel-heading"><div><p className="kicker">{kicker}</p><h3>{heading === 'Live conditions' ? 'Analysis Report' : heading}</h3></div>{action}</div>{kicker === 'Market matrix' && marketAnalysis && <div role="status" style={{ marginBottom: '16px', padding: '10px 12px', border: '1px solid var(--line)', background: 'var(--paper)' }}><div className="analysis-result-grid"><span>Market<strong>{marketAnalysis.marketType}</strong></span><span>Synthetic<strong>{marketAnalysis.market}</strong></span><span>{marketAnalysis.primaryLabel}<strong>{marketAnalysis.primaryValue}%</strong></span><span>{marketAnalysis.secondaryLabel}<strong>{marketAnalysis.secondaryValue}%</strong></span></div></div>}</>;
 }
 
 function LiveFeedChart({ market = 'R_100', onMarketChange }) {

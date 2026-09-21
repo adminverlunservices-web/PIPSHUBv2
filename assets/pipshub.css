@@ -30,6 +30,9 @@
 .analysis-processing-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .analysis-processing-grid span{padding:9px 10px;background:#f5f8f5;color:var(--muted);font:10px 'DM Mono',monospace;text-transform:uppercase}
 .analysis-processing-grid strong{display:block;margin-top:5px;color:var(--ink);font:600 14px 'Space Grotesk',sans-serif;text-transform:none}
+.analysis-result-grid{display:grid;grid-template-columns:1.4fr 1.4fr 1fr 1fr;gap:10px}
+.analysis-result-grid span{padding:9px 10px;background:#f5f8f5;color:var(--muted);font:10px 'DM Mono',monospace;text-transform:uppercase}
+.analysis-result-grid strong{display:block;margin-top:5px;color:var(--ink);font:600 14px 'Space Grotesk',sans-serif;text-transform:none}
 .analysis-grid table{display:none}
 @keyframes analysis-pulse{50%{opacity:.3}}
 @keyframes matrix-scroll-left{0%{transform:translateX(0);opacity:.25}15%,75%{opacity:.95}100%{transform:translateX(-20%);opacity:.25}}
