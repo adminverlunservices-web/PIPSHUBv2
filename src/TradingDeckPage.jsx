@@ -535,7 +535,7 @@ function TradingDeckPage() {
       .then(async (response) => {
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || 'Unable to load accounts.');
-        const target = data.accounts?.find((account) => account.account_type !== accountType && account.status === 'active');
+        const target = data.accounts?.find((account) => String(account.account_type || '').toLowerCase() !== accountType && account.status === 'active');
         if (!target) throw new Error(`No ${accountType === 'real' ? 'demo' : 'real'} account is available.`);
 
         const body = new URLSearchParams({ account_id: target.account_id });
@@ -550,7 +550,7 @@ function TradingDeckPage() {
         return target;
       })
       .then((target) => {
-        setAccountType(target.account_type === 'real' ? 'real' : 'demo');
+        setAccountType(String(target.account_type || '').toLowerCase() === 'real' ? 'real' : 'demo');
         setBalance(Number(target.balance || 0).toFixed(2));
         setCurrency(target.currency || 'USD');
       })
@@ -769,7 +769,7 @@ function TradingDeckPage() {
         if (payload && typeof payload.balance === 'number') {
           setBalance(`${payload.balance.toFixed(2)}`);
           setCurrency(payload.currency || 'USD');
-          setAccountType(payload.account_type === 'real' ? 'real' : 'demo');
+          setAccountType(String(payload.account_type || '').toLowerCase() === 'real' ? 'real' : 'demo');
         } else {
           setBalance('--');
           setCurrency('USD');
