@@ -381,6 +381,7 @@ function TradingDeckPage() {
     'Even / Odd': { primary: 'Even', secondary: 'Odd', primaryValue: 'even', secondaryValue: 'odd' },
     'Accumulators': { primary: 'Up', secondary: 'Down', primaryValue: 'up', secondaryValue: 'down' },
     Digits: { primary: 'Over', secondary: 'Under', primaryValue: 'over', secondaryValue: 'under' },
+    'Matches & Differs': { primary: 'Matches', secondary: 'Differs', primaryValue: 'matches', secondaryValue: 'differs' },
   };
   const syntheticMarkets = {
     'Higher / Lower': ['R_10', 'R_25', 'R_50', 'R_75', 'R_100', 'RDBEAR', 'RDBULL'],
@@ -389,6 +390,7 @@ function TradingDeckPage() {
     'Even / Odd': ['1HZ10V', '1HZ25V', '1HZ50V', '1HZ75V', '1HZ100V'],
     Accumulators: ['R_10', 'R_25', 'R_50', 'R_75', 'R_100', 'RDBEAR', 'RDBULL'],
     Digits: ['1HZ10V', '1HZ25V', '1HZ50V', '1HZ75V', '1HZ100V'],
+    'Matches & Differs': ['1HZ10V', '1HZ25V', '1HZ50V', '1HZ75V', '1HZ100V'],
   };
   const activeTradeType = tradeTypeOptions[tradeType] || tradeTypeOptions['Higher / Lower'];
   const availableMarkets = syntheticMarkets[tradeType] || syntheticMarkets['Higher / Lower'];
@@ -396,8 +398,8 @@ function TradingDeckPage() {
   const currentPrice = liveQuote ?? currentMarket.price;
   const directionLabel = tradeDirection === activeTradeType.secondaryValue ? activeTradeType.secondary : activeTradeType.primary;
   const isAccumulatorMode = tradeType === 'Accumulators';
-  const isDigitsMode = tradeType === 'Digits';
-  const tradeContractType = ['fall', 'down', 'odd', 'noTouch', 'under'].includes(tradeDirection) ? 'PUT' : 'CALL';
+  const isDigitsMode = tradeType === 'Digits' || tradeType === 'Matches & Differs';
+  const tradeContractType = ['fall', 'down', 'odd', 'noTouch', 'under', 'differs'].includes(tradeDirection) ? 'PUT' : 'CALL';
   const navItems = [
     { label: 'Dashboard', href: '#/' },
     { label: 'Trading Deck', href: '#/trading-deck', active: true },
@@ -983,6 +985,7 @@ function TradingDeckPage() {
                 <option>Even / Odd</option>
                 <option>Accumulators</option>
                 <option>Digits</option>
+                <option>Matches & Differs</option>
               </select>
               <span className="selector-value">{tradeType}</span>
               <span className="selector-caret">⌄</span>
