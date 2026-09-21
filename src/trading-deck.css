@@ -1530,6 +1530,17 @@
   cursor: pointer;
 }
 
+.demo-account-button.is-real {
+  border-color: rgba(99, 209, 161, 0.62);
+  background: rgba(35, 125, 97, 0.22);
+  color: #bfffe5;
+}
+
+.demo-account-button:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
 .trading-card-market-row {
   display: flex;
   align-items: center;

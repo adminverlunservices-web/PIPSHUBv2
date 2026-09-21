@@ -668,7 +668,7 @@ function App() {
   const [route, title] = routeNames[path];
 
   if (path === '/trading-deck') {
-    return <TradingDeckGate />;
+    return <TradingDeckPage />;
   }
 
   let content = <Dashboard />;

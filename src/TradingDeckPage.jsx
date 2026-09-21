@@ -1046,7 +1046,15 @@ function TradingDeckPage() {
                 {loadedBot && <span className="loaded-bot-label">Bot loaded: {loadedBot.name}</span>}
               </div>
               <div className="trading-card-actions">
-                <button type="button" className="demo-account-button">{accountType === 'real' ? 'Real account' : 'Demo account'}</button>
+                <button
+                  type="button"
+                  className={`demo-account-button ${accountType === 'real' ? 'is-real' : 'is-demo'}`}
+                  onClick={switchAccount}
+                  disabled={accountSwitching}
+                  aria-label={`Current account: ${accountType === 'real' ? 'Real' : 'Demo'}. Switch account`}
+                >
+                  {accountSwitching ? 'Switching...' : `${accountType === 'real' ? 'Real' : 'Demo'} account`}
+                </button>
                 {smartTradingOpen && <button type="button" className="trading-panel-close" onClick={() => setSmartTradingOpen(false)} aria-label="Close trading panel">×</button>}
               </div>
             </div>
