@@ -1342,6 +1342,18 @@
   box-shadow: 0 16px 32px rgba(2, 10, 20, 0.28);
 }
 
+@media (max-width: 1200px) and (min-width: 901px) {
+  .trading-card-wrap {
+    flex: 1 1 auto;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .trading-card-shell {
+    max-width: none;
+  }
+}
+
 .trading-card-header {
   display: flex;
   align-items: flex-start;
