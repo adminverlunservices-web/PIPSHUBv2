@@ -871,6 +871,19 @@
   opacity: 0.9;
 }
 
+.trading-deck-time {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 5px 10px;
+  border: 1px solid rgba(154, 172, 195, 0.3);
+  border-radius: 9px;
+  color: #a9c1dc;
+  background: rgba(12, 20, 28, 0.72);
+  font: 600 0.76rem/1 'Space Grotesk', sans-serif;
+  white-space: nowrap;
+}
+
 .trading-deck-search {
   flex: 1 1 auto;
   max-width: 420px;
@@ -2342,7 +2355,7 @@
   }
 
   .trading-deck-trade-label {
-    display: none;
+    font-size: 0.86rem;
   }
 
   .trading-deck-topbar {
