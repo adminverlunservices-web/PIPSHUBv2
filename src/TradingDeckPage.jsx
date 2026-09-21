@@ -900,7 +900,6 @@ function TradingDeckPage() {
         )}
         <header className="trading-deck-topbar">
           <div className="trading-deck-brand-wrap">
-            <span className="trading-deck-trade-label">Trading with {accountType} account</span>
             <time className="trading-deck-time" dateTime={new Date().toISOString()}>{localTime}</time>
           </div>
 

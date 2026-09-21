@@ -1098,6 +1098,34 @@
   max-width: 460px;
 }
 
+@media (max-width: 1200px) and (min-width: 961px) {
+  .trading-deck-topbar {
+    flex-wrap: wrap;
+    min-height: 124px;
+  }
+
+  .trading-deck-brand-wrap {
+    position: static;
+    transform: none;
+    flex: 1 1 auto;
+    justify-content: flex-start;
+    white-space: nowrap;
+  }
+
+  .trading-deck-search {
+    order: 3;
+    flex: 1 1 100%;
+    max-width: none;
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .trading-deck-balance-block {
+    flex: 0 1 auto;
+    max-width: 390px;
+  }
+}
+
 .balance-actions {
   display: inline-flex;
   align-items: center;
