@@ -20,7 +20,6 @@ const folderBots = Object.entries(folderBotFiles).map(([filePath, script]) => {
 const nav = [
   ['dashboard', 'Dashboard', '/'],
   ['trading-deck', 'Trading Deck', '/trading-deck'],
-  ['account', 'Account Setup', '/account'],
   ['contracts', 'Contracts', '/contracts'],
   ['builder', 'Bot Builder', '/builder'],
   ['smart', 'Smart Trading', '/smart'],
