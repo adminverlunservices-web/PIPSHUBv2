@@ -72,3 +72,79 @@
 .access-actions .primary-button{background:var(--green);color:#f2fff9}
 .access-actions .dashboard-action{background:var(--red);color:#fff}
 .access-state{display:grid;place-items:center;min-height:100vh;background:var(--paper);color:var(--muted);font:12px 'DM Mono',monospace}
+
+.sidebar{
+  width:268px;
+  padding:28px 18px 20px;
+  overflow-y:auto;
+  background:
+    radial-gradient(ellipse at 0 0,rgba(35,119,201,.2),transparent 52%),
+    linear-gradient(180deg,#15232d 0%,#101820 48%,#0d151c 100%);
+  border-right:1px solid rgba(255,255,255,.08);
+  box-shadow:16px 0 44px rgba(16,24,32,.12);
+}
+.brand{
+  display:flex;
+  align-items:baseline;
+  gap:4px;
+  padding:16px 14px;
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:16px;
+  background:rgba(255,255,255,.055);
+  box-shadow:inset 0 1px rgba(255,255,255,.06);
+  font-size:18px;
+  letter-spacing:.06em;
+}
+.brand b{color:#ff8279}
+.brand small{font-size:10px;letter-spacing:.09em}
+.sidebar .eyebrow{margin:34px 12px 12px;color:#778b98;font-size:9px}
+.sidebar nav{display:grid;gap:5px}
+.nav-link{
+  min-height:46px;
+  padding:0 14px;
+  border:1px solid transparent;
+  border-radius:12px;
+  color:#a7b6c0;
+  font-size:13px;
+  font-weight:500;
+  transition:background .18s ease,border-color .18s ease,color .18s ease,transform .18s ease;
+}
+.nav-link:hover{
+  transform:translateX(2px);
+  background:rgba(255,255,255,.055);
+  border-color:rgba(255,255,255,.07);
+  color:#fff;
+}
+.nav-link.is-active{
+  color:#fff;
+  background:linear-gradient(105deg,rgba(240,91,85,.2),rgba(240,91,85,.07));
+  border-color:rgba(240,91,85,.22);
+  box-shadow:inset 3px 0 #f4776e;
+}
+.nav-link.is-active .nav-dot{
+  border-color:#ff9a91;
+  background:#ff8279;
+  box-shadow:0 0 0 4px rgba(240,91,85,.14),0 0 12px rgba(240,91,85,.4);
+}
+.nav-dot{flex:0 0 8px;width:8px;height:8px;border-color:#526571}
+.sidebar-foot{
+  margin-top:auto;
+  padding:15px 14px;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:14px;
+  background:rgba(255,255,255,.04);
+  color:#a7b6c0;
+  line-height:1.5;
+}
+.sidebar-foot a{margin-top:12px;color:#ff9a91;font-weight:500}
+.sidebar-foot a:hover{color:#ffc0b9}
+.status-dot{box-shadow:0 0 10px rgba(85,200,158,.5)}
+.shell{margin-left:268px}
+@media(max-width:900px){
+  .sidebar{width:min(290px,calc(100vw - 48px));padding:24px 16px 18px}
+  .shell{margin-left:0}
+}
+@media(prefers-reduced-motion:reduce){
+  .nav-link{transition:none}
+  .nav-link:hover{transform:none}
+}
