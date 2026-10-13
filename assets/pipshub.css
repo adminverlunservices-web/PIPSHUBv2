@@ -515,6 +515,40 @@
   border-color:rgba(35,119,201,.35);
   background:#f1f7fc;
 }
+.shell .chart-controls select{
+  color-scheme:light;
+  border:1px solid #cbd7d0;
+  border-radius:9px;
+  background-color:#fff;
+  color:#17232b;
+  font-weight:600;
+}
+.shell .chart-controls select option{
+  background:#fff;
+  color:#17232b;
+}
+.shell .chart-controls .view-switcher{
+  padding:4px;
+  border:1px solid #d8e1dc;
+  border-radius:11px;
+  background:#edf2ef;
+}
+.shell .chart-controls .view-switcher button{
+  min-height:34px;
+  border-radius:8px;
+  color:#45564e;
+  font-size:11px;
+  font-weight:600;
+}
+.shell .chart-controls .view-switcher button:hover{
+  background:rgba(255,255,255,.72);
+  color:#17232b;
+}
+.shell .chart-controls .view-switcher button.is-active{
+  background:#fff;
+  color:#17232b;
+  box-shadow:0 1px 4px rgba(16,24,32,.12);
+}
 @media(prefers-reduced-motion:reduce){
   .shell .metric,.shell .bot-card,.shell .signal-list>div,.shell .account-row button{transition:none}
   .shell .metric:hover,.shell .bot-card:hover,.shell .signal-list>div:hover{transform:none}
