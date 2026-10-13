@@ -4,3 +4,8 @@
 .deriv-login-button{display:inline-flex;align-items:center;justify-content:center;padding:10px 14px;background:var(--green);color:#fff;border:0;font-size:12px;font-weight:600;white-space:nowrap;cursor:pointer;transition:background .2s}
 .deriv-login-button:hover{background:#107354}
 .login-error{max-width:220px;color:#b33b36;font-size:11px}
+.oauth-callback{min-height:100vh;display:grid;place-items:center;padding:24px}
+.oauth-callback .panel{width:min(480px,100%)}
+.oauth-callback h1{font-size:24px;margin-bottom:12px}
+.oauth-status,.oauth-error{line-height:1.6;color:var(--green)}
+.oauth-error{color:#b33b36}

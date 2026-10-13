@@ -7,5 +7,5 @@ export function getDerivRedirectUrl() {
 
   const appPath = window.location.pathname.replace(/index\.html$/i, '');
   const basePath = appPath.endsWith('/') ? appPath : `${appPath}/`;
-  return new URL('deriv-callback.html', `${window.location.origin}${basePath}`).href;
+  return new URL(basePath, window.location.origin).href;
 }

@@ -38,6 +38,92 @@ function encodeBase64Url(bytes) {
   return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 
+function OAuthCallback() {
+  const [status, setStatus] = useState({ type: 'pending', message: 'Completing Deriv login…' });
+
+  useEffect(() => {
+    let active = true;
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
+    const returnedState = params.get('state');
+    const oauthError = params.get('error');
+    const errorDescription = params.get('error_description');
+
+    window.history.replaceState(
+      window.history.state,
+      '',
+      `${window.location.pathname}${window.location.hash}`
+    );
+
+    const fail = (message) => {
+      sessionStorage.removeItem('deriv.oauth.state');
+      sessionStorage.removeItem('deriv.oauth.verifier');
+      sessionStorage.removeItem('deriv.oauth.app_id');
+      if (active) setStatus({ type: 'error', message });
+    };
+
+    const completeLogin = async () => {
+      if (oauthError) {
+        fail(errorDescription || `Deriv authorization failed: ${oauthError}`);
+        return;
+      }
+
+      const expectedState = sessionStorage.getItem('deriv.oauth.state');
+      const verifier = sessionStorage.getItem('deriv.oauth.verifier');
+      const appId = sessionStorage.getItem('deriv.oauth.app_id');
+      if (!code || !returnedState || returnedState !== expectedState || !verifier || !appId) {
+        fail('The login response could not be verified. Return to PIPSHUB and try again.');
+        return;
+      }
+
+      try {
+        const body = new URLSearchParams({
+          grant_type: 'authorization_code',
+          code,
+          client_id: appId,
+          redirect_uri: getDerivRedirectUrl(),
+          code_verifier: verifier,
+        });
+        const response = await fetch('https://auth.deriv.com/oauth2/token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: body.toString(),
+          cache: 'no-store',
+        });
+        const tokenData = await response.json();
+        if (!response.ok || !tokenData.access_token) {
+          throw new Error(tokenData.error_description || tokenData.error || 'Token exchange failed.');
+        }
+
+        sessionStorage.setItem('deriv.oauth.tokens', JSON.stringify(tokenData));
+        sessionStorage.removeItem('deriv.oauth.state');
+        sessionStorage.removeItem('deriv.oauth.verifier');
+        sessionStorage.removeItem('deriv.oauth.app_id');
+        if (active) {
+          setStatus({ type: 'success', message: 'Login successful. Returning to PIPSHUB…' });
+          window.location.replace(getDerivRedirectUrl());
+        }
+      } catch (error) {
+        fail(error instanceof Error ? error.message : 'Unable to complete Deriv login.');
+      }
+    };
+
+    completeLogin();
+    return () => { active = false; };
+  }, []);
+
+  return (
+    <main className="oauth-callback">
+      <section className="panel">
+        <p className="kicker">Deriv authorization</p>
+        <h1>Login with Deriv</h1>
+        <p className={status.type === 'error' ? 'oauth-error' : 'oauth-status'} role={status.type === 'error' ? 'alert' : 'status'}>{status.message}</p>
+        {status.type === 'error' && <a className="text-link" href={window.location.pathname}>Return to PIPSHUB →</a>}
+      </section>
+    </main>
+  );
+}
+
 function Layout({ route, title, children }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [loginError, setLoginError] = useState('');
@@ -67,7 +153,7 @@ function Layout({ route, title, children }) {
       sessionStorage.setItem('deriv.oauth.state', state);
       sessionStorage.setItem('deriv.oauth.verifier', verifier);
       sessionStorage.setItem('deriv.oauth.app_id', DERIV_APP_ID.trim());
-      window.open(`https://auth.deriv.com/oauth2/auth?${params.toString()}`, '_self');
+      window.location.href = `https://auth.deriv.com/oauth2/auth?${params.toString()}`;
     } catch (error) {
       setLoginError(error instanceof Error ? error.message : 'Unable to start Deriv login.');
     }
@@ -172,6 +258,9 @@ function Markets() { return <><Hero kicker="Market intelligence" heading="Read t
 
 function App() {
   const [path] = useRoute();
+  const oauthParams = new URLSearchParams(window.location.search);
+  if (oauthParams.has('code') || oauthParams.has('error')) return <OAuthCallback />;
+
   const [route, title] = routeNames[path];
   let content = <Dashboard />;
   if (path === '/builder') content = <Builder />;
