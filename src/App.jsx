@@ -33,6 +33,61 @@ const nav = [
 const routeNames = Object.fromEntries(nav.map(([key, label, path]) => [path, [key, label]]));
 routeNames['/trading-deck'] = ['trading-deck', 'VERLUN| PIPSHIB V3'];
 
+const seoMetadata = {
+  '/': {
+    title: 'Midnightpips | Deriv Trading Workspace',
+    description: 'Analyze synthetic markets, build trading strategies, and monitor live market activity in the Midnightpips Deriv workspace.',
+  },
+  '/account': {
+    title: 'Deriv Account Setup | Midnightpips',
+    description: 'Select and manage the Deriv account connected to your Midnightpips trading workspace.',
+  },
+  '/contracts': {
+    title: 'Open Deriv Contracts | Midnightpips',
+    description: 'Review and manage open Deriv contracts from your Midnightpips trading workspace.',
+  },
+  '/builder': {
+    title: 'Trading Bot Builder | Midnightpips',
+    description: 'Build a trading strategy by choosing a market, configuring a contract, and arranging entry conditions.',
+  },
+  '/markets': {
+    title: 'Synthetic Market Analysis | Midnightpips',
+    description: 'Explore synthetic market conditions and analysis tools in the Midnightpips Deriv workspace.',
+  },
+  '/bots': {
+    title: 'Deriv Trading Bots | Midnightpips',
+    description: 'Browse trading bot templates and strategies for synthetic markets in Midnightpips.',
+  },
+  '/speed': {
+    title: 'Speed Trading Bots | Midnightpips',
+    description: 'Browse lightweight trading strategies for short contract cycles in the Midnightpips workspace.',
+  },
+  '/smart': {
+    title: 'Smart Trading | Midnightpips',
+    description: 'Use clear entry signals and a repeatable workflow in the Midnightpips smart trading workspace.',
+  },
+  '/automated': {
+    title: 'Automated Trading Bots | Midnightpips',
+    description: 'Manage reusable automated strategies in the Midnightpips trading workspace.',
+  },
+  '/trading-deck': {
+    title: 'Trading Deck | Midnightpips',
+    description: 'Access the Midnightpips trading deck for live Deriv market monitoring and trade management.',
+  },
+  '/rise-fall': {
+    title: 'Rise and Fall Trading | Midnightpips',
+    description: 'Configure rise and fall contract strategies for synthetic markets in Midnightpips.',
+  },
+  '/digits': {
+    title: 'Digits Trading Strategies | Midnightpips',
+    description: 'Explore digit-based contract strategies and synthetic market entries in Midnightpips.',
+  },
+  '/accumulators': {
+    title: 'Accumulator Strategies | Midnightpips',
+    description: 'Configure accumulator strategies with stake and risk settings in the Midnightpips workspace.',
+  },
+};
+
 function useRoute() {
   const [path, setPath] = useState(() => window.location.hash.slice(1) || '/');
   useEffect(() => {
@@ -666,6 +721,16 @@ function Markets() {
 function App() {
   const [path] = useRoute();
   const [route, title] = routeNames[path];
+
+  useEffect(() => {
+    const metadata = seoMetadata[path] || seoMetadata['/'];
+    document.title = metadata.title;
+    document.querySelector('meta[name="description"]')?.setAttribute('content', metadata.description);
+    document.querySelector('meta[property="og:title"]')?.setAttribute('content', metadata.title);
+    document.querySelector('meta[property="og:description"]')?.setAttribute('content', metadata.description);
+    document.querySelector('meta[name="twitter:title"]')?.setAttribute('content', metadata.title);
+    document.querySelector('meta[name="twitter:description"]')?.setAttribute('content', metadata.description);
+  }, [path]);
 
   if (path === '/trading-deck') {
     return <TradingDeckPage />;
