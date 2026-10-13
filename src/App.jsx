@@ -67,7 +67,7 @@ function Layout({ route, title, children }) {
       sessionStorage.setItem('deriv.oauth.state', state);
       sessionStorage.setItem('deriv.oauth.verifier', verifier);
       sessionStorage.setItem('deriv.oauth.app_id', DERIV_APP_ID.trim());
-      window.location.replace(`https://auth.deriv.com/oauth2/auth?${params.toString()}`);
+      window.open(`https://auth.deriv.com/oauth2/auth?${params.toString()}`, '_self');
     } catch (error) {
       setLoginError(error instanceof Error ? error.message : 'Unable to start Deriv login.');
     }
