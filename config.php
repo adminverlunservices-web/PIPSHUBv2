@@ -1,6 +1,10 @@
 <?php
 declare(strict_types=1);
 
+const PIPSHUB_REDIRECT_URI = "https://midnight-pips.site/api/deriv-callback.js";
+
+
+
 const PIPSHUB_APP_ID = '33Qn9yJLubVP6VQ8F5MoG';
 const PIPSHUB_DERIV_APP_ID = '1089';
 const PIPSHUB_SITE = 'https://midnight-pips.site';
