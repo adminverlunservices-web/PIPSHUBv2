@@ -66,6 +66,12 @@ function Layout({ route, title, children }) {
         </header>
         {children}
       </main>
+      {!connected && (
+        <a className="floating-login-button" href={`${API_BASE_URL}/api/deriv-login.js`}>
+          <span className="floating-login-icon">D</span>
+          Login with Deriv
+        </a>
+      )}
     </>
   );
 }
