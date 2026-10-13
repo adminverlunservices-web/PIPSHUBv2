@@ -34,9 +34,9 @@ Public tick data does not require OAuth credentials. Starting Deriv login requir
 
 ## Main workspace Deriv login
 
-The App ID and redirect URI are configured in `ceccuro_servo/cred.php`; `ceccuro_servo/cred.js` supplies the same values to the frontend login button. Open the app through a web server, not `file://`. On localhost the callback is built under the current app path; on the configured hosted origin the configured callback is used. Register each exact callback URL in your Deriv app. The callback at `api/deriv-callback.php` requires a PHP-enabled host (GitHub Pages alone cannot run it).
+Set the public Deriv App ID in `ceccuro_servo/cred.js`. The redirect URI is generated on the current app origin and path as `deriv-callback.html`, so the same static callback works on Vercel and GitHub Pages. Open the app through a web server, not `file://`. Register the exact callback URL for each deployment in your Deriv app; for GitHub Pages this includes the repository path when using a project site. The old PHP callback is not used by this static flow.
 
-The Login with Deriv button navigates in the same tab to Deriv's authorization page using the configured callback URL. After authorization, the callback validates the returned state, exchanges the code, stores the token response in the current browser session, and redirects to the PIPSHUB app root. Account-backed trading is not enabled in the main workspace.
+The Login with Deriv button navigates in the same tab to Deriv's authorization page. After authorization, the static callback validates the returned state, exchanges the code, stores the token response in the current browser session, and redirects to the PIPSHUB app root. Account-backed trading is not enabled in the main workspace.
 
 ## Rise/Fall app
 
