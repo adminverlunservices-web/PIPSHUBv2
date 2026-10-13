@@ -45,7 +45,7 @@ function Layout({ route, title, children }) {
         <header className="topbar">
           <button className="icon-button menu-button" onClick={() => setMenuOpen((open) => !open)} aria-label="Open menu">☰</button>
           <div><p className="eyebrow">VERLUN / PIPSHUB</p><h1>{title}</h1></div>
-          <div className="top-actions"><span className="connection"><i /> Live gateway</span></div>
+          <div className="top-actions"><span className="connection"><i /> Live gateway</span><a className="deriv-login-button" href="https://app.deriv.com/" target="_blank" rel="noreferrer">Login with Deriv</a></div>
         </header>
         {children}
       </main>
