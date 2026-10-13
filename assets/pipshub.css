@@ -403,7 +403,7 @@
   line-height:1.45;
 }
 .shell .panel{
-  overflow:hidden;
+  overflow:visible;
   border-radius:19px;
   background:
     radial-gradient(ellipse at 100% 0,rgba(35,119,201,.035),transparent 38%),
@@ -437,6 +437,7 @@
 }
 .shell .bot-card{
   min-height:210px;
+  overflow:visible;
   border-radius:17px;
   padding:22px;
 }
@@ -473,12 +474,13 @@
 }
 .shell .quick-row a{
   position:relative;
-  overflow:hidden;
+  overflow:visible;
   border-color:rgba(25,43,54,.08);
   box-shadow:0 2px 7px rgba(16,24,32,.025);
 }
 .shell .quick-row a::after{
   position:absolute;
+  z-index:0;
   right:-32px;
   bottom:-40px;
   width:110px;
@@ -491,6 +493,13 @@
 }
 .shell .quick-row b{font-size:14px}
 .shell .quick-row small{line-height:1.45}
+.shell .quick-row a > *{position:relative;z-index:1;min-width:0}
+.shell :is(.panel,.bot-card,.metric,.quick-row a){min-width:0}
+.shell :is(.panel-heading h3,.bot-card h3,.bot-card p,.metric span,.metric small,.quick-row b,.quick-row small,.account-row small){
+  overflow-wrap:anywhere;
+  word-break:normal;
+}
+.shell .panel-heading > div,.shell .bot-card > *,.shell .account-row > div{min-width:0}
 .shell .account-row{
   margin:0 -10px;
   padding:16px 10px;
