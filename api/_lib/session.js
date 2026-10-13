@@ -50,7 +50,7 @@ export function cors(res) {
 export async function derivRequest(path, token, options = {}) {
   const response = await fetch(`https://api.derivws.com/trading/v1/options/${path}`, {
     ...options,
-    headers: { Accept: 'application/json', Authorization: `Bearer ${token}`, 'Deriv-App-ID': process.env.DERIV_CLIENT_ID, ...(options.headers || {}) },
+    headers: { Accept: 'application/json', Authorization: `Bearer ${token}`, 'Deriv-App-ID': process.env.DERIV_APP_ID || '1089', ...(options.headers || {}) },
   });
   const data = await response.json().catch(() => null);
   if (!response.ok || !data) throw new Error(`Deriv account service rejected the request (${response.status}).`);
