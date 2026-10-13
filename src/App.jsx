@@ -153,7 +153,20 @@ function Layout({ route, title, children }) {
       sessionStorage.setItem('deriv.oauth.state', state);
       sessionStorage.setItem('deriv.oauth.verifier', verifier);
       sessionStorage.setItem('deriv.oauth.app_id', DERIV_APP_ID.trim());
-      window.location.href = `https://auth.deriv.com/oauth2/auth?${params.toString()}`;
+      const form = document.createElement('form');
+      form.method = 'get';
+      form.action = 'https://auth.deriv.com/oauth2/auth';
+      form.target = '_self';
+      form.hidden = true;
+      for (const [name, value] of params) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = name;
+        input.value = value;
+        form.appendChild(input);
+      }
+      document.body.appendChild(form);
+      form.submit();
     } catch (error) {
       setLoginError(error instanceof Error ? error.message : 'Unable to start Deriv login.');
     }
