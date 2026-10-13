@@ -1,11 +1,11 @@
 import { cloneElement, useEffect, useRef, useState } from 'react';
 import TradingDeckPage from './TradingDeckPage';
-import { API_BASE_URL, apiUrl } from './config';
+import { apiUrl } from './config';
 import { sampleBots } from './sampleBots';
 
-const derivLoginUrl = API_BASE_URL ? `${API_BASE_URL}/api/deriv-login.js` : 'deriv/login.php';
-const derivLogoutUrl = API_BASE_URL ? `${API_BASE_URL}/api/logout.js` : 'deriv/logout.php';
-const derivSessionUrl = API_BASE_URL ? apiUrl('api/deriv-session.js') : 'deriv/session.php';
+const derivLoginUrl = apiUrl('api/deriv-login.js');
+const derivLogoutUrl = apiUrl('api/logout.js');
+const derivSessionUrl = apiUrl('api/deriv-session.js');
 
 const folderBotFiles = import.meta.glob('../bots/bots/*.xml', { query: '?raw', import: 'default', eager: true });
 const folderBots = Object.entries(folderBotFiles).map(([filePath, script]) => {
@@ -127,7 +127,7 @@ function Layout({ route, title, children }) {
   useEffect(() => {
     let active = true;
 
-    fetch(derivSessionUrl, { credentials: 'same-origin' })
+    fetch(derivSessionUrl, { credentials: 'include' })
       .then((response) => response.json().then((data) => ({ ok: response.ok, data })))
       .then(({ ok, data }) => {
         if (active) setConnected(Boolean(ok && data.connected));
