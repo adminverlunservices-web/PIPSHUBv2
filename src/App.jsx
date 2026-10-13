@@ -43,18 +43,20 @@ function Layout({ route, title, children }) {
   const [loginError, setLoginError] = useState('');
 
   const loginWithDeriv = async () => {
+    setLoginError('');
     if (!DERIV_APP_ID.trim()) {
       setLoginError('Add your Deriv App ID in ceccuro_servo/cred.js.');
       return;
     }
 
     try {
+      const redirectUri = getDerivRedirectUrl();
       const verifier = encodeBase64Url(crypto.getRandomValues(new Uint8Array(32)));
       const state = encodeBase64Url(crypto.getRandomValues(new Uint8Array(32)));
       const challengeBytes = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier));
       const params = new URLSearchParams({
         client_id: DERIV_APP_ID.trim(),
-        redirect_uri: getDerivRedirectUrl(),
+        redirect_uri: redirectUri,
         response_type: 'code',
         scope: 'trade account_manage',
         state,
@@ -76,7 +78,7 @@ function Layout({ route, title, children }) {
         <Link className="brand" href="/"><span>VERLUN</span><b>|</b><small>PIPSHUB</small></Link>
         <p className="eyebrow">Trading workspace</p>
         <nav>{nav.map(([key, label, href]) => <Link key={key} className={`nav-link ${route === key ? 'is-active' : ''}`} href={href} onClick={() => setMenuOpen(false)}><span className="nav-dot" />{label}</Link>)}</nav>
-        <div className="sidebar-foot"><span className="status-dot" /><span>Deriv link ready</span><a href="https://t.me/derivdominator" target="_blank" rel="noreferrer">Community ↗</a></div>
+        <div className="sidebar-foot"><span className="status-dot" /><span>Deriv link ready</span></div>
       </aside>
       <main className="shell">
         <header className="topbar">

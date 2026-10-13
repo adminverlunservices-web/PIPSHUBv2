@@ -14,10 +14,39 @@ if (!isset($appID, $redirectURI) || trim($appID) === '' || filter_var($redirectU
     exit('Deriv OAuth configuration is missing or invalid.');
 }
 
+$requestHost = $_SERVER['HTTP_HOST'] ?? '';
+$callbackPath = $_SERVER['SCRIPT_NAME'] ?? '';
+if (!preg_match('/\A[a-zA-Z0-9.-]+(?::[0-9]{1,5})?\z/', $requestHost) || $callbackPath === '') {
+    http_response_code(400);
+    exit('Invalid callback request.');
+}
+
+$hostName = strtolower(preg_replace('/:[0-9]+$/', '', $requestHost));
+$configuredHost = strtolower((string) parse_url($redirectURI, PHP_URL_HOST));
+$configuredPath = parse_url($redirectURI, PHP_URL_PATH);
+$isLocalhost = $hostName === 'localhost' || $hostName === '127.0.0.1';
+if ($isLocalhost) {
+    $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $effectiveRedirectUri = $scheme . '://' . $requestHost . $callbackPath;
+} elseif ($hostName === $configuredHost && $callbackPath === $configuredPath) {
+    $effectiveRedirectUri = trim($redirectURI);
+} else {
+    http_response_code(400);
+    exit('This callback host or path does not match the configured Deriv redirect URI.');
+}
+
+$appPath = dirname(dirname($callbackPath));
+if ($appPath === DIRECTORY_SEPARATOR || $appPath === '.') {
+    $appPath = '';
+}
+$redirectScheme = (string) parse_url($effectiveRedirectUri, PHP_URL_SCHEME);
+$returnUrl = $redirectScheme . '://' . $requestHost . rtrim(str_replace(DIRECTORY_SEPARATOR, '/', $appPath), '/') . '/';
+
 $config = json_encode(
     [
         'appId' => trim($appID),
-        'redirectUri' => trim($redirectURI),
+        'redirectUri' => $effectiveRedirectUri,
+        'returnUrl' => $returnUrl,
     ],
     JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
 );
@@ -93,7 +122,7 @@ $config = json_encode(
           sessionStorage.removeItem('deriv.oauth.state');
           sessionStorage.removeItem('deriv.oauth.verifier');
           statusElement.textContent = 'Login successful. Returning to PIPSHUB…';
-          window.location.replace(new URL('../', window.location.href).href);
+          window.location.replace(config.returnUrl);
         } catch (error) {
           sessionStorage.removeItem('deriv.oauth.state');
           sessionStorage.removeItem('deriv.oauth.verifier');
