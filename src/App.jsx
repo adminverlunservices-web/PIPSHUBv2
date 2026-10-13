@@ -85,15 +85,15 @@ function Layout({ route, title, children }) {
   return (
     <>
       <aside className={`sidebar ${menuOpen ? 'open' : ''}`}>
-        <Link className="brand" href="/"><span>VERLUN</span><b>|</b><small> PIPSHIB V3</small></Link>
-        <p className="eyebrow">VERLUN| PIPSHIB V3</p>
+        <Link className="brand" href="/"><span>Midnightpips</span></Link>
+        <p className="eyebrow">Midnightpips</p>
         <nav>{nav.filter(([key]) => key !== 'smart').map(([key, label, href]) => <Link key={key} className={`nav-link ${route === key ? 'is-active' : ''}`} href={href} onClick={() => setMenuOpen(false)}><span className="nav-dot" />{label}</Link>)}</nav>
         <div className="sidebar-foot"><span className="status-dot" /><span>Deriv link ready</span><a href="https://t.me/derivdominator" target="_blank" rel="noreferrer">Community ↗</a></div>
       </aside>
       <main className="shell">
         <header className="topbar">
           <button className="icon-button menu-button" onClick={() => setMenuOpen((open) => !open)} aria-label="Open menu">☰</button>
-          <div><p className="eyebrow">VERLUN| PIPSHIB V3</p><h1>{title}</h1></div>
+          <div><p className="eyebrow">Midnightpips</p><h1>{title}</h1></div>
           <div className="top-actions"><span className="connection"><i /> {connected ? 'Deriv connected' : 'Live gateway'}</span>{connected ? <><span className="login-button is-connected" style={{ background: '#238b68', color: '#f2fff9' }}>Deriv Connected</span><a className="login-button" href={`${API_BASE_URL}/api/logout.js`}>Logout</a></> : <a className="login-button" href={`${API_BASE_URL}/api/deriv-login.js`}>Connect Deriv</a>}</div>
         </header>
         {children}
