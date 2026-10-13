@@ -1,6 +1,6 @@
 # PIPSHUB
 
-PIPSHUB is a React/Vite trading workspace for public Deriv market data and strategy templates. The main workspace no longer includes a Deriv login flow or account-backed trading.
+PIPSHUB is a React/Vite trading workspace for public Deriv market data and strategy templates. The main workspace includes a Deriv OAuth login entry point; account-backed trading is not enabled.
 
 ## Stack
 
@@ -30,7 +30,13 @@ The production bundle is written to `react-dist/`. Deploy the repository to Verc
 
 For Vercel, the included `vercel.json` points the deployment output to `react-dist/`.
 
-The main workspace uses public Deriv tick data and does not require OAuth credentials or session configuration.
+Public tick data does not require OAuth credentials. Starting Deriv login requires the App ID configured below.
+
+## Main workspace Deriv login
+
+Set `DERIV_APP_ID` in `ceccuro_servo/cred.js` to your public Deriv App ID. The redirect URI is built from the current page URL so the same source works on XAMPP and GitHub Pages. Register the exact local and hosted page URLs as redirect URIs in your Deriv app before building/deploying.
+
+The Login with Deriv button starts an OAuth authorization-code flow with PKCE. This workspace does not yet exchange the returned code for tokens or enable account-backed trading.
 
 ## Rise/Fall app
 

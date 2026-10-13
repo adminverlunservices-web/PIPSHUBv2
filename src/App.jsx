@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { BOT_URL, DIGITS_URL, RISE_FALL_URL } from './config';
+import { DERIV_APP_ID, getDerivRedirectUrl } from '../ceccuro_servo/cred';
 
 const nav = [
   ['dashboard', 'Dashboard', '/'],
@@ -31,8 +32,44 @@ function Link({ href, children, className = '', onClick }) {
   return <a className={className} href={external ? href : `#${href}`} onClick={onClick}>{children}</a>;
 }
 
+function encodeBase64Url(bytes) {
+  let binary = '';
+  bytes.forEach((byte) => { binary += String.fromCharCode(byte); });
+  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
 function Layout({ route, title, children }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [loginError, setLoginError] = useState('');
+
+  const loginWithDeriv = async () => {
+    if (!DERIV_APP_ID.trim()) {
+      setLoginError('Add your Deriv App ID in ceccuro_servo/cred.js.');
+      return;
+    }
+
+    try {
+      const verifier = encodeBase64Url(crypto.getRandomValues(new Uint8Array(32)));
+      const state = encodeBase64Url(crypto.getRandomValues(new Uint8Array(32)));
+      const challengeBytes = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier));
+      const params = new URLSearchParams({
+        client_id: DERIV_APP_ID.trim(),
+        redirect_uri: getDerivRedirectUrl(),
+        response_type: 'code',
+        scope: 'trade account_manage',
+        state,
+        code_challenge: encodeBase64Url(new Uint8Array(challengeBytes)),
+        code_challenge_method: 'S256',
+      });
+
+      sessionStorage.setItem('deriv.oauth.state', state);
+      sessionStorage.setItem('deriv.oauth.verifier', verifier);
+      window.location.assign(`https://auth.deriv.com/oauth2/auth?${params.toString()}`);
+    } catch (error) {
+      setLoginError(error instanceof Error ? error.message : 'Unable to start Deriv login.');
+    }
+  };
+
   return (
     <>
       <aside className={`sidebar ${menuOpen ? 'open' : ''}`}>
@@ -45,7 +82,7 @@ function Layout({ route, title, children }) {
         <header className="topbar">
           <button className="icon-button menu-button" onClick={() => setMenuOpen((open) => !open)} aria-label="Open menu">☰</button>
           <div><p className="eyebrow">VERLUN / PIPSHUB</p><h1>{title}</h1></div>
-          <div className="top-actions"><span className="connection"><i /> Live gateway</span><a className="deriv-login-button" href="https://app.deriv.com/" target="_blank" rel="noreferrer">Login with Deriv</a></div>
+          <div className="top-actions"><span className="connection"><i /> Live gateway</span><button className="deriv-login-button" type="button" onClick={loginWithDeriv}>Login with Deriv</button>{loginError && <span className="login-error" role="alert">{loginError}</span>}</div>
         </header>
         {children}
       </main>
