@@ -49,4 +49,4 @@ The same navigation exposes the attached Digits and Deriv Bot apps. Deploy them 
 
 ## Repository notes
 
-Standalone Deriv apps under `deriv/` are separate deployments and retain their own authentication configuration. They are not part of the main workspace login flow.
+Standalone Deriv apps under `deriv/` are separate deployments and retain their own authentication configuration. They are not part of the main workspace login flow. The obsolete legacy router that wrote user data to a remote database has been removed.
