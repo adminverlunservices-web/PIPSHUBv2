@@ -3,6 +3,10 @@ import TradingDeckPage from './TradingDeckPage';
 import { API_BASE_URL, apiUrl } from './config';
 import { sampleBots } from './sampleBots';
 
+const derivLoginUrl = API_BASE_URL ? `${API_BASE_URL}/api/deriv-login.js` : 'deriv/login.php';
+const derivLogoutUrl = API_BASE_URL ? `${API_BASE_URL}/api/logout.js` : 'deriv/logout.php';
+const derivSessionUrl = API_BASE_URL ? apiUrl('api/deriv-session.js') : 'deriv/session.php';
+
 const folderBotFiles = import.meta.glob('../bots/bots/*.xml', { query: '?raw', import: 'default', eager: true });
 const folderBots = Object.entries(folderBotFiles).map(([filePath, script]) => {
   const fileName = filePath.split('/').pop()?.replace(/\.xml$/i, '').trim() || 'XML bot';
@@ -123,7 +127,7 @@ function Layout({ route, title, children }) {
   useEffect(() => {
     let active = true;
 
-    fetch(apiUrl('api/deriv-session.js'), { credentials: 'include' })
+    fetch(derivSessionUrl, { credentials: 'same-origin' })
       .then((response) => response.json().then((data) => ({ ok: response.ok, data })))
       .then(({ ok, data }) => {
         if (active) setConnected(Boolean(ok && data.connected));
@@ -149,7 +153,7 @@ function Layout({ route, title, children }) {
         <header className="topbar">
           <button className="icon-button menu-button" onClick={() => setMenuOpen((open) => !open)} aria-label="Open menu">☰</button>
           <div><p className="eyebrow">Midnightpips</p><h1>{title}</h1></div>
-          <div className="top-actions"><span className="connection"><i /> {connected ? 'Deriv connected' : 'Live gateway'}</span>{connected ? <><span className="login-button is-connected" style={{ background: '#238b68', color: '#f2fff9' }}>Deriv Connected</span><a className="login-button" href={`${API_BASE_URL}/api/logout.js`}>Logout</a></> : <a className="login-button" href={`${API_BASE_URL}/api/deriv-login.js`}>Connect Deriv</a>}</div>
+          <div className="top-actions"><span className="connection"><i /> {connected ? 'Deriv connected' : 'Live gateway'}</span>{connected ? <><span className="login-button is-connected" style={{ background: '#238b68', color: '#f2fff9' }}>Deriv Connected</span><a className="login-button" href={derivLogoutUrl}>Logout</a></> : <a className="login-button" href={derivLoginUrl}>Connect Deriv</a>}</div>
         </header>
         {children}
       </main>
@@ -184,7 +188,7 @@ function TradingDeckGate() {
         <h1>Please Login first to Continue.</h1>
         <div className="access-sad-face" role="img" aria-label="Login required">😞</div>
         <div className="access-actions">
-          <a className="primary-button" href={`${API_BASE_URL}/api/deriv-login.js`}>Connect Deriv <span>→</span></a>
+          <a className="primary-button" href={derivLoginUrl}>Connect Deriv <span>→</span></a>
           <a className="primary-button dashboard-action" href="#/">Dashboard</a>
         </div>
       </section>
